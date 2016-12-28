@@ -1,0 +1,8 @@
+--source include/have_innodb.inc
+
+########################################################################
+# Bug #917246: Unintentional change of innodb_version format in 5.1.60
+########################################################################
+
+--replace_regex /5\.5\.[0-9]+-[0-9]+\.[0-9]+/5.5.x-x.x/
+SELECT @@innodb_version;

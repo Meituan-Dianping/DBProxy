@@ -1,0 +1,72 @@
+#case-sensitive
+
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+
+#case1: admin
+connection conn0;
+select * from pwds;
+alter admin user Abc:Abc;
+select * from pwds;
+--error 1045
+connect (conn1, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+--error 1045
+connect (conn2, 127.0.0.1, abc, 'Abc', '*NO-ONE*', 6018);
+--error 1045
+connect (conn3, 127.0.0.1, Abc, 'abc', '*NO-ONE*', 6018);
+
+connect (conn4, 127.0.0.1, Abc, 'Abc', '*NO-ONE*', 6018);
+connection conn4;
+alter admin user dbproxy_test:123456;
+select * from pwds;
+
+#case2: user
+connection conn0;
+select * from pwds;
+connect (conn5, 127.0.0.1, dbproxy_test, '123456', 'test', 6003);
+connection conn5;
+#select version();
+
+connection conn0;
+add pwd Def:Def;
+select * from pwds;
+
+--error 1045
+connect (conn6, 127.0.0.1, Def, 'def', 'test', 6003);
+--error 1045
+connect (conn7, 127.0.0.1, def, 'Def', 'test', 6003);
+
+connect (conn8, 127.0.0.1, Def, 'Def', 'test', 6003);
+connection conn8;
+#select version();
+
+connection conn0;
+--error 1105
+remove pwd def;
+
+remove pwd Def;
+select * from pwds;
+
+add enpwd Def:hC+0;
+select * from pwds;
+
+--error 1045
+connect (conn9, 127.0.0.1, Def, 'def', 'test', 6003);
+--error 1045
+connect (conn10, 127.0.0.1, def, 'Def', 'test', 6003);
+
+connect (conn11, 127.0.0.1, Def, 'Def', 'test', 6003);
+connection conn11;
+#select version();
+
+connection conn0;
+--error 1105
+remove pwd def;
+
+remove pwd Def;
+select * from pwds;
+
+#case3: monitor
+connection conn0;
+show variables like 'backend-monitor-pwds';
+set backend-monitor-pwds = Abc:Abc;
+show variables like 'backend-monitor-pwds';

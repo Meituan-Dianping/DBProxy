@@ -1,0 +1,36 @@
+SELECT 'connection_one';
+connection_one
+connection_one
+SELECT 'connection_two';
+connection_two
+connection_two
+SELECT 'connection_three';
+connection_three
+connection_three
+SELECT 'connection_one';
+connection_one
+connection_one
+SELECT 'connection_two';
+connection_two
+connection_two
+SELECT 'connection_three';
+connection_three
+connection_three
+SELECT 'connection_one';
+connection_one
+connection_one
+SELECT 'connection_two';
+connection_two
+connection_two
+SELECT 'connection_three';
+connection_three
+connection_three
+SELECT 'connection_one';
+connection_one
+connection_one
+SELECT 'connection_two';
+connection_two
+connection_two
+SELECT 'connection_three';
+connection_three
+connection_three

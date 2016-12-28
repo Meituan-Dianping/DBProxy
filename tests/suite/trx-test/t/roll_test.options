@@ -1,0 +1,8 @@
+
+roll_test_options = {
+	["event-threads"]					= 1
+	}
+
+
+
+start_proxy("roll_test", roll_test_options)

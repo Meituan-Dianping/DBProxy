@@ -1,0 +1,112 @@
+###############################################
+#                                             #
+#   Prepared Statements                       #
+#   re-testing bug DB entries                 #
+#                                             #
+# The bugs are reported as "closed".          #
+# Command sequences taken from bug report.    #
+# No other test contains the bug# as comment. #
+#                                             #
+# Tests drop/create tables 't1', 't2', ...    #
+#                                             #
+###############################################
+
+--disable_warnings
+drop table if exists t1, t2;
+--enable_warnings
+
+# bug#1180: optimized away part of WHERE clause cause incorect prepared satatement results
+
+CREATE TABLE t1(session_id  char(9) NOT NULL);
+INSERT INTO t1 VALUES ("abc");
+SELECT * FROM t1;
+
+
+# Must not find a row
+
+# Now, it should find one row
+
+# Back to non-matching
+
+drop table t1;
+
+# end of bug#1180
+
+
+# bug#1644: Insertion of more than 3 NULL columns with parameter binding fails
+
+# Using prepared statements, insertion of more than three columns with NULL
+# values fails to insert additional NULLS.  After the third column NULLS will
+# be inserted into the database as zeros.
+# First insert four columns of a value (i.e. 22) to verify binding is working
+# correctly.  Then Bind to each columns bind parameter an is_null value of 1.
+# Then insert four more columns of integers, just for sanity.
+# A subsequent select on the server will result in this:
+# mysql> select * from foo_dfr;
+# +------+------+------+------+
+# | col1 | col2 | col3 | col4 |
+# +------+------+------+------+
+# |   22 |   22 |   22 |   22 |
+# | NULL | NULL | NULL |    0 |
+# |   88 |   88 |   88 |   88 |
+# +------+------+------+------+
+
+# Test is extended to more columns - code stores bit vector in bytes.
+
+create table t1 (
+  c_01 char(6), c_02 integer, c_03 real, c_04 int(3), c_05 varchar(20),
+  c_06 date,    c_07 char(1), c_08 real, c_09 int(11), c_10 time,
+  c_11 char(6), c_12 integer, c_13 real, c_14 int(3), c_15 varchar(20),
+  c_16 date,    c_17 char(1), c_18 real, c_19 int(11), c_20 text);
+# Do not use "timestamp" type, because it has a non-NULL default as of 4.1.2
+
+select * from t1;
+
+drop table t1;
+
+# end of bug#1644
+
+
+# bug#1676: Prepared statement two-table join returns no rows when one is expected
+
+create table t1(
+   cola varchar(50) not null,
+   colb varchar(8) not null,
+   colc varchar(12) not null,
+   cold varchar(2) not null,
+   primary key (cola, colb, cold));
+
+create table t2(
+   cola varchar(50) not null,
+   colb varchar(8) not null,
+   colc varchar(2) not null,
+   cold float,
+   primary key (cold));
+
+insert into t1 values ('aaaa', 'yyyy', 'yyyy-dd-mm', 'R');
+
+insert into t2 values ('aaaa', 'yyyy', 'R', 203), ('bbbb', 'zzzz', 'C', 201);
+
+
+
+
+drop table t1, t2;
+
+# end of bug#1676
+
+# End of 4.1 tests
+
+# bug#18492: mysqld reports ER_ILLEGAL_REFERENCE in --ps-protocol
+
+create table t1 (a int primary key);
+insert into t1 values (1);
+
+explain select * from t1 where 3 in (select (1+1) union select 1);
+
+select * from t1 where 3 in (select (1+1) union select 1);
+
+
+drop table t1;
+
+
+--echo End of 5.0 tests.

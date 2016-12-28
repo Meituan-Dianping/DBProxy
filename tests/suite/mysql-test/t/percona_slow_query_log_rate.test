@@ -1,0 +1,19 @@
+# Force deterministic session and query ids
+
+let $old_long_query_time=`SELECT @@global.long_query_time`;
+let $old_log_slow_rate_type=`SELECT @@global.log_slow_rate_type`;
+let $old_log_slow_rate_limit=`SELECT @@global.log_slow_rate_limit`;
+let $old_slow_query_log_always_write_time=`SELECT @@global.slow_query_log_always_write_time`;
+
+
+--let log_file=percona.slow_extended.log_slow_rate_limit_1
+--source include/percona_slow_query_log_rate.inc
+
+# This is restart is necessary because of the variable possible number of session
+# disconnect checks at the end of the previous test
+
+--let log_file=percona.slow_extended.log_slow_rate_limit_2
+--source include/percona_slow_query_log_rate.inc
+
+--disable_query_log
+--enable_query_log

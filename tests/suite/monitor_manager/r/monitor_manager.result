@@ -1,0 +1,210 @@
+show variables like 'access-num-per-time-window';
+Variable_name	Group	Value	Set mode
+access-num-per-time-window	main	5	Dynamic
+show variables like 'admin-address';
+Variable_name	Group	Value	Set mode
+admin-address	admin	0.0.0.0:6018	Static
+show variables like 'admin-password';
+Variable_name	Group	Value	Set mode
+admin-password	admin	8XjhBQKd	Dynamic
+show variables like 'admin-username';
+Variable_name	Group	Value	Set mode
+admin-username	admin	dbproxy_test	Dynamic
+show variables like 'auto-filter-flag';
+Variable_name	Group	Value	Set mode
+auto-filter-flag	main	OFF	Dynamic
+show variables like 'backend-max-thread-running';
+Variable_name	Group	Value	Set mode
+backend-max-thread-running	main	0	Dynamic
+show variables like 'backend-monitor-pwds';
+Variable_name	Group	Value	Set mode
+backend-monitor-pwds	main		Dynamic
+show variables like 'basedir';
+Variable_name	Group	Value	Set mode
+basedir	main	/usr/local/mysql-proxy	Static
+show variables like 'blacklist-file';
+Variable_name	Group	Value	Set mode
+blacklist-file	main	/usr/local/mysql-proxy/conf/blacklist.dat	Dynamic
+show variables like 'check-state-conn-timeout';
+Variable_name	Group	Value	Set mode
+check-state-conn-timeout	proxy	1	Dynamic
+show variables like 'check-state-interval';
+Variable_name	Group	Value	Set mode
+check-state-interval	proxy	4	Dynamic
+show variables like 'daemon';
+Variable_name	Group	Value	Set mode
+daemon	main	TRUE	Static
+show variables like 'db-connection-idle-timeout';
+Variable_name	Group	Value	Set mode
+db-connection-idle-timeout	main	3600(s)	Dynamic
+show variables like 'db-connection-max-age';
+Variable_name	Group	Value	Set mode
+db-connection-max-age	main	7200(s)	Dynamic
+show variables like 'event-threads';
+Variable_name	Group	Value	Set mode
+event-threads	main	8	Static
+show variables like 'instance';
+Variable_name	Group	Value	Set mode
+instance	main	default_test	Static
+show variables like 'keepalive';
+Variable_name	Group	Value	Set mode
+keepalive	main	FALSE	Static
+show variables like 'lastest-query-num';
+Variable_name	Group	Value	Set mode
+lastest-query-num	main	0	Dynamic
+show variables like 'log-level';
+Variable_name	Group	Value	Set mode
+log-level	main	message	Dynamic
+show variables like 'log-path';
+Variable_name	Group	Value	Set mode
+log-path	main	/usr/local/mysql-proxy/log/	Static
+show variables like 'log-trace-modules';
+Variable_name	Group	Value	Set mode
+log-trace-modules	main	0	Dynamic
+show variables like 'long-query-time';
+Variable_name	Group	Value	Set mode
+long-query-time	main	0(ms)	Dynamic
+show variables like 'long-wait-time';
+Variable_name	Group	Value	Set mode
+long-wait-time	main	0(ms)	Dynamic
+show variables like 'manual-filter-flag';
+Variable_name	Group	Value	Set mode
+manual-filter-flag	main	OFF	Dynamic
+show variables like 'max-connections';
+Variable_name	Group	Value	Set mode
+max-connections	main	0	Dynamic
+show variables like 'max-open-files';
+Variable_name	Group	Value	Set mode
+max-open-files	main	1000000	Static
+show variables like 'percentile';
+Variable_name	Group	Value	Set mode
+percentile	proxy	2	Static
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	OFF	Dynamic
+show variables like 'percentile-value';
+Variable_name	Group	Value	Set mode
+percentile-value	proxy	64	Dynamic
+show variables like 'plugins';
+Variable_name	Group	Value	Set mode
+plugins	main	proxy, admin	Static
+show variables like 'proxy-address';
+Variable_name	Group	Value	Set mode
+proxy-address	proxy	0.0.0.0:6003	Static
+show variables like 'query-filter-frequent-threshold';
+Variable_name	Group	Value	Set mode
+query-filter-frequent-threshold	main	0.000000	Dynamic
+show variables like 'query-filter-time-threshold';
+Variable_name	Group	Value	Set mode
+query-filter-time-threshold	main	-1	Dynamic
+show variables like 'query-response-time-range-base';
+Variable_name	Group	Value	Set mode
+query-response-time-range-base	main	2	Dynamic
+show variables like 'query-response-time-stats';
+Variable_name	Group	Value	Set mode
+query-response-time-stats	main	1	Dynamic
+show variables like 'remove-backend-timeout';
+Variable_name	Group	Value	Set mode
+remove-backend-timeout	main	3600(s)	Dynamic
+show variables like 'select-where-limit';
+Variable_name	Group	Value	Set mode
+select-where-limit	proxy	OFF	Dynamic
+show variables like 'shutdown-timeout';
+Variable_name	Group	Value	Set mode
+shutdown-timeout	main	1(s)	Dynamic
+show variables like 'sql-log';
+Variable_name	Group	Value	Set mode
+sql-log	proxy	REALTIME	Dynamic
+show variables like 'sql-log-buffer-size';
+Variable_name	Group	Value	Set mode
+sql-log-buffer-size	proxy	10000	Dynamic
+show variables like 'sql-log-file-num';
+Variable_name	Group	Value	Set mode
+sql-log-file-num	proxy	0	Dynamic
+show variables like 'sql-log-file-size';
+Variable_name	Group	Value	Set mode
+sql-log-file-size	proxy	0	Dynamic
+show variables like 'sql-log-mode';
+Variable_name	Group	Value	Set mode
+sql-log-mode	proxy	BACKEND	Dynamic
+show variables like 'sql-log-slow-ms';
+Variable_name	Group	Value	Set mode
+sql-log-slow-ms	proxy	0(ms)	Dynamic
+show variables like 'thread-running-sleep-delay';
+Variable_name	Group	Value	Set mode
+thread-running-sleep-delay	main	1(ms)	Dynamic
+show variables like 'user';
+Variable_name	Group	Value	Set mode
+user	main		Static
+show variables like 'wait-timeout';
+Variable_name	Group	Value	Set mode
+wait-timeout	main	0(s)	Dynamic
+show proxy status;
+Variable_name	Value
+DB_connections_cached	0
+Net_client_read_packets	50
+Net_server_write_packets	0
+DB_connections	0
+Percentile	2
+Com_query_write	0
+Aborted_clients	0
+Closed_clients	0
+Com_query_read	0
+Com_query_read_sent	0
+Net_server_write	0
+Max_connections	0
+Connections	2
+Net_client_read	2200
+Max_used_connections	2
+Aborted_connects	0
+Slow_query_total_time	0
+Net_server_read_packets	0
+Attempted_connects	1
+Net_server_read	0
+Threads_running	0
+Slow_query	0
+Com_query_write_sent	0
+Net_client_write_packets	51
+Net_client_write	9529
+Com_other	0
+Com_other_sent	0
+show events waits status;
+event_name	waits	slow_waits	min_wait_time	max_wait_time	total_wait_time	total_slow_wait_time
+Waiting server connect	0	0	0	0	0	0
+show query_response_time;
+time	type	count	total	min_time	max_time
+ALL	read	0	0	0	0
+ALL	write	0	0	0	0
+ALL	other	0	0	0	0
+show lastest_queries;
+query_rewrite	fist_access_time	last_access_time	query_times	lastest_query_times
+show blacklists;
+filter_hashcode	filter	is_enabled	filter_status	hit_times
+set percentile-switch = ON;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	ON	Dynamic
+set percentile-value = 95;
+status
+show variables like 'percentile-value';
+Variable_name	Group	Value	Set mode
+percentile-value	proxy	95	Dynamic
+show percentile;
+percentile(μs)
+64.000000
+show percentile 1m;
+percentile(μs)
+64.000000
+show percentile 5h;
+percentile(μs)
+64.000000
+show percentile 1;
+ERROR 07000: invalid operation value: 1
+set percentile-switch = OFF;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	OFF	Dynamic
+show percentile;
+ERROR 07000: the percentile_switch is off

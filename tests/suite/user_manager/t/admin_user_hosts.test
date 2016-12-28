@@ -1,0 +1,25 @@
+#admin-user-hosts
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+
+#case1:不设置admin-user-hosts时尝试登录
+connection conn0;
+select * from pwds;
+#case2:登录admin,设置admin-user-hosts 为本host
+connection conn0;
+select * from pwds;
+add admin user hosts 127.0.0.1;
+select * from pwds;
+connect (conn1, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+connection conn1;
+remove admin user hosts 127.0.0.1;
+#case3:登录admin,设置admin-user-hosts 为非本hosts
+connection conn0;
+select * from pwds;
+add admin user hosts 1.1.1.1;
+select * from pwds;
+--error 1045
+connect (conn2, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+#connection conn2;
+#select * from pwds;
+connection conn0;
+remove admin user hosts 1.1.1.1;

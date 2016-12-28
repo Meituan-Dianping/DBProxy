@@ -1,0 +1,10 @@
+flush logs;
+show variables like 'log_bin%';
+Variable_name	Value
+log_bin	ON
+log_bin_trust_function_creators	OFF
+flush logs;
+show variables like 'log_bin%';
+Variable_name	Value
+log_bin	ON
+log_bin_trust_function_creators	OFF

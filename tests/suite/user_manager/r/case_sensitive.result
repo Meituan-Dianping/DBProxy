@@ -1,0 +1,80 @@
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+alter admin user Abc:Abc;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+Abc	gSix			admin
+connect(127.0.0.1,dbproxy_test,123456,,6018,/opt/tmp/mysql.sock);
+ERROR 28000: unknown user
+connect(127.0.0.1,abc,Abc,,6018,/opt/tmp/mysql.sock);
+ERROR 28000: unknown user
+connect(127.0.0.1,Abc,abc,,6018,/opt/tmp/mysql.sock);
+ERROR 28000: password doesn't match
+alter admin user dbproxy_test:123456;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+add pwd Def:Def;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+Def	hC+0			proxy
+dbproxy_test	8XjhBQKd			admin
+dbproxy_test	8XjhBQKd			proxy
+connect(127.0.0.1,Def,def,test,6003,/opt/tmp/mysql.sock);
+ERROR 28000: Access denied for user 'Def'@'127.0.0.1' (using password: YES)
+connect(127.0.0.1,def,Def,test,6003,/opt/tmp/mysql.sock);
+ERROR 28000: Access denied for user 'def'@'127.0.0.1' (using password: YES)
+remove pwd def;
+ERROR 07000: this user is NOT exist
+remove pwd Def;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+add enpwd Def:hC+0;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+Def	hC+0			proxy
+dbproxy_test	8XjhBQKd			admin
+dbproxy_test	8XjhBQKd			proxy
+connect(127.0.0.1,Def,def,test,6003,/opt/tmp/mysql.sock);
+ERROR 28000: Access denied for user 'Def'@'127.0.0.1' (using password: YES)
+connect(127.0.0.1,def,Def,test,6003,/opt/tmp/mysql.sock);
+ERROR 28000: Access denied for user 'def'@'127.0.0.1' (using password: YES)
+remove pwd def;
+ERROR 07000: this user is NOT exist
+remove pwd Def;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+show variables like 'backend-monitor-pwds';
+Variable_name	Group	Value	Set mode
+backend-monitor-pwds	main		Dynamic
+set backend-monitor-pwds = Abc:Abc;
+status
+show variables like 'backend-monitor-pwds';
+Variable_name	Group	Value	Set mode
+backend-monitor-pwds	main	Abc:gSix	Dynamic

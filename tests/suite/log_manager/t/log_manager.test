@@ -1,0 +1,139 @@
+#log-manager
+
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+
+#case1: log-level
+connection conn0;
+
+set log-level = message;
+show variables like 'log-level';
+set log-level = Message;
+show variables like 'log-level';
+
+set log-level = warning;
+show variables like 'log-level';
+set log-level = wArning;
+show variables like 'log-level';
+
+set log-level = critical;
+show variables like 'log-level';
+set log-level = crItical;
+show variables like 'log-level';
+
+set log-level = error;
+show variables like 'log-level';
+set log-level = errOr;
+show variables like 'log-level';
+
+set log-level = info;
+show variables like 'log-level';
+set log-level = infO;
+show variables like 'log-level';
+
+set log-level = debug;
+show variables like 'log-level';
+set log-level = debuG;
+show variables like 'log-level';
+
+--error 1105
+set log-level = abc;
+
+#case2: log-trace-modules
+connection conn0;
+
+set log-trace-modules = 1;
+show variables like 'log-trace-modules';
+
+#--error 1105
+set log-trace-modules = 32;
+--error 1105
+set log-trace-modules = -1;
+--error 1105
+set log-trace-modules = abc;
+
+set log-trace-modules = 0;
+
+#case3: sql-log
+connection conn0;
+
+set sql-log = on;
+show variables like 'sql-log';
+set sql-log = off;
+show variables like 'sql-log';
+set sql-log = realtime;
+show variables like 'sql-log';
+
+set sql-log = On;
+show variables like 'sql-log';
+set sql-log = OFF;
+show variables like 'sql-log';
+set sql-log = reALTIme;
+show variables like 'sql-log';
+
+--error 1105
+set sql-log = abc;
+
+#case4: sql-log-buffer-size
+connection conn0;
+
+set sql-log-file-num = 10001;
+show variables like 'sql-log-buffer-size';
+
+#--error 1105
+set sql-log-file-num = 0;
+show variables like 'sql-log-buffer-size';
+--error 1105
+set sql-log-file-num = -1;
+
+#case5: sql-log-file-num
+connection conn0;
+
+set sql-log-file-num = 10000;
+show variables like 'sql-log-file-num';
+
+set sql-log-file-num = 0;
+show variables like 'sql-log-file-num';
+
+--error 1105
+set sql-log-file-num = -1;
+
+#case6: sql-log-file-size
+connection conn0;
+
+set sql-log-file-size = 1000;
+show variables like 'sql-log-file-size';
+
+set sql-log-file-size = 0;
+show variables like 'sql-log-file-size';
+
+--error 1105
+set sql-log-file-size = -1;
+
+#case7: sql-log-mode
+connection conn0;
+
+set sql-log-mode = ALL;
+show variables like 'sql-log-mode';
+set sql-log-mode = CLIENT;
+show variables like 'sql-log-mode';
+set sql-log-mode = BACKEND;
+show variables like 'sql-log-mode';
+
+set sql-log-mode = aLl;
+show variables like 'sql-log-mode';
+
+--error 1105
+set sql-log-mode = abc;
+
+#case8: sql-log-slow-ms
+connection conn0;
+
+set sql-log-slow-ms = 100;
+show variables like 'sql-log-buffer-size';
+
+set sql-log-slow-ms = 0;
+show variables like 'sql-log-buffer-size';
+
+--error 1105
+set sql-log-slow-ms = -1;
+show variables like 'sql-log-buffer-size';

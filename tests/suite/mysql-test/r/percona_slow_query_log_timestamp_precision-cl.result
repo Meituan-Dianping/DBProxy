@@ -1,0 +1,6 @@
+SHOW VARIABLES LIKE 'slow_query_log_timestamp_precision';
+Variable_name	Value
+slow_query_log_timestamp_precision	second
+SHOW GLOBAL VARIABLES LIKE 'slow_query_log_timestamp_precision';
+Variable_name	Value
+slow_query_log_timestamp_precision	second

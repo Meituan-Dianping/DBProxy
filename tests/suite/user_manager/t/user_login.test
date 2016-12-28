@@ -1,0 +1,11 @@
+#user-login
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+connect (conn1, 127.0.0.1, dbproxy_test, '123456', 'test', 6003);
+#case1:旧用户密码登录，新用户密码登录
+connection conn0;
+select * from pwds;
+connection conn1;
+show databases;
+connection conn0;
+add pwd slave_tag1:123456;
+connect (conn2, 127.0.0.1, slave_tag1, '123456', 'test', 6003);

@@ -1,0 +1,2 @@
+-- source include/percona_query_cache_with_comments.inc
+-- source include/percona_query_cache_with_comments_end.inc

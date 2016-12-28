@@ -1,0 +1,19 @@
+#connection-manager
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+
+#case1: max-connections
+connection conn0;
+show variables like 'max-connections';
+set max-connections = 1;
+show variables like 'max-connections';
+--error 1040
+connect (conn1, 127.0.0.1, dbproxy_test, '123456', 'test', 6003);
+
+set max-connections = 3;
+show variables like 'max-connections';
+connect (conn2, 127.0.0.1, dbproxy_test, '123456', 'test', 6003);
+--error 1040
+connect (conn3, 127.0.0.1, dbproxy_test, '123456', 'test', 6003);
+
+connection conn0;
+set max-connections = 1024;

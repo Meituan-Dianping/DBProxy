@@ -1,0 +1,23 @@
+drop table if exists roll_test;
+create table roll_test(tc1 int primary key, tc2 int);
+
+connect (conn1,localhost,dbproxy_test,'123456',test,6003);
+connect (conn2,localhost,dbproxy_test,'123456',test,6003);
+
+connection conn1;
+set autocommit=0;
+insert into roll_test values(1,2);
+
+--error 1062
+insert into roll_test values(1,3);
+
+connection conn2;
+set autocommit=0;
+insert into roll_test values(2,3);
+commit;
+
+connection conn1;
+rollback;
+
+# 正常情况下，结果集应该为空
+select * from roll_test where tc1 = 1;

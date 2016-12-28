@@ -1,0 +1,58 @@
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+slave_tag1	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+dbproxy_test	8XjhBQKd			proxy
+show databases;
+Database
+information_schema
+XY
+benchmarksql
+d1
+mysql
+mysqltest1
+mysqltest2
+performance_schema
+test
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+slave_tag1	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+dbproxy_test	8XjhBQKd			proxy
+add user hosts dbproxy_test@127.0.0.1;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+slave_tag1	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+dbproxy_test	8XjhBQKd	127.0.0.1		proxy
+show databases;
+Database
+information_schema
+benchmarksql
+mysql
+performance_schema
+test
+remove user hosts dbproxy_test@127.0.0.1;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+slave_tag1	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+dbproxy_test	8XjhBQKd			proxy
+add user hosts dbproxy_test@1.1.1.1;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+slave_tag1	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+dbproxy_test	8XjhBQKd	1.1.1.1		proxy
+connect(127.0.0.1,dbproxy_test,123456,test,6003,/opt/tmp/mysql.sock);
+ERROR 28000: Access denied(host is forbidden) for user 'dbproxy_test'@'127.0.0.1' (using password: YES)
+remove user hosts dbproxy_test@1.1.1.1;
+status

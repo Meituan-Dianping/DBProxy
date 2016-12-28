@@ -1,0 +1,49 @@
+drop table if exists sharding_test_table_0;
+drop table if exists sharding_test_table_1;
+drop table if exists sharding_test_table_2;
+create table sharding_test_table_0 (a int, b int not null primary key);
+create table sharding_test_table_1 (a int, b int not null primary key);
+create table sharding_test_table_2 (a int, b int not null primary key);
+show tables;
+db	tables
+add tables 'test.sharding_test_table.a.3';
+status
+show tables;
+db	tables
+test	test.sharding_test_table.a.3
+use test;
+insert into sharding_test_table values (1, 2);
+insert into sharding_test_table values (2, 3);
+insert into sharding_test_table values (3, 4);
+select * from sharding_test_table where a=1;
+a	b
+1	2
+select * from sharding_test_table where a=2;
+a	b
+2	3
+select * from sharding_test_table where a=3;
+a	b
+3	4
+select * from sharding_test_table where a in (1, 2, 3);
+a	b
+3	4
+1	2
+2	3
+select * from sharding_test_table where a=1 or b=2;
+a	b
+1	2
+select * from sharding_test_table where a > 0;
+ERROR 42S02: Table 'test.sharding_test_table' doesn't exist
+insert into sharding_test_table values(4, 5), (5, 6), (6, 7);
+select * from sharding_test_table where a in (4, 5, 6);
+a	b
+4	5
+remove tables like 'test.sharding_test_table';
+status
+show tables;
+db	tables
+select * from sharding_test_table where a=1;
+ERROR 42S02: Table 'test.sharding_test_table' doesn't exist
+drop table if exists sharding_test_table_0;
+drop table if exists sharding_test_table_1;
+drop table if exists sharding_test_table_2;

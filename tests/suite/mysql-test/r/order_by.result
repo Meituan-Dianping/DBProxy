@@ -1,0 +1,8529 @@
+drop table if exists t1,t2,t3;
+CREATE TABLE t1 (
+id int(6) DEFAULT '0' NOT NULL,
+idservice int(5),
+clee char(20) NOT NULL,
+flag char(1),
+KEY id (id),
+PRIMARY KEY (clee)
+);
+INSERT INTO t1 VALUES (2,4,'6067169d','Y');
+INSERT INTO t1 VALUES (2,5,'606716d1','Y');
+INSERT INTO t1 VALUES (2,1,'606717c1','Y');
+INSERT INTO t1 VALUES (3,1,'6067178d','Y');
+INSERT INTO t1 VALUES (2,6,'60671515','Y');
+INSERT INTO t1 VALUES (2,7,'60671569','Y');
+INSERT INTO t1 VALUES (2,3,'dd','Y');
+CREATE TABLE t2 (
+id int(6) NOT NULL auto_increment,
+description varchar(40) NOT NULL,
+idform varchar(40),
+ordre int(6) unsigned DEFAULT '0' NOT NULL,
+image varchar(60),
+PRIMARY KEY (id),
+KEY id (id,ordre)
+);
+INSERT INTO t2 VALUES (1,'Emettre un appel d''offres','en_construction.html',10,'emettre.gif');
+INSERT INTO t2 VALUES (2,'Emettre des soumissions','en_construction.html',20,'emettre.gif');
+INSERT INTO t2 VALUES (7,'Liste des t2','t2_liste_form.phtml',51060,'link.gif');
+INSERT INTO t2 VALUES (8,'Consulter les soumissions','consulter_soumissions.phtml',200,'link.gif');
+INSERT INTO t2 VALUES (9,'Ajouter un type de materiel','typeMateriel_ajoute_form.phtml',51000,'link.gif');
+INSERT INTO t2 VALUES (10,'Lister/modifier un type de materiel','typeMateriel_liste_form.phtml',51010,'link.gif');
+INSERT INTO t2 VALUES (3,'Créer une fiche de client','clients_ajoute_form.phtml',40000,'link.gif');
+INSERT INTO t2 VALUES (4,'Modifier des clients','en_construction.html',40010,'link.gif');
+INSERT INTO t2 VALUES (5,'Effacer des clients','en_construction.html',40020,'link.gif');
+INSERT INTO t2 VALUES (6,'Ajouter un service','t2_ajoute_form.phtml',51050,'link.gif');
+select t1.id,t1.idservice,t2.ordre,t2.description  from t1, t2 where t1.id = 2   and t1.idservice = t2.id  order by t2.ordre;
+id	idservice	ordre	description
+2	1	10	Emettre un appel d'offres
+2	3	40000	Créer une fiche de client
+2	4	40010	Modifier des clients
+2	5	40020	Effacer des clients
+2	6	51050	Ajouter un service
+2	7	51060	Liste des t2
+drop table t1,t2;
+create table t1 (first char(10),last char(10));
+insert into t1 values ("Michael","Widenius");
+insert into t1 values ("Allan","Larsson");
+insert into t1 values ("David","Axmark");
+select concat(first," ",last) as name from t1 order by name;
+name
+Allan Larsson
+David Axmark
+Michael Widenius
+select concat(last," ",first) as name from t1 order by name;
+name
+Axmark David
+Larsson Allan
+Widenius Michael
+drop table t1;
+create table t1 (i int);
+insert into t1 values(1),(2),(1),(2),(1),(2),(3);
+select distinct i from t1;
+i
+1
+2
+3
+select distinct i from t1 order by rand(5);
+i
+1
+3
+2
+select distinct i from t1 order by i desc;
+i
+3
+2
+1
+select distinct i from t1 order by 1-i;
+i
+3
+2
+1
+select distinct i from t1 order by mod(i,2),i;
+i
+2
+1
+3
+drop table t1;
+create table t1 ( pk     int primary key, name   varchar(255) not null, number varchar(255) not null);
+insert into t1 values (1, 'Gamma',     '123'), (2, 'Gamma Ext', '123a'), (3, 'Alpha',     '001'), (4, 'Beta',      '200c');
+select distinct t1.name as 'Building Name',t1.number as 'Building Number' from t1 order by t1.name asc;
+Building Name	Building Number
+Alpha	001
+Beta	200c
+Gamma	123
+Gamma Ext	123a
+drop table t1;
+create table t1 (id int not null,col1 int not null,col2 int not null,index(col1));
+insert into t1 values(1,2,2),(2,2,1),(3,1,2),(4,1,1),(5,1,4),(6,2,3),(7,3,1),(8,2,4);
+select * from t1 order by col1,col2;
+id	col1	col2
+4	1	1
+3	1	2
+5	1	4
+2	2	1
+1	2	2
+6	2	3
+8	2	4
+7	3	1
+select col1 from t1 order by id;
+col1
+2
+2
+1
+1
+1
+2
+3
+2
+select col1 as id from t1 order by id;
+id
+1
+1
+1
+2
+2
+2
+2
+3
+select concat(col1) as id from t1 order by id;
+id
+1
+1
+1
+2
+2
+2
+2
+3
+drop table t1;
+CREATE TABLE t1 (id int auto_increment primary key,aika varchar(40),aikakentta  timestamp);
+insert into t1 (aika) values ('Keskiviikko');
+insert into t1 (aika) values ('Tiistai');
+insert into t1 (aika) values ('Maanantai');
+insert into t1 (aika) values ('Sunnuntai');
+SELECT FIELD(SUBSTRING(t1.aika,1,2),'Ma','Ti','Ke','To','Pe','La','Su') AS test FROM t1 ORDER by test;
+test
+1
+2
+3
+7
+drop table t1;
+CREATE TABLE t1
+(
+a          int unsigned       NOT NULL,
+b          int unsigned       NOT NULL,
+c          int unsigned       NOT NULL,
+UNIQUE(a),
+INDEX(b),
+INDEX(c)
+);
+CREATE TABLE t2
+(
+c          int unsigned       NOT NULL,
+i          int unsigned       NOT NULL,
+INDEX(c)
+);
+CREATE TABLE t3
+(
+c          int unsigned       NOT NULL,
+v          varchar(64),
+INDEX(c)
+);
+INSERT INTO t1 VALUES (1,1,1);
+INSERT INTO t1 VALUES (2,1,2);
+INSERT INTO t1 VALUES (3,2,1);
+INSERT INTO t1 VALUES (4,2,2);
+INSERT INTO t2 VALUES (1,50);
+INSERT INTO t2 VALUES (2,25);
+INSERT INTO t3 VALUES (1,'123 Park Place');
+INSERT INTO t3 VALUES (2,'453 Boardwalk');
+SELECT    a,b,if(b = 1,i,if(b = 2,v,''))
+FROM      t1
+LEFT JOIN t2 USING(c)
+LEFT JOIN t3 ON t3.c = t1.c;
+a	b	if(b = 1,i,if(b = 2,v,''))
+1	1	50
+2	1	25
+3	2	123 Park Place
+4	2	453 Boardwalk
+SELECT    a,b,if(b = 1,i,if(b = 2,v,''))
+FROM      t1
+LEFT JOIN t2 ON t1.c = t2.c
+LEFT JOIN t3 ON t3.c = t1.c;
+a	b	if(b = 1,i,if(b = 2,v,''))
+1	1	50
+2	1	25
+3	2	123 Park Place
+4	2	453 Boardwalk
+SELECT    a,b,if(b = 1,i,if(b = 2,v,''))
+FROM      t1
+LEFT JOIN t2 USING(c)
+LEFT JOIN t3 ON t3.c = t1.c
+ORDER BY a;
+a	b	if(b = 1,i,if(b = 2,v,''))
+1	1	50
+2	1	25
+3	2	123 Park Place
+4	2	453 Boardwalk
+SELECT    a,b,if(b = 1,i,if(b = 2,v,''))
+FROM      t1
+LEFT JOIN t2 ON t1.c = t2.c
+LEFT JOIN t3 ON t3.c = t1.c
+ORDER BY a;
+a	b	if(b = 1,i,if(b = 2,v,''))
+1	1	50
+2	1	25
+3	2	123 Park Place
+4	2	453 Boardwalk
+drop table t1,t2,t3;
+create table t1 (ID int not null primary key, TransactionID int not null);
+insert into t1 (ID, TransactionID) values  (1,  87), (2,  89), (3,  92), (4,  94), (5,  486), (6,  490), (7,  753), (9,  828), (10, 832), (11, 834), (12, 840);
+create table t2 (ID int not null primary key, GroupID int not null);
+insert into t2 (ID, GroupID) values (87,  87), (89,  89), (92,  92), (94,  94), (486, 486), (490, 490),(753, 753), (828, 828), (832, 832), (834, 834), (840, 840);
+create table t3 (ID int not null primary key, DateOfAction date not null);
+insert into t3 (ID, DateOfAction) values  (87,  '1999-07-19'), (89,  '1999-07-19'), (92,  '1999-07-19'), (94,  '1999-07-19'), (486, '1999-07-18'), (490, '2000-03-27'), (753, '2000-03-28'), (828, '1999-07-27'), (832, '1999-07-27'),(834, '1999-07-27'), (840, '1999-07-27');
+select t3.DateOfAction, t1.TransactionID from t1 join t2 join t3 where t2.ID = t1.TransactionID and t3.ID = t2.GroupID order by t3.DateOfAction, t1.TransactionID;
+DateOfAction	TransactionID
+1999-07-18	486
+1999-07-19	87
+1999-07-19	89
+1999-07-19	92
+1999-07-19	94
+1999-07-27	828
+1999-07-27	832
+1999-07-27	834
+1999-07-27	840
+2000-03-27	490
+2000-03-28	753
+select t3.DateOfAction, t1.TransactionID from t1 join t2 join t3 where t2.ID = t1.TransactionID and t3.ID = t2.GroupID order by t1.TransactionID,t3.DateOfAction;
+DateOfAction	TransactionID
+1999-07-19	87
+1999-07-19	89
+1999-07-19	92
+1999-07-19	94
+1999-07-18	486
+2000-03-27	490
+2000-03-28	753
+1999-07-27	828
+1999-07-27	832
+1999-07-27	834
+1999-07-27	840
+drop table t1,t2,t3;
+CREATE TABLE t1 (
+member_id int(11) NOT NULL auto_increment,
+inschrijf_datum varchar(20) NOT NULL default '',
+lastchange_datum varchar(20) NOT NULL default '',
+nickname varchar(20) NOT NULL default '',
+password varchar(8) NOT NULL default '',
+voornaam varchar(30) NOT NULL default '',
+tussenvoegsels varchar(10) NOT NULL default '',
+achternaam varchar(50) NOT NULL default '',
+straat varchar(100) NOT NULL default '',
+postcode varchar(10) NOT NULL default '',
+wijk varchar(40) NOT NULL default '',
+plaats varchar(50) NOT NULL default '',
+telefoon varchar(10) NOT NULL default '',
+geboortedatum date NOT NULL default '0000-00-00',
+geslacht varchar(5) NOT NULL default '',
+email varchar(80) NOT NULL default '',
+uin varchar(15) NOT NULL default '',
+homepage varchar(100) NOT NULL default '',
+internet varchar(15) NOT NULL default '',
+scherk varchar(30) NOT NULL default '',
+favo_boek varchar(50) NOT NULL default '',
+favo_tijdschrift varchar(50) NOT NULL default '',
+favo_tv varchar(50) NOT NULL default '',
+favo_eten varchar(50) NOT NULL default '',
+favo_muziek varchar(30) NOT NULL default '',
+info text NOT NULL default '',
+ipnr varchar(30) NOT NULL default '',
+PRIMARY KEY  (member_id)
+) ENGINE=MyISAM PACK_KEYS=1;
+insert into t1 (member_id) values (1),(2),(3);
+select member_id, nickname, voornaam FROM t1
+ORDER by lastchange_datum DESC LIMIT 2;
+member_id	nickname	voornaam
+1		
+2		
+drop table t1;
+create table t1 (a int not null, b int, c varchar(10), key (a, b, c));
+insert into t1 values (1, NULL, NULL), (1, NULL, 'b'), (1, 1, NULL), (1, 1, 'b'), (1, 1, 'b'), (2, 1, 'a'), (2, 1, 'b'), (2, 2, 'a'), (2, 2, 'b'), (2, 3, 'c'),(1,3,'b');
+select * from t1 where (a = 1 and b is null and c = 'b') or (a > 2) order by a desc;
+a	b	c
+1	NULL	b
+select * from t1 where (a = 1 and b is null and c = 'b') or (a > 2) order by a desc;
+a	b	c
+1	NULL	b
+select * from t1 where a >= 1 and a < 3 order by a desc;
+a	b	c
+2	3	c
+2	2	b
+2	2	a
+2	1	b
+2	1	a
+1	3	b
+1	1	b
+1	1	b
+1	1	NULL
+1	NULL	b
+1	NULL	NULL
+select * from t1 where a >= 1 and a < 3 order by a desc;
+a	b	c
+2	3	c
+2	2	b
+2	2	a
+2	1	b
+2	1	a
+1	3	b
+1	1	b
+1	1	b
+1	1	NULL
+1	NULL	b
+1	NULL	NULL
+select * from t1 where a = 1 order by a desc, b desc;
+a	b	c
+1	3	b
+1	1	b
+1	1	b
+1	1	NULL
+1	NULL	b
+1	NULL	NULL
+select * from t1 where a = 1 order by a desc, b desc;
+a	b	c
+1	3	b
+1	1	b
+1	1	b
+1	1	NULL
+1	NULL	b
+1	NULL	NULL
+select * from t1 where a = 1 and b is null order by a desc, b desc;
+a	b	c
+1	NULL	NULL
+1	NULL	b
+select * from t1 where a = 1 and b is null order by a desc, b desc;
+a	b	c
+1	NULL	NULL
+1	NULL	b
+select * from t1 where a >= 1 and a < 3 and b >0 order by a desc,b desc;
+a	b	c
+2	3	c
+2	2	b
+2	2	a
+2	1	b
+2	1	a
+1	3	b
+1	1	b
+1	1	b
+1	1	NULL
+select * from t1 where a = 2 and b >0 order by a desc,b desc;
+a	b	c
+2	3	c
+2	2	b
+2	2	a
+2	1	b
+2	1	a
+select * from t1 where a = 2 and b is null order by a desc,b desc;
+a	b	c
+select * from t1 where a = 2 and (b is null or b > 0) order by a
+desc,b desc;
+a	b	c
+2	3	c
+2	2	b
+2	2	a
+2	1	b
+2	1	a
+select * from t1 where a = 2 and b > 0 order by a desc,b desc;
+a	b	c
+2	3	c
+2	2	b
+2	2	a
+2	1	b
+2	1	a
+select * from t1 where a = 2 and b < 2 order by a desc,b desc;
+a	b	c
+2	1	b
+2	1	a
+select * from t1 where a = 1 order by b desc;
+a	b	c
+1	3	b
+1	1	b
+1	1	b
+1	1	NULL
+1	NULL	b
+1	NULL	NULL
+select * from t1 where a = 1 order by b desc;
+a	b	c
+1	3	b
+1	1	b
+1	1	b
+1	1	NULL
+1	NULL	b
+1	NULL	NULL
+alter table t1 modify b int not null, modify c varchar(10) not null;
+select * from t1 order by a, b, c;
+a	b	c
+1	0	
+1	0	b
+1	1	
+1	1	b
+1	1	b
+1	3	b
+2	1	a
+2	1	b
+2	2	a
+2	2	b
+2	3	c
+select * from t1 order by a, b, c;
+a	b	c
+1	0	
+1	0	b
+1	1	
+1	1	b
+1	1	b
+1	3	b
+2	1	a
+2	1	b
+2	2	a
+2	2	b
+2	3	c
+select * from t1 order by a desc, b desc, c desc;
+a	b	c
+2	3	c
+2	2	b
+2	2	a
+2	1	b
+2	1	a
+1	3	b
+1	1	b
+1	1	b
+1	1	
+1	0	b
+1	0	
+select * from t1 order by a desc, b desc, c desc;
+a	b	c
+2	3	c
+2	2	b
+2	2	a
+2	1	b
+2	1	a
+1	3	b
+1	1	b
+1	1	b
+1	1	
+1	0	b
+1	0	
+select * from t1 where (a = 1 and b = 1 and c = 'b') or (a > 2) order by a desc;
+a	b	c
+1	1	b
+1	1	b
+select * from t1 where (a = 1 and b = 1 and c = 'b') or (a > 2) order by a desc;
+a	b	c
+1	1	b
+1	1	b
+select * from t1 where a < 2 and b <= 1 order by a desc, b desc;
+a	b	c
+1	1	b
+1	1	b
+1	1	
+1	0	b
+1	0	
+select * from t1 where a < 2 and b <= 1 order by a desc, b desc;
+a	b	c
+1	1	b
+1	1	b
+1	1	
+1	0	b
+1	0	
+select count(*) from t1 where a < 5 and b > 0;
+count(*)
+9
+select * from t1 where a < 5 and b > 0 order by a desc,b desc;
+a	b	c
+2	3	c
+2	2	b
+2	2	a
+2	1	b
+2	1	a
+1	3	b
+1	1	b
+1	1	b
+1	1	
+select * from t1 where a between 1 and 3 and b <= 1 order by a desc, b desc;
+a	b	c
+2	1	b
+2	1	a
+1	1	b
+1	1	b
+1	1	
+1	0	b
+1	0	
+select * from t1 where a between 1 and 3 and b <= 1 order by a desc, b desc;
+a	b	c
+2	1	b
+2	1	a
+1	1	b
+1	1	b
+1	1	
+1	0	b
+1	0	
+select * from t1 where a between 0 and 1 order by a desc, b desc;
+a	b	c
+1	3	b
+1	1	b
+1	1	b
+1	1	
+1	0	b
+1	0	
+select * from t1 where a between 0 and 1 order by a desc, b desc;
+a	b	c
+1	3	b
+1	1	b
+1	1	b
+1	1	
+1	0	b
+1	0	
+drop table t1;
+CREATE TABLE t1 (
+gid int(10) unsigned NOT NULL auto_increment,
+cid smallint(5) unsigned NOT NULL default '0',
+PRIMARY KEY  (gid),
+KEY component_id (cid)
+) ENGINE=MyISAM;
+INSERT INTO t1 VALUES (103853,108),(103867,108),(103962,108),(104505,108),(104619,108),(104620,108);
+ALTER TABLE t1 add skr int(10) not null;
+CREATE TABLE t2 (
+gid int(10) unsigned NOT NULL default '0',
+uid smallint(5) unsigned NOT NULL default '1',
+sid tinyint(3) unsigned NOT NULL default '1',
+PRIMARY KEY  (gid),
+KEY uid (uid),
+KEY status_id (sid)
+) ENGINE=MyISAM;
+INSERT INTO t2 VALUES (103853,250,5),(103867,27,5),(103962,27,5),(104505,117,5),(104619,75,5),(104620,15,5);
+CREATE TABLE t3 (
+uid smallint(6) NOT NULL auto_increment,
+PRIMARY KEY  (uid)
+) ENGINE=MyISAM;
+INSERT INTO t3 VALUES (1),(15),(27),(75),(117),(250);
+ALTER TABLE t3 add skr int(10) not null;
+select t1.gid, t2.sid, t3.uid from t2, t1, t3 where t2.gid = t1.gid and t2.uid = t3.uid order by t3.uid, t1.gid;
+gid	sid	uid
+104620	5	15
+103867	5	27
+103962	5	27
+104619	5	75
+104505	5	117
+103853	5	250
+select t1.gid, t2.sid, t3.uid from t3, t2, t1 where t2.gid = t1.gid and t2.uid = t3.uid order by t3.uid, t1.gid;
+gid	sid	uid
+104620	5	15
+103867	5	27
+103962	5	27
+104619	5	75
+104505	5	117
+103853	5	250
+select t1.gid, t2.sid, t3.uid from t3, t2, t1 where t2.gid = t1.gid and t2.uid = t3.uid order by t1.gid, t3.uid;
+gid	sid	uid
+103853	5	250
+103867	5	27
+103962	5	27
+104505	5	117
+104619	5	75
+104620	5	15
+SELECT t1.gid, t3.uid from t1, t3 where t1.gid = t3.uid order by t1.gid,t3.skr;
+gid	uid
+SELECT t1.gid, t2.sid, t3.uid from t2, t1, t3 where t2.gid = t1.gid and t2.uid = t3.uid order by t3.uid, t1.gid;
+gid	sid	uid
+104620	5	15
+103867	5	27
+103962	5	27
+104619	5	75
+104505	5	117
+103853	5	250
+SELECT t1.gid, t3.uid from t1, t3 where t1.gid = t3.uid order by t3.skr,t1.gid;
+gid	uid
+SELECT t1.gid, t3.uid from t1, t3 where t1.skr = t3.uid order by t1.gid,t3.skr;
+gid	uid
+drop table t1,t2,t3;
+CREATE TABLE t1 (
+`titre` char(80) NOT NULL default '',
+`numeropost` mediumint(8) unsigned NOT NULL auto_increment,
+`date` datetime NOT NULL default '0000-00-00 00:00:00',
+`auteur` char(35) NOT NULL default '',
+`icone` tinyint(2) unsigned NOT NULL default '0',
+`lastauteur` char(35) NOT NULL default '',
+`nbrep` smallint(6) unsigned NOT NULL default '0',
+`dest` char(35) NOT NULL default '',
+`lu` tinyint(1) unsigned NOT NULL default '0',
+`vue` mediumint(8) unsigned NOT NULL default '0',
+`ludest` tinyint(1) unsigned NOT NULL default '0',
+`ouvert` tinyint(1) unsigned NOT NULL default '1',
+PRIMARY KEY  (`numeropost`),
+KEY `date` (`date`),
+KEY `dest` (`dest`,`ludest`),
+KEY `auteur` (`auteur`,`lu`),
+KEY `auteur_2` (`auteur`,`date`),
+KEY `dest_2` (`dest`,`date`)
+) CHECKSUM=1;
+CREATE TABLE t2 (
+`numeropost` mediumint(8) unsigned NOT NULL default '0',
+`pseudo` char(35) NOT NULL default '',
+PRIMARY KEY  (`numeropost`,`pseudo`),
+KEY `pseudo` (`pseudo`)
+);
+INSERT INTO t1 (titre,auteur,dest) VALUES ('test','joce','bug');
+INSERT INTO t2 (numeropost,pseudo) VALUES (1,'joce'),(1,'bug');
+SELECT titre,t1.numeropost,auteur,icone,nbrep,0,date,vue,ouvert,lastauteur,dest FROM t2 LEFT JOIN t1 USING(numeropost) WHERE t2.pseudo='joce' ORDER BY date DESC LIMIT 0,30;
+titre	numeropost	auteur	icone	nbrep	0	date	vue	ouvert	lastauteur	dest
+test	1	joce	0	0	0	0000-00-00 00:00:00	0	1		bug
+SELECT titre,numeropost,auteur,icone,nbrep,0,date,vue,ouvert,lastauteur,dest FROM t2 LEFT JOIN t1 USING(numeropost) WHERE t2.pseudo='joce' ORDER BY date DESC LIMIT 0,30;
+titre	numeropost	auteur	icone	nbrep	0	date	vue	ouvert	lastauteur	dest
+test	1	joce	0	0	0	0000-00-00 00:00:00	0	1		bug
+SELECT titre,t1.numeropost,auteur,icone,nbrep,'0',date,vue,ouvert,lastauteur,dest FROM t2 LEFT JOIN t1 USING(numeropost) WHERE t2.pseudo='joce' ORDER BY date DESC LIMIT 0,30;
+titre	numeropost	auteur	icone	nbrep	0	date	vue	ouvert	lastauteur	dest
+test	1	joce	0	0	0	0000-00-00 00:00:00	0	1		bug
+SELECT titre,numeropost,auteur,icone,nbrep,'0',date,vue,ouvert,lastauteur,dest FROM t2 LEFT JOIN t1 USING(numeropost) WHERE t2.pseudo='joce' ORDER BY date DESC LIMIT 0,30;
+titre	numeropost	auteur	icone	nbrep	0	date	vue	ouvert	lastauteur	dest
+test	1	joce	0	0	0	0000-00-00 00:00:00	0	1		bug
+drop table t1,t2;
+CREATE TABLE t1 (a int, b int);
+INSERT INTO t1 VALUES (1, 2);
+INSERT INTO t1 VALUES (3, 4);
+INSERT INTO t1 VALUES (5, NULL);
+SELECT * FROM t1 ORDER BY b;
+a	b
+5	NULL
+1	2
+3	4
+SELECT * FROM t1 ORDER BY b DESC;
+a	b
+3	4
+1	2
+5	NULL
+SELECT * FROM t1 ORDER BY (a + b);
+a	b
+5	NULL
+1	2
+3	4
+SELECT * FROM t1 ORDER BY (a + b) DESC;
+a	b
+3	4
+1	2
+5	NULL
+DROP TABLE t1;
+create table t1(id int not null auto_increment primary key, t char(12));
+select id,t from t1 order by id;
+id	t
+1	1000
+2	999
+3	998
+4	997
+5	996
+6	995
+7	994
+8	993
+9	992
+10	991
+11	990
+12	989
+13	988
+14	987
+15	986
+16	985
+17	984
+18	983
+19	982
+20	981
+21	980
+22	979
+23	978
+24	977
+25	976
+26	975
+27	974
+28	973
+29	972
+30	971
+31	970
+32	969
+33	968
+34	967
+35	966
+36	965
+37	964
+38	963
+39	962
+40	961
+41	960
+42	959
+43	958
+44	957
+45	956
+46	955
+47	954
+48	953
+49	952
+50	951
+51	950
+52	949
+53	948
+54	947
+55	946
+56	945
+57	944
+58	943
+59	942
+60	941
+61	940
+62	939
+63	938
+64	937
+65	936
+66	935
+67	934
+68	933
+69	932
+70	931
+71	930
+72	929
+73	928
+74	927
+75	926
+76	925
+77	924
+78	923
+79	922
+80	921
+81	920
+82	919
+83	918
+84	917
+85	916
+86	915
+87	914
+88	913
+89	912
+90	911
+91	910
+92	909
+93	908
+94	907
+95	906
+96	905
+97	904
+98	903
+99	902
+100	901
+101	900
+102	899
+103	898
+104	897
+105	896
+106	895
+107	894
+108	893
+109	892
+110	891
+111	890
+112	889
+113	888
+114	887
+115	886
+116	885
+117	884
+118	883
+119	882
+120	881
+121	880
+122	879
+123	878
+124	877
+125	876
+126	875
+127	874
+128	873
+129	872
+130	871
+131	870
+132	869
+133	868
+134	867
+135	866
+136	865
+137	864
+138	863
+139	862
+140	861
+141	860
+142	859
+143	858
+144	857
+145	856
+146	855
+147	854
+148	853
+149	852
+150	851
+151	850
+152	849
+153	848
+154	847
+155	846
+156	845
+157	844
+158	843
+159	842
+160	841
+161	840
+162	839
+163	838
+164	837
+165	836
+166	835
+167	834
+168	833
+169	832
+170	831
+171	830
+172	829
+173	828
+174	827
+175	826
+176	825
+177	824
+178	823
+179	822
+180	821
+181	820
+182	819
+183	818
+184	817
+185	816
+186	815
+187	814
+188	813
+189	812
+190	811
+191	810
+192	809
+193	808
+194	807
+195	806
+196	805
+197	804
+198	803
+199	802
+200	801
+201	800
+202	799
+203	798
+204	797
+205	796
+206	795
+207	794
+208	793
+209	792
+210	791
+211	790
+212	789
+213	788
+214	787
+215	786
+216	785
+217	784
+218	783
+219	782
+220	781
+221	780
+222	779
+223	778
+224	777
+225	776
+226	775
+227	774
+228	773
+229	772
+230	771
+231	770
+232	769
+233	768
+234	767
+235	766
+236	765
+237	764
+238	763
+239	762
+240	761
+241	760
+242	759
+243	758
+244	757
+245	756
+246	755
+247	754
+248	753
+249	752
+250	751
+251	750
+252	749
+253	748
+254	747
+255	746
+256	745
+257	744
+258	743
+259	742
+260	741
+261	740
+262	739
+263	738
+264	737
+265	736
+266	735
+267	734
+268	733
+269	732
+270	731
+271	730
+272	729
+273	728
+274	727
+275	726
+276	725
+277	724
+278	723
+279	722
+280	721
+281	720
+282	719
+283	718
+284	717
+285	716
+286	715
+287	714
+288	713
+289	712
+290	711
+291	710
+292	709
+293	708
+294	707
+295	706
+296	705
+297	704
+298	703
+299	702
+300	701
+301	700
+302	699
+303	698
+304	697
+305	696
+306	695
+307	694
+308	693
+309	692
+310	691
+311	690
+312	689
+313	688
+314	687
+315	686
+316	685
+317	684
+318	683
+319	682
+320	681
+321	680
+322	679
+323	678
+324	677
+325	676
+326	675
+327	674
+328	673
+329	672
+330	671
+331	670
+332	669
+333	668
+334	667
+335	666
+336	665
+337	664
+338	663
+339	662
+340	661
+341	660
+342	659
+343	658
+344	657
+345	656
+346	655
+347	654
+348	653
+349	652
+350	651
+351	650
+352	649
+353	648
+354	647
+355	646
+356	645
+357	644
+358	643
+359	642
+360	641
+361	640
+362	639
+363	638
+364	637
+365	636
+366	635
+367	634
+368	633
+369	632
+370	631
+371	630
+372	629
+373	628
+374	627
+375	626
+376	625
+377	624
+378	623
+379	622
+380	621
+381	620
+382	619
+383	618
+384	617
+385	616
+386	615
+387	614
+388	613
+389	612
+390	611
+391	610
+392	609
+393	608
+394	607
+395	606
+396	605
+397	604
+398	603
+399	602
+400	601
+401	600
+402	599
+403	598
+404	597
+405	596
+406	595
+407	594
+408	593
+409	592
+410	591
+411	590
+412	589
+413	588
+414	587
+415	586
+416	585
+417	584
+418	583
+419	582
+420	581
+421	580
+422	579
+423	578
+424	577
+425	576
+426	575
+427	574
+428	573
+429	572
+430	571
+431	570
+432	569
+433	568
+434	567
+435	566
+436	565
+437	564
+438	563
+439	562
+440	561
+441	560
+442	559
+443	558
+444	557
+445	556
+446	555
+447	554
+448	553
+449	552
+450	551
+451	550
+452	549
+453	548
+454	547
+455	546
+456	545
+457	544
+458	543
+459	542
+460	541
+461	540
+462	539
+463	538
+464	537
+465	536
+466	535
+467	534
+468	533
+469	532
+470	531
+471	530
+472	529
+473	528
+474	527
+475	526
+476	525
+477	524
+478	523
+479	522
+480	521
+481	520
+482	519
+483	518
+484	517
+485	516
+486	515
+487	514
+488	513
+489	512
+490	511
+491	510
+492	509
+493	508
+494	507
+495	506
+496	505
+497	504
+498	503
+499	502
+500	501
+501	500
+502	499
+503	498
+504	497
+505	496
+506	495
+507	494
+508	493
+509	492
+510	491
+511	490
+512	489
+513	488
+514	487
+515	486
+516	485
+517	484
+518	483
+519	482
+520	481
+521	480
+522	479
+523	478
+524	477
+525	476
+526	475
+527	474
+528	473
+529	472
+530	471
+531	470
+532	469
+533	468
+534	467
+535	466
+536	465
+537	464
+538	463
+539	462
+540	461
+541	460
+542	459
+543	458
+544	457
+545	456
+546	455
+547	454
+548	453
+549	452
+550	451
+551	450
+552	449
+553	448
+554	447
+555	446
+556	445
+557	444
+558	443
+559	442
+560	441
+561	440
+562	439
+563	438
+564	437
+565	436
+566	435
+567	434
+568	433
+569	432
+570	431
+571	430
+572	429
+573	428
+574	427
+575	426
+576	425
+577	424
+578	423
+579	422
+580	421
+581	420
+582	419
+583	418
+584	417
+585	416
+586	415
+587	414
+588	413
+589	412
+590	411
+591	410
+592	409
+593	408
+594	407
+595	406
+596	405
+597	404
+598	403
+599	402
+600	401
+601	400
+602	399
+603	398
+604	397
+605	396
+606	395
+607	394
+608	393
+609	392
+610	391
+611	390
+612	389
+613	388
+614	387
+615	386
+616	385
+617	384
+618	383
+619	382
+620	381
+621	380
+622	379
+623	378
+624	377
+625	376
+626	375
+627	374
+628	373
+629	372
+630	371
+631	370
+632	369
+633	368
+634	367
+635	366
+636	365
+637	364
+638	363
+639	362
+640	361
+641	360
+642	359
+643	358
+644	357
+645	356
+646	355
+647	354
+648	353
+649	352
+650	351
+651	350
+652	349
+653	348
+654	347
+655	346
+656	345
+657	344
+658	343
+659	342
+660	341
+661	340
+662	339
+663	338
+664	337
+665	336
+666	335
+667	334
+668	333
+669	332
+670	331
+671	330
+672	329
+673	328
+674	327
+675	326
+676	325
+677	324
+678	323
+679	322
+680	321
+681	320
+682	319
+683	318
+684	317
+685	316
+686	315
+687	314
+688	313
+689	312
+690	311
+691	310
+692	309
+693	308
+694	307
+695	306
+696	305
+697	304
+698	303
+699	302
+700	301
+701	300
+702	299
+703	298
+704	297
+705	296
+706	295
+707	294
+708	293
+709	292
+710	291
+711	290
+712	289
+713	288
+714	287
+715	286
+716	285
+717	284
+718	283
+719	282
+720	281
+721	280
+722	279
+723	278
+724	277
+725	276
+726	275
+727	274
+728	273
+729	272
+730	271
+731	270
+732	269
+733	268
+734	267
+735	266
+736	265
+737	264
+738	263
+739	262
+740	261
+741	260
+742	259
+743	258
+744	257
+745	256
+746	255
+747	254
+748	253
+749	252
+750	251
+751	250
+752	249
+753	248
+754	247
+755	246
+756	245
+757	244
+758	243
+759	242
+760	241
+761	240
+762	239
+763	238
+764	237
+765	236
+766	235
+767	234
+768	233
+769	232
+770	231
+771	230
+772	229
+773	228
+774	227
+775	226
+776	225
+777	224
+778	223
+779	222
+780	221
+781	220
+782	219
+783	218
+784	217
+785	216
+786	215
+787	214
+788	213
+789	212
+790	211
+791	210
+792	209
+793	208
+794	207
+795	206
+796	205
+797	204
+798	203
+799	202
+800	201
+801	200
+802	199
+803	198
+804	197
+805	196
+806	195
+807	194
+808	193
+809	192
+810	191
+811	190
+812	189
+813	188
+814	187
+815	186
+816	185
+817	184
+818	183
+819	182
+820	181
+821	180
+822	179
+823	178
+824	177
+825	176
+826	175
+827	174
+828	173
+829	172
+830	171
+831	170
+832	169
+833	168
+834	167
+835	166
+836	165
+837	164
+838	163
+839	162
+840	161
+841	160
+842	159
+843	158
+844	157
+845	156
+846	155
+847	154
+848	153
+849	152
+850	151
+851	150
+852	149
+853	148
+854	147
+855	146
+856	145
+857	144
+858	143
+859	142
+860	141
+861	140
+862	139
+863	138
+864	137
+865	136
+866	135
+867	134
+868	133
+869	132
+870	131
+871	130
+872	129
+873	128
+874	127
+875	126
+876	125
+877	124
+878	123
+879	122
+880	121
+881	120
+882	119
+883	118
+884	117
+885	116
+886	115
+887	114
+888	113
+889	112
+890	111
+891	110
+892	109
+893	108
+894	107
+895	106
+896	105
+897	104
+898	103
+899	102
+900	101
+901	100
+902	99
+903	98
+904	97
+905	96
+906	95
+907	94
+908	93
+909	92
+910	91
+911	90
+912	89
+913	88
+914	87
+915	86
+916	85
+917	84
+918	83
+919	82
+920	81
+921	80
+922	79
+923	78
+924	77
+925	76
+926	75
+927	74
+928	73
+929	72
+930	71
+931	70
+932	69
+933	68
+934	67
+935	66
+936	65
+937	64
+938	63
+939	62
+940	61
+941	60
+942	59
+943	58
+944	57
+945	56
+946	55
+947	54
+948	53
+949	52
+950	51
+951	50
+952	49
+953	48
+954	47
+955	46
+956	45
+957	44
+958	43
+959	42
+960	41
+961	40
+962	39
+963	38
+964	37
+965	36
+966	35
+967	34
+968	33
+969	32
+970	31
+971	30
+972	29
+973	28
+974	27
+975	26
+976	25
+977	24
+978	23
+979	22
+980	21
+981	20
+982	19
+983	18
+984	17
+985	16
+986	15
+987	14
+988	13
+989	12
+990	11
+991	10
+992	9
+993	8
+994	7
+995	6
+996	5
+997	4
+998	3
+999	2
+1000	1
+select id,t from t1 force index (primary) order by id;
+id	t
+1	1000
+2	999
+3	998
+4	997
+5	996
+6	995
+7	994
+8	993
+9	992
+10	991
+11	990
+12	989
+13	988
+14	987
+15	986
+16	985
+17	984
+18	983
+19	982
+20	981
+21	980
+22	979
+23	978
+24	977
+25	976
+26	975
+27	974
+28	973
+29	972
+30	971
+31	970
+32	969
+33	968
+34	967
+35	966
+36	965
+37	964
+38	963
+39	962
+40	961
+41	960
+42	959
+43	958
+44	957
+45	956
+46	955
+47	954
+48	953
+49	952
+50	951
+51	950
+52	949
+53	948
+54	947
+55	946
+56	945
+57	944
+58	943
+59	942
+60	941
+61	940
+62	939
+63	938
+64	937
+65	936
+66	935
+67	934
+68	933
+69	932
+70	931
+71	930
+72	929
+73	928
+74	927
+75	926
+76	925
+77	924
+78	923
+79	922
+80	921
+81	920
+82	919
+83	918
+84	917
+85	916
+86	915
+87	914
+88	913
+89	912
+90	911
+91	910
+92	909
+93	908
+94	907
+95	906
+96	905
+97	904
+98	903
+99	902
+100	901
+101	900
+102	899
+103	898
+104	897
+105	896
+106	895
+107	894
+108	893
+109	892
+110	891
+111	890
+112	889
+113	888
+114	887
+115	886
+116	885
+117	884
+118	883
+119	882
+120	881
+121	880
+122	879
+123	878
+124	877
+125	876
+126	875
+127	874
+128	873
+129	872
+130	871
+131	870
+132	869
+133	868
+134	867
+135	866
+136	865
+137	864
+138	863
+139	862
+140	861
+141	860
+142	859
+143	858
+144	857
+145	856
+146	855
+147	854
+148	853
+149	852
+150	851
+151	850
+152	849
+153	848
+154	847
+155	846
+156	845
+157	844
+158	843
+159	842
+160	841
+161	840
+162	839
+163	838
+164	837
+165	836
+166	835
+167	834
+168	833
+169	832
+170	831
+171	830
+172	829
+173	828
+174	827
+175	826
+176	825
+177	824
+178	823
+179	822
+180	821
+181	820
+182	819
+183	818
+184	817
+185	816
+186	815
+187	814
+188	813
+189	812
+190	811
+191	810
+192	809
+193	808
+194	807
+195	806
+196	805
+197	804
+198	803
+199	802
+200	801
+201	800
+202	799
+203	798
+204	797
+205	796
+206	795
+207	794
+208	793
+209	792
+210	791
+211	790
+212	789
+213	788
+214	787
+215	786
+216	785
+217	784
+218	783
+219	782
+220	781
+221	780
+222	779
+223	778
+224	777
+225	776
+226	775
+227	774
+228	773
+229	772
+230	771
+231	770
+232	769
+233	768
+234	767
+235	766
+236	765
+237	764
+238	763
+239	762
+240	761
+241	760
+242	759
+243	758
+244	757
+245	756
+246	755
+247	754
+248	753
+249	752
+250	751
+251	750
+252	749
+253	748
+254	747
+255	746
+256	745
+257	744
+258	743
+259	742
+260	741
+261	740
+262	739
+263	738
+264	737
+265	736
+266	735
+267	734
+268	733
+269	732
+270	731
+271	730
+272	729
+273	728
+274	727
+275	726
+276	725
+277	724
+278	723
+279	722
+280	721
+281	720
+282	719
+283	718
+284	717
+285	716
+286	715
+287	714
+288	713
+289	712
+290	711
+291	710
+292	709
+293	708
+294	707
+295	706
+296	705
+297	704
+298	703
+299	702
+300	701
+301	700
+302	699
+303	698
+304	697
+305	696
+306	695
+307	694
+308	693
+309	692
+310	691
+311	690
+312	689
+313	688
+314	687
+315	686
+316	685
+317	684
+318	683
+319	682
+320	681
+321	680
+322	679
+323	678
+324	677
+325	676
+326	675
+327	674
+328	673
+329	672
+330	671
+331	670
+332	669
+333	668
+334	667
+335	666
+336	665
+337	664
+338	663
+339	662
+340	661
+341	660
+342	659
+343	658
+344	657
+345	656
+346	655
+347	654
+348	653
+349	652
+350	651
+351	650
+352	649
+353	648
+354	647
+355	646
+356	645
+357	644
+358	643
+359	642
+360	641
+361	640
+362	639
+363	638
+364	637
+365	636
+366	635
+367	634
+368	633
+369	632
+370	631
+371	630
+372	629
+373	628
+374	627
+375	626
+376	625
+377	624
+378	623
+379	622
+380	621
+381	620
+382	619
+383	618
+384	617
+385	616
+386	615
+387	614
+388	613
+389	612
+390	611
+391	610
+392	609
+393	608
+394	607
+395	606
+396	605
+397	604
+398	603
+399	602
+400	601
+401	600
+402	599
+403	598
+404	597
+405	596
+406	595
+407	594
+408	593
+409	592
+410	591
+411	590
+412	589
+413	588
+414	587
+415	586
+416	585
+417	584
+418	583
+419	582
+420	581
+421	580
+422	579
+423	578
+424	577
+425	576
+426	575
+427	574
+428	573
+429	572
+430	571
+431	570
+432	569
+433	568
+434	567
+435	566
+436	565
+437	564
+438	563
+439	562
+440	561
+441	560
+442	559
+443	558
+444	557
+445	556
+446	555
+447	554
+448	553
+449	552
+450	551
+451	550
+452	549
+453	548
+454	547
+455	546
+456	545
+457	544
+458	543
+459	542
+460	541
+461	540
+462	539
+463	538
+464	537
+465	536
+466	535
+467	534
+468	533
+469	532
+470	531
+471	530
+472	529
+473	528
+474	527
+475	526
+476	525
+477	524
+478	523
+479	522
+480	521
+481	520
+482	519
+483	518
+484	517
+485	516
+486	515
+487	514
+488	513
+489	512
+490	511
+491	510
+492	509
+493	508
+494	507
+495	506
+496	505
+497	504
+498	503
+499	502
+500	501
+501	500
+502	499
+503	498
+504	497
+505	496
+506	495
+507	494
+508	493
+509	492
+510	491
+511	490
+512	489
+513	488
+514	487
+515	486
+516	485
+517	484
+518	483
+519	482
+520	481
+521	480
+522	479
+523	478
+524	477
+525	476
+526	475
+527	474
+528	473
+529	472
+530	471
+531	470
+532	469
+533	468
+534	467
+535	466
+536	465
+537	464
+538	463
+539	462
+540	461
+541	460
+542	459
+543	458
+544	457
+545	456
+546	455
+547	454
+548	453
+549	452
+550	451
+551	450
+552	449
+553	448
+554	447
+555	446
+556	445
+557	444
+558	443
+559	442
+560	441
+561	440
+562	439
+563	438
+564	437
+565	436
+566	435
+567	434
+568	433
+569	432
+570	431
+571	430
+572	429
+573	428
+574	427
+575	426
+576	425
+577	424
+578	423
+579	422
+580	421
+581	420
+582	419
+583	418
+584	417
+585	416
+586	415
+587	414
+588	413
+589	412
+590	411
+591	410
+592	409
+593	408
+594	407
+595	406
+596	405
+597	404
+598	403
+599	402
+600	401
+601	400
+602	399
+603	398
+604	397
+605	396
+606	395
+607	394
+608	393
+609	392
+610	391
+611	390
+612	389
+613	388
+614	387
+615	386
+616	385
+617	384
+618	383
+619	382
+620	381
+621	380
+622	379
+623	378
+624	377
+625	376
+626	375
+627	374
+628	373
+629	372
+630	371
+631	370
+632	369
+633	368
+634	367
+635	366
+636	365
+637	364
+638	363
+639	362
+640	361
+641	360
+642	359
+643	358
+644	357
+645	356
+646	355
+647	354
+648	353
+649	352
+650	351
+651	350
+652	349
+653	348
+654	347
+655	346
+656	345
+657	344
+658	343
+659	342
+660	341
+661	340
+662	339
+663	338
+664	337
+665	336
+666	335
+667	334
+668	333
+669	332
+670	331
+671	330
+672	329
+673	328
+674	327
+675	326
+676	325
+677	324
+678	323
+679	322
+680	321
+681	320
+682	319
+683	318
+684	317
+685	316
+686	315
+687	314
+688	313
+689	312
+690	311
+691	310
+692	309
+693	308
+694	307
+695	306
+696	305
+697	304
+698	303
+699	302
+700	301
+701	300
+702	299
+703	298
+704	297
+705	296
+706	295
+707	294
+708	293
+709	292
+710	291
+711	290
+712	289
+713	288
+714	287
+715	286
+716	285
+717	284
+718	283
+719	282
+720	281
+721	280
+722	279
+723	278
+724	277
+725	276
+726	275
+727	274
+728	273
+729	272
+730	271
+731	270
+732	269
+733	268
+734	267
+735	266
+736	265
+737	264
+738	263
+739	262
+740	261
+741	260
+742	259
+743	258
+744	257
+745	256
+746	255
+747	254
+748	253
+749	252
+750	251
+751	250
+752	249
+753	248
+754	247
+755	246
+756	245
+757	244
+758	243
+759	242
+760	241
+761	240
+762	239
+763	238
+764	237
+765	236
+766	235
+767	234
+768	233
+769	232
+770	231
+771	230
+772	229
+773	228
+774	227
+775	226
+776	225
+777	224
+778	223
+779	222
+780	221
+781	220
+782	219
+783	218
+784	217
+785	216
+786	215
+787	214
+788	213
+789	212
+790	211
+791	210
+792	209
+793	208
+794	207
+795	206
+796	205
+797	204
+798	203
+799	202
+800	201
+801	200
+802	199
+803	198
+804	197
+805	196
+806	195
+807	194
+808	193
+809	192
+810	191
+811	190
+812	189
+813	188
+814	187
+815	186
+816	185
+817	184
+818	183
+819	182
+820	181
+821	180
+822	179
+823	178
+824	177
+825	176
+826	175
+827	174
+828	173
+829	172
+830	171
+831	170
+832	169
+833	168
+834	167
+835	166
+836	165
+837	164
+838	163
+839	162
+840	161
+841	160
+842	159
+843	158
+844	157
+845	156
+846	155
+847	154
+848	153
+849	152
+850	151
+851	150
+852	149
+853	148
+854	147
+855	146
+856	145
+857	144
+858	143
+859	142
+860	141
+861	140
+862	139
+863	138
+864	137
+865	136
+866	135
+867	134
+868	133
+869	132
+870	131
+871	130
+872	129
+873	128
+874	127
+875	126
+876	125
+877	124
+878	123
+879	122
+880	121
+881	120
+882	119
+883	118
+884	117
+885	116
+886	115
+887	114
+888	113
+889	112
+890	111
+891	110
+892	109
+893	108
+894	107
+895	106
+896	105
+897	104
+898	103
+899	102
+900	101
+901	100
+902	99
+903	98
+904	97
+905	96
+906	95
+907	94
+908	93
+909	92
+910	91
+911	90
+912	89
+913	88
+914	87
+915	86
+916	85
+917	84
+918	83
+919	82
+920	81
+921	80
+922	79
+923	78
+924	77
+925	76
+926	75
+927	74
+928	73
+929	72
+930	71
+931	70
+932	69
+933	68
+934	67
+935	66
+936	65
+937	64
+938	63
+939	62
+940	61
+941	60
+942	59
+943	58
+944	57
+945	56
+946	55
+947	54
+948	53
+949	52
+950	51
+951	50
+952	49
+953	48
+954	47
+955	46
+956	45
+957	44
+958	43
+959	42
+960	41
+961	40
+962	39
+963	38
+964	37
+965	36
+966	35
+967	34
+968	33
+969	32
+970	31
+971	30
+972	29
+973	28
+974	27
+975	26
+976	25
+977	24
+978	23
+979	22
+980	21
+981	20
+982	19
+983	18
+984	17
+985	16
+986	15
+987	14
+988	13
+989	12
+990	11
+991	10
+992	9
+993	8
+994	7
+995	6
+996	5
+997	4
+998	3
+999	2
+1000	1
+drop table t1;
+CREATE TABLE t1 (
+FieldKey varchar(36) NOT NULL default '',
+LongVal bigint(20) default NULL,
+StringVal mediumtext,
+KEY FieldKey (FieldKey),
+KEY LongField (FieldKey,LongVal),
+KEY StringField (FieldKey,StringVal(32))
+);
+INSERT INTO t1 VALUES ('0',3,'0'),('0',2,'1'),('0',1,'2'),('1',2,'1'),('1',1,'3'), ('1',0,'2'),('2',3,'0'),('2',2,'1'),('2',1,'2'),('2',3,'0'),('2',2,'1'),('2',1,'2'),('3',2,'1'),('3',1,'2'),('3','3','3');
+SELECT * FROM t1 WHERE FieldKey = '1' ORDER BY LongVal;
+FieldKey	LongVal	StringVal
+1	0	2
+1	1	3
+1	2	1
+SELECT * FROM t1 WHERE FieldKey = '1' ORDER BY LongVal;
+FieldKey	LongVal	StringVal
+1	0	2
+1	1	3
+1	2	1
+SELECT * FROM t1 WHERE FieldKey > '2' ORDER BY LongVal;
+FieldKey	LongVal	StringVal
+3	1	2
+3	2	1
+3	3	3
+SELECT * FROM t1 WHERE FieldKey > '2' ORDER BY LongVal;
+FieldKey	LongVal	StringVal
+3	1	2
+3	2	1
+3	3	3
+SELECT * FROM t1 WHERE FieldKey > '2' ORDER BY FieldKey, LongVal;
+FieldKey	LongVal	StringVal
+3	1	2
+3	2	1
+3	3	3
+SELECT * FROM t1 WHERE FieldKey > '2' ORDER BY FieldKey, LongVal;
+FieldKey	LongVal	StringVal
+3	1	2
+3	2	1
+3	3	3
+DROP TABLE t1;
+CREATE TABLE t1 (a INT, b INT);
+DROP TABLE t1;
+CREATE TABLE t1 (  id smallint(6) unsigned NOT NULL default '0',  menu tinyint(4) NOT NULL default '0',  KEY id (id),  KEY menu (menu)) ENGINE=MyISAM;
+INSERT INTO t1 VALUES (11384, 2),(11392, 2);
+SELECT id FROM t1 WHERE id <11984 AND menu =2 ORDER BY id DESC LIMIT 1 ;
+id
+11392
+drop table t1;
+create table t1(a int, b int, index(b));
+insert into t1 values (2, 1), (1, 1), (4, NULL), (3, NULL), (6, 2), (5, 2);
+select * from t1 where b=1 or b is null order by a;
+a	b
+1	1
+2	1
+3	NULL
+4	NULL
+select * from t1 where b=1 or b is null order by a;
+a	b
+1	1
+2	1
+3	NULL
+4	NULL
+select * from t1 where b=2 or b is null order by a;
+a	b
+3	NULL
+4	NULL
+5	2
+6	2
+select * from t1 where b=2 or b is null order by a;
+a	b
+3	NULL
+4	NULL
+5	2
+6	2
+drop table t1;
+create table t1 (a int not null auto_increment, b int not null, c int not null, d int not null,
+key(a,b,d), key(c,b,a));
+create table t2 like t1;
+insert into t1 values (NULL, 1, 2, 0), (NULL, 2, 1, 1), (NULL, 3, 4, 2), (NULL, 4, 3, 3);
+insert into t2 select null, b, c, d from t1;
+insert into t1 select null, b, c, d from t2;
+insert into t2 select null, b, c, d from t1;
+insert into t1 select null, b, c, d from t2;
+insert into t2 select null, b, c, d from t1;
+insert into t1 select null, b, c, d from t2;
+insert into t2 select null, b, c, d from t1;
+insert into t1 select null, b, c, d from t2;
+insert into t2 select null, b, c, d from t1;
+insert into t1 select null, b, c, d from t2;
+optimize table t1;
+Table	Op	Msg_type	Msg_text
+test.t1	optimize	note	Table does not support optimize, doing recreate + analyze instead
+test.t1	optimize	status	OK
+select * from t1 where a=1 and b in (1) order by c, b, a;
+a	b	c	d
+1	1	2	0
+select * from t1 where a=1 and b in (1);
+a	b	c	d
+1	1	2	0
+drop table t1, t2;
+create table t1 (col1 int, col int);
+create table t2 (col2 int, col int);
+insert into t1 values (1,1),(2,2),(3,3);
+insert into t2 values (1,3),(2,2),(3,1);
+select t1.* , t2.col as t2_col from t1 left join t2 on (t1.col1=t2.col2)
+order by col;
+col1	col	t2_col
+1	1	3
+2	2	2
+3	3	1
+select col1 as col, col from t1 order by col;
+ERROR 23000: Column 'col' in order clause is ambiguous
+select t1.col as c1, t2.col as c2 from t1, t2 where t1.col1=t2.col2
+order by col;
+ERROR 23000: Column 'col' in order clause is ambiguous
+select t1.col as c1, t2.col as c2 from t1, t2 where t1.col1=t2.col2
+order by col;
+ERROR 23000: Column 'col' in order clause is ambiguous
+select col1 from t1, t2 where t1.col1=t2.col2 order by col;
+ERROR 23000: Column 'col' in order clause is ambiguous
+select t1.col as t1_col, t2.col2 from t1, t2 where t1.col1=t2.col2
+order by col;
+ERROR 23000: Column 'col' in order clause is ambiguous
+select t1.col as t1_col, t2.col from t1, t2 where t1.col1=t2.col2
+order by col;
+t1_col	col
+3	1
+2	2
+1	3
+select col2 as c, col as c from t2 order by col;
+c	c
+3	1
+2	2
+1	3
+select col2 as col, col as col2 from t2 order by col;
+col	col2
+1	3
+2	2
+3	1
+select t2.col2, t2.col, t2.col from t2 order by col;
+col2	col	col
+3	1	1
+2	2	2
+1	3	3
+select t2.col2 as col from t2 order by t2.col;
+col
+3
+2
+1
+select t2.col2 as col, t2.col from t2 order by t2.col;
+col	col
+3	1
+2	2
+1	3
+select t2.col2, t2.col, t2.col from t2 order by t2.col;
+col2	col	col
+3	1	1
+2	2	2
+1	3	3
+drop table t1, t2;
+create table t1 (a char(25));
+insert into t1 set a = repeat('x', 20);
+insert into t1 set a = concat(repeat('x', 19), 'z');
+insert into t1 set a = concat(repeat('x', 19), 'ab');
+insert into t1 set a = concat(repeat('x', 19), 'aa');
+set max_sort_length=20;
+select a from t1 order by a;
+a
+xxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxz
+xxxxxxxxxxxxxxxxxxxab
+xxxxxxxxxxxxxxxxxxxaa
+drop table t1;
+create table t1 (
+`sid` decimal(8,0) default null,
+`wnid` varchar(11) not null default '',
+key `wnid14` (`wnid`(4)),
+key `wnid` (`wnid`)
+) engine=myisam default charset=latin1;
+insert into t1 (`sid`, `wnid`) values
+('10100','01019000000'),('37986','01019000000'),('37987','01019010000'),
+('39560','01019090000'),('37989','01019000000'),('37990','01019011000'),
+('37991','01019011000'),('37992','01019019000'),('37993','01019030000'),
+('37994','01019090000'),('475','02070000000'),('25253','02071100000'),
+('25255','02071100000'),('25256','02071110000'),('25258','02071130000'),
+('25259','02071190000'),('25260','02071200000'),('25261','02071210000'),
+('25262','02071290000'),('25263','02071300000'),('25264','02071310000'),
+('25265','02071310000'),('25266','02071320000'),('25267','02071320000'),
+('25269','02071330000'),('25270','02071340000'),('25271','02071350000'),
+('25272','02071360000'),('25273','02071370000'),('25281','02071391000'),
+('25282','02071391000'),('25283','02071399000'),('25284','02071400000'),
+('25285','02071410000'),('25286','02071410000'),('25287','02071420000'),
+('25288','02071420000'),('25291','02071430000'),('25290','02071440000'),
+('25292','02071450000'),('25293','02071460000'),('25294','02071470000'),
+('25295','02071491000'),('25296','02071491000'),('25297','02071499000');
+select * from t1 where wnid like '0101%' order by wnid;
+sid	wnid
+10100	01019000000
+37986	01019000000
+37989	01019000000
+37987	01019010000
+37990	01019011000
+37991	01019011000
+37992	01019019000
+37993	01019030000
+39560	01019090000
+37994	01019090000
+select * from t1 where wnid like '0101%' order by wnid;
+sid	wnid
+10100	01019000000
+37986	01019000000
+37989	01019000000
+37987	01019010000
+37990	01019011000
+37991	01019011000
+37992	01019019000
+37993	01019030000
+39560	01019090000
+37994	01019090000
+drop table t1;
+CREATE TABLE t1 (a int);
+INSERT INTO t1 VALUES (2), (1), (1), (2), (1);
+SELECT a FROM t1 ORDER BY a;
+a
+1
+1
+1
+2
+2
+(SELECT a FROM t1) ORDER BY a;
+a
+1
+1
+1
+2
+2
+DROP TABLE t1;
+CREATE TABLE t1 (a int, b int);
+INSERT INTO t1 VALUES (1,30), (2,20), (1,10), (2,30), (1,20), (2,10);
+(SELECT b,a FROM t1 ORDER BY a,b) ORDER BY b,a;
+b	a
+10	1
+10	2
+20	1
+20	2
+30	1
+30	2
+(SELECT b FROM t1 ORDER BY b DESC) ORDER BY b ASC;
+b
+10
+10
+20
+20
+30
+30
+(SELECT b,a FROM t1 ORDER BY b,a) ORDER BY a,b;
+b	a
+10	1
+20	1
+30	1
+10	2
+20	2
+30	2
+(SELECT b,a FROM t1 ORDER by b,a LIMIT 3) ORDER by a,b;
+b	a
+10	1
+20	1
+10	2
+DROP TABLE t1;
+CREATE TABLE t1 (a INT);
+INSERT INTO t1 VALUES (1),(2);
+SELECT a + 1 AS num FROM t1 ORDER BY 30 - num;
+num
+3
+2
+SELECT CONCAT('test', a) AS str FROM t1 ORDER BY UPPER(str);
+str
+test1
+test2
+SELECT a + 1 AS num FROM t1 GROUP BY 30 - num;
+num
+3
+2
+SELECT a + 1 AS num FROM t1 HAVING 30 - num;
+num
+2
+3
+SELECT a + 1 AS num, num + 1 FROM t1;
+ERROR 42S22: Unknown column 'num' in 'field list'
+SELECT a + 1 AS num, (select num + 2 FROM t1 LIMIT 1) FROM t1;
+num	(select num + 2 FROM t1 LIMIT 1)
+2	4
+3	5
+SELECT a.a + 1 AS num FROM t1 a JOIN t1 b ON num = b.a;
+ERROR 42S22: Unknown column 'num' in 'on clause'
+DROP TABLE t1;
+CREATE TABLE bug25126 (
+val int unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY
+);
+UPDATE bug25126 SET MissingCol = MissingCol;
+ERROR 42S22: Unknown column 'MissingCol' in 'field list'
+UPDATE bug25126 SET val = val ORDER BY MissingCol;
+ERROR 42S22: Unknown column 'MissingCol' in 'order clause'
+UPDATE bug25126 SET val = val ORDER BY val;
+UPDATE bug25126 SET val = 1 ORDER BY val;
+UPDATE bug25126 SET val = 1 ORDER BY MissingCol;
+ERROR 42S22: Unknown column 'MissingCol' in 'order clause'
+UPDATE bug25126 SET val = 1 ORDER BY val, MissingCol;
+ERROR 42S22: Unknown column 'MissingCol' in 'order clause'
+UPDATE bug25126 SET val = MissingCol ORDER BY MissingCol;
+ERROR 42S22: Unknown column 'MissingCol' in 'order clause'
+UPDATE bug25126 SET MissingCol = 1 ORDER BY val, MissingCol;
+ERROR 42S22: Unknown column 'MissingCol' in 'order clause'
+UPDATE bug25126 SET MissingCol = 1 ORDER BY MissingCol;
+ERROR 42S22: Unknown column 'MissingCol' in 'order clause'
+UPDATE bug25126 SET MissingCol = val ORDER BY MissingCol;
+ERROR 42S22: Unknown column 'MissingCol' in 'order clause'
+UPDATE bug25126 SET MissingCol = MissingCol ORDER BY MissingCol;
+ERROR 42S22: Unknown column 'MissingCol' in 'order clause'
+DROP TABLE bug25126;
+CREATE TABLE t1 (a int);
+SELECT p.a AS val, q.a AS val1 FROM t1 p, t1 q ORDER BY val > 1;
+val	val1
+SELECT p.a AS val, q.a AS val FROM t1 p, t1 q ORDER BY val;
+ERROR 23000: Column 'val' in order clause is ambiguous
+SELECT p.a AS val, q.a AS val FROM t1 p, t1 q ORDER BY val > 1;
+ERROR 23000: Column 'val' in order clause is ambiguous
+DROP TABLE t1;
+CREATE TABLE t1 (a int);
+INSERT INTO t1 VALUES (3), (2), (4), (1);
+SELECT a, IF(a IN (2,3), a, a+10) FROM t1
+ORDER BY IF(a IN (2,3), a, a+10);
+a	IF(a IN (2,3), a, a+10)
+2	2
+3	3
+1	11
+4	14
+SELECT a, IF(a NOT IN (2,3), a, a+10) FROM t1 
+ORDER BY IF(a NOT IN (2,3), a, a+10);
+a	IF(a NOT IN (2,3), a, a+10)
+1	1
+4	4
+2	12
+3	13
+SELECT a, IF(a IN (2,3), a, a+10) FROM t1 
+ORDER BY IF(a NOT IN (2,3), a, a+10);
+a	IF(a IN (2,3), a, a+10)
+1	11
+4	14
+2	2
+3	3
+SELECT a, IF(a BETWEEN 2 AND 3, a, a+10) FROM t1
+ORDER BY IF(a BETWEEN 2 AND 3, a, a+10);
+a	IF(a BETWEEN 2 AND 3, a, a+10)
+2	2
+3	3
+1	11
+4	14
+SELECT a, IF(a NOT BETWEEN 2 AND 3, a, a+10) FROM t1 
+ORDER BY IF(a NOT BETWEEN 2 AND 3, a, a+10);
+a	IF(a NOT BETWEEN 2 AND 3, a, a+10)
+1	1
+4	4
+2	12
+3	13
+SELECT a, IF(a BETWEEN 2 AND 3, a, a+10) FROM t1 
+ORDER BY IF(a NOT BETWEEN 2 AND 3, a, a+10);
+a	IF(a BETWEEN 2 AND 3, a, a+10)
+1	11
+4	14
+2	2
+3	3
+SELECT IF(a IN (1,2), a, '') as x1, IF(a NOT IN (1,2), a, '') as x2
+FROM t1 GROUP BY x1, x2;
+x1	x2
+	3
+	4
+1	
+2	
+SELECT IF(a IN (1,2), a, '') as x1, IF(a NOT IN (1,2), a, '') as x2
+FROM t1 GROUP BY x1, IF(a NOT IN (1,2), a, '');
+x1	x2
+	3
+	4
+1	
+2	
+SELECT a, a IN (1,2) FROM t1 ORDER BY a IN (1,2);
+a	a IN (1,2)
+3	0
+4	0
+2	1
+1	1
+SELECT a FROM t1 ORDER BY a IN (1,2);
+a
+3
+4
+2
+1
+SELECT a+10 FROM t1 ORDER BY a IN (1,2);
+a+10
+13
+14
+12
+11
+SELECT a, IF(a IN (1,2), a, a+10) FROM t1
+ORDER BY IF(a IN (3,4), a, a+10);
+a	IF(a IN (1,2), a, a+10)
+3	13
+4	14
+1	1
+2	2
+DROP TABLE t1;
+create table t1 (a int not null, b  int not null, c int not null);
+insert t1 values (1,1,1),(1,1,2),(1,2,1);
+select a, b from t1 group by a, b order by sum(c);
+a	b
+1	2
+1	1
+drop table t1;
+CREATE TABLE t1 (a int, b int, PRIMARY KEY  (a));
+INSERT INTO t1 VALUES (1,1), (2,2), (3,3);
+SELECT t1.b as a, t2.b as c FROM 
+t1 LEFT JOIN t1 t2 ON (t1.a = t2.a AND t2.a = 2)
+ORDER BY c, a;
+a	c
+1	NULL
+3	NULL
+2	2
+SELECT t2.b as c FROM 
+t1 LEFT JOIN t1 t2 ON (t1.a = t2.a AND t2.a = 2) 
+ORDER BY c;
+c
+NULL
+NULL
+2
+SELECT t1.b as a, t2.b as c FROM 
+t1 JOIN t1 t2 ON (t1.a = t2.a AND t2.a = 2)  
+ORDER BY c;
+a	c
+2	2
+CREATE TABLE t2 LIKE t1;
+INSERT INTO t2 SELECT * from t1;
+CREATE TABLE t3 LIKE t1;
+INSERT INTO t3 SELECT * from t1;
+CREATE TABLE t4 LIKE t1;
+INSERT INTO t4 SELECT * from t1;
+INSERT INTO t1 values (0,0),(4,4);
+SELECT t2.b FROM t1 LEFT JOIN (t2, t3 LEFT JOIN t4 ON t3.a=t4.a)
+ON (t1.a=t2.a AND t1.b=t3.b) order by t2.b;
+b
+NULL
+NULL
+1
+2
+3
+DROP TABLE t1,t2,t3,t4;
+create table t1 (a int, b int, c int);
+insert into t1 values (1,2,3), (9,8,3), (19,4,3), (1,4,9);
+select a,(sum(b)/sum(c)) as ratio from t1 group by a order by sum(b)/sum(c) asc;
+a	ratio
+1	0.5000
+19	1.3333
+9	2.6667
+drop table t1;
+CREATE TABLE t1 (a INT UNSIGNED NOT NULL, b TIME);
+INSERT INTO t1 (a) VALUES (100000), (0), (100), (1000000),(10000), (1000), (10);
+UPDATE t1 SET b = SEC_TO_TIME(a);
+SELECT a, b FROM t1 ORDER BY b DESC;
+a	b
+1000000	277:46:40
+100000	27:46:40
+10000	02:46:40
+1000	00:16:40
+100	00:01:40
+10	00:00:10
+0	00:00:00
+SELECT a, b FROM t1 ORDER BY SEC_TO_TIME(a) DESC;
+a	b
+1000000	277:46:40
+100000	27:46:40
+10000	02:46:40
+1000	00:16:40
+100	00:01:40
+10	00:00:10
+0	00:00:00
+DROP TABLE t1;
+CREATE TABLE t1 (a INT, b INT, PRIMARY KEY (a), UNIQUE KEY b (b));
+INSERT INTO t1 VALUES (1,1),(2,2);
+CREATE TABLE t2 (a INT, b INT, KEY a (a,b));
+INSERT INTO t2 VALUES (1,1),(1,2),(2,1),(2,2);
+SELECT 1 FROM t1,t2 WHERE t1.b=2 AND t1.a=t2.a ORDER BY t2.b;
+1
+1
+1
+DROP TABLE t1,t2;
+CREATE TABLE t1(
+id int auto_increment PRIMARY KEY, c2 int, c3 int, INDEX k2(c2), INDEX k3(c3));
+INSERT INTO t1 (c2,c3) VALUES
+(31,34),(35,38),(34,31),(32,35),(31,39),
+(11,14),(15,18),(14,11),(12,15),(11,19);
+INSERT INTO t1 (c2,c3) SELECT c2,c3 FROM t1;
+INSERT INTO t1 (c2,c3) SELECT c2,c3 FROM t1;
+INSERT INTO t1 (c2,c3) SELECT c2,c3 FROM t1;
+INSERT INTO t1 (c2,c3) SELECT c2,c3 FROM t1;
+INSERT INTO t1 (c2,c3) SELECT c2,c3 FROM t1;
+INSERT INTO t1 (c2,c3) SELECT c2,c3 FROM t1;
+INSERT INTO t1 (c2,c3) SELECT c2,c3 FROM t1;
+INSERT INTO t1 (c2,c3) SELECT c2,c3 FROM t1;
+INSERT INTO t1 (c2,c3) SELECT c2,c3 FROM t1;
+INSERT INTO t1 (c2,c3) SELECT c2,c3 FROM t1;
+INSERT INTO t1 (c2,c3) SELECT c2,c3 FROM t1;
+INSERT INTO t1 (c2,c3) SELECT c2,c3 FROM t1;
+UPDATE t1 SET c2=20 WHERE id%100 = 0;
+SELECT COUNT(*) FROM t1;
+COUNT(*)
+40960
+CREATE TABLE t2 LIKE t1;
+INSERT INTO t2 SELECT * FROM t1 ORDER BY id;
+SELECT id,c3 FROM t2 WHERE c2=11 ORDER BY c3 LIMIT 20;
+id	c3
+6	14
+16	14
+31	14
+41	14
+62	14
+72	14
+82	14
+92	14
+125	14
+135	14
+145	14
+155	14
+165	14
+175	14
+185	14
+195	14
+252	14
+262	14
+272	14
+282	14
+SELECT id,c3 FROM t2 WHERE c2=11 ORDER BY c3 LIMIT 4000;
+id	c3
+6	14
+16	14
+31	14
+41	14
+62	14
+72	14
+82	14
+92	14
+125	14
+135	14
+145	14
+155	14
+165	14
+175	14
+185	14
+195	14
+252	14
+262	14
+272	14
+282	14
+292	14
+302	14
+312	14
+322	14
+332	14
+342	14
+352	14
+362	14
+372	14
+382	14
+392	14
+402	14
+507	14
+517	14
+527	14
+537	14
+547	14
+557	14
+567	14
+577	14
+587	14
+597	14
+607	14
+617	14
+627	14
+637	14
+647	14
+657	14
+667	14
+677	14
+687	14
+697	14
+707	14
+717	14
+727	14
+737	14
+747	14
+757	14
+767	14
+777	14
+787	14
+797	14
+807	14
+817	14
+1018	14
+1028	14
+1038	14
+1048	14
+1058	14
+1068	14
+1078	14
+1088	14
+1098	14
+1108	14
+1118	14
+1128	14
+1138	14
+1148	14
+1158	14
+1168	14
+1178	14
+1188	14
+1198	14
+1208	14
+1218	14
+1228	14
+1238	14
+1248	14
+1258	14
+1268	14
+1278	14
+1288	14
+1298	14
+1308	14
+1318	14
+1328	14
+1338	14
+1348	14
+1358	14
+1368	14
+1378	14
+1388	14
+1398	14
+1408	14
+1418	14
+1428	14
+1438	14
+1448	14
+1458	14
+1468	14
+1478	14
+1488	14
+1498	14
+1508	14
+1518	14
+1528	14
+1538	14
+1548	14
+1558	14
+1568	14
+1578	14
+1588	14
+1598	14
+1608	14
+1618	14
+1628	14
+1638	14
+1648	14
+2041	14
+2051	14
+2061	14
+2071	14
+2081	14
+2091	14
+2101	14
+2111	14
+2121	14
+2131	14
+2141	14
+2151	14
+2161	14
+2171	14
+2181	14
+2191	14
+2201	14
+2211	14
+2221	14
+2231	14
+2241	14
+2251	14
+2261	14
+2271	14
+2281	14
+2291	14
+2301	14
+2311	14
+2321	14
+2331	14
+2341	14
+2351	14
+2361	14
+2371	14
+2381	14
+2391	14
+2401	14
+2411	14
+2421	14
+2431	14
+2441	14
+2451	14
+2461	14
+2471	14
+2481	14
+2491	14
+2501	14
+2511	14
+2521	14
+2531	14
+2541	14
+2551	14
+2561	14
+2571	14
+2581	14
+2591	14
+2601	14
+2611	14
+2621	14
+2631	14
+2641	14
+2651	14
+2661	14
+2671	14
+2681	14
+2691	14
+2701	14
+2711	14
+2721	14
+2731	14
+2741	14
+2751	14
+2761	14
+2771	14
+2781	14
+2791	14
+2801	14
+2811	14
+2821	14
+2831	14
+2841	14
+2851	14
+2861	14
+2871	14
+2881	14
+2891	14
+2901	14
+2911	14
+2921	14
+2931	14
+2941	14
+2951	14
+2961	14
+2971	14
+2981	14
+2991	14
+3001	14
+3011	14
+3021	14
+3031	14
+3041	14
+3051	14
+3061	14
+3071	14
+3081	14
+3091	14
+3101	14
+3111	14
+3121	14
+3131	14
+3141	14
+3151	14
+3161	14
+3171	14
+3181	14
+3191	14
+3201	14
+3211	14
+3221	14
+3231	14
+3241	14
+3251	14
+3261	14
+3271	14
+3281	14
+3291	14
+3301	14
+3311	14
+4088	14
+4098	14
+4108	14
+4118	14
+4128	14
+4138	14
+4148	14
+4158	14
+4168	14
+4178	14
+4188	14
+4198	14
+4208	14
+4218	14
+4228	14
+4238	14
+4248	14
+4258	14
+4268	14
+4278	14
+4288	14
+4298	14
+4308	14
+4318	14
+4328	14
+4338	14
+4348	14
+4358	14
+4368	14
+4378	14
+4388	14
+4398	14
+4408	14
+4418	14
+4428	14
+4438	14
+4448	14
+4458	14
+4468	14
+4478	14
+4488	14
+4498	14
+4508	14
+4518	14
+4528	14
+4538	14
+4548	14
+4558	14
+4568	14
+4578	14
+4588	14
+4598	14
+4608	14
+4618	14
+4628	14
+4638	14
+4648	14
+4658	14
+4668	14
+4678	14
+4688	14
+4698	14
+4708	14
+4718	14
+4728	14
+4738	14
+4748	14
+4758	14
+4768	14
+4778	14
+4788	14
+4798	14
+4808	14
+4818	14
+4828	14
+4838	14
+4848	14
+4858	14
+4868	14
+4878	14
+4888	14
+4898	14
+4908	14
+4918	14
+4928	14
+4938	14
+4948	14
+4958	14
+4968	14
+4978	14
+4988	14
+4998	14
+5008	14
+5018	14
+5028	14
+5038	14
+5048	14
+5058	14
+5068	14
+5078	14
+5088	14
+5098	14
+5108	14
+5118	14
+5128	14
+5138	14
+5148	14
+5158	14
+5168	14
+5178	14
+5188	14
+5198	14
+5208	14
+5218	14
+5228	14
+5238	14
+5248	14
+5258	14
+5268	14
+5278	14
+5288	14
+5298	14
+5308	14
+5318	14
+5328	14
+5338	14
+5348	14
+5358	14
+5368	14
+5378	14
+5388	14
+5398	14
+5408	14
+5418	14
+5428	14
+5438	14
+5448	14
+5458	14
+5468	14
+5478	14
+5488	14
+5498	14
+5508	14
+5518	14
+5528	14
+5538	14
+5548	14
+5558	14
+5568	14
+5578	14
+5588	14
+5598	14
+5608	14
+5618	14
+5628	14
+5638	14
+5648	14
+5658	14
+5668	14
+5678	14
+5688	14
+5698	14
+5708	14
+5718	14
+5728	14
+5738	14
+5748	14
+5758	14
+5768	14
+5778	14
+5788	14
+5798	14
+5808	14
+5818	14
+5828	14
+5838	14
+5848	14
+5858	14
+5868	14
+5878	14
+5888	14
+5898	14
+5908	14
+5918	14
+5928	14
+5938	14
+5948	14
+5958	14
+5968	14
+5978	14
+5988	14
+5998	14
+6008	14
+6018	14
+6028	14
+6038	14
+6048	14
+6058	14
+6068	14
+6078	14
+6088	14
+6098	14
+6108	14
+6118	14
+6128	14
+6138	14
+6148	14
+6158	14
+6168	14
+6178	14
+6188	14
+6198	14
+6208	14
+6218	14
+6228	14
+6238	14
+6248	14
+6258	14
+6268	14
+6278	14
+6288	14
+6298	14
+6308	14
+6318	14
+6328	14
+6338	14
+6348	14
+6358	14
+6368	14
+6378	14
+6388	14
+6398	14
+6408	14
+6418	14
+6428	14
+6438	14
+6448	14
+6458	14
+6468	14
+6478	14
+6488	14
+6498	14
+6508	14
+6518	14
+6528	14
+6538	14
+6548	14
+6558	14
+6568	14
+6578	14
+6588	14
+6598	14
+6608	14
+6618	14
+6628	14
+6638	14
+8183	14
+8193	14
+8203	14
+8213	14
+8223	14
+8233	14
+8243	14
+8253	14
+8263	14
+8273	14
+8283	14
+8293	14
+8303	14
+8313	14
+8323	14
+8333	14
+8343	14
+8353	14
+8363	14
+8373	14
+8383	14
+8393	14
+8403	14
+8413	14
+8423	14
+8433	14
+8443	14
+8453	14
+8463	14
+8473	14
+8483	14
+8493	14
+8503	14
+8513	14
+8523	14
+8533	14
+8543	14
+8553	14
+8563	14
+8573	14
+8583	14
+8593	14
+8603	14
+8613	14
+8623	14
+8633	14
+8643	14
+8653	14
+8663	14
+8673	14
+8683	14
+8693	14
+8703	14
+8713	14
+8723	14
+8733	14
+8743	14
+8753	14
+8763	14
+8773	14
+8783	14
+8793	14
+8803	14
+8813	14
+8823	14
+8833	14
+8843	14
+8853	14
+8863	14
+8873	14
+8883	14
+8893	14
+8903	14
+8913	14
+8923	14
+8933	14
+8943	14
+8953	14
+8963	14
+8973	14
+8983	14
+8993	14
+9003	14
+9013	14
+9023	14
+9033	14
+9043	14
+9053	14
+9063	14
+9073	14
+9083	14
+9093	14
+9103	14
+9113	14
+9123	14
+9133	14
+9143	14
+9153	14
+9163	14
+9173	14
+9183	14
+9193	14
+9203	14
+9213	14
+9223	14
+9233	14
+9243	14
+9253	14
+9263	14
+9273	14
+9283	14
+9293	14
+9303	14
+9313	14
+9323	14
+9333	14
+9343	14
+9353	14
+9363	14
+9373	14
+9383	14
+9393	14
+9403	14
+9413	14
+9423	14
+9433	14
+9443	14
+9453	14
+9463	14
+9473	14
+9483	14
+9493	14
+9503	14
+9513	14
+9523	14
+9533	14
+9543	14
+9553	14
+9563	14
+9573	14
+9583	14
+9593	14
+9603	14
+9613	14
+9623	14
+9633	14
+9643	14
+9653	14
+9663	14
+9673	14
+9683	14
+9693	14
+9703	14
+9713	14
+9723	14
+9733	14
+9743	14
+9753	14
+9763	14
+9773	14
+9783	14
+9793	14
+9803	14
+9813	14
+9823	14
+9833	14
+9843	14
+9853	14
+9863	14
+9873	14
+9883	14
+9893	14
+9903	14
+9913	14
+9923	14
+9933	14
+9943	14
+9953	14
+9963	14
+9973	14
+9983	14
+9993	14
+10003	14
+10013	14
+10023	14
+10033	14
+10043	14
+10053	14
+10063	14
+10073	14
+10083	14
+10093	14
+10103	14
+10113	14
+10123	14
+10133	14
+10143	14
+10153	14
+10163	14
+10173	14
+10183	14
+10193	14
+10203	14
+10213	14
+10223	14
+10233	14
+10243	14
+10253	14
+10263	14
+10273	14
+10283	14
+10293	14
+10303	14
+10313	14
+10323	14
+10333	14
+10343	14
+10353	14
+10363	14
+10373	14
+10383	14
+10393	14
+10403	14
+10413	14
+10423	14
+10433	14
+10443	14
+10453	14
+10463	14
+10473	14
+10483	14
+10493	14
+10503	14
+10513	14
+10523	14
+10533	14
+10543	14
+10553	14
+10563	14
+10573	14
+10583	14
+10593	14
+10603	14
+10613	14
+10623	14
+10633	14
+10643	14
+10653	14
+10663	14
+10673	14
+10683	14
+10693	14
+10703	14
+10713	14
+10723	14
+10733	14
+10743	14
+10753	14
+10763	14
+10773	14
+10783	14
+10793	14
+10803	14
+10813	14
+10823	14
+10833	14
+10843	14
+10853	14
+10863	14
+10873	14
+10883	14
+10893	14
+10903	14
+10913	14
+10923	14
+10933	14
+10943	14
+10953	14
+10963	14
+10973	14
+10983	14
+10993	14
+11003	14
+11013	14
+11023	14
+11033	14
+11043	14
+11053	14
+11063	14
+11073	14
+11083	14
+11093	14
+11103	14
+11113	14
+11123	14
+11133	14
+11143	14
+11153	14
+11163	14
+11173	14
+11183	14
+11193	14
+11203	14
+11213	14
+11223	14
+11233	14
+11243	14
+11253	14
+11263	14
+11273	14
+11283	14
+11293	14
+11303	14
+11313	14
+11323	14
+11333	14
+11343	14
+11353	14
+11363	14
+11373	14
+11383	14
+11393	14
+11403	14
+11413	14
+11423	14
+11433	14
+11443	14
+11453	14
+11463	14
+11473	14
+11483	14
+11493	14
+11503	14
+11513	14
+11523	14
+11533	14
+11543	14
+11553	14
+11563	14
+11573	14
+11583	14
+11593	14
+11603	14
+11613	14
+11623	14
+11633	14
+11643	14
+11653	14
+11663	14
+11673	14
+11683	14
+11693	14
+11703	14
+11713	14
+11723	14
+11733	14
+11743	14
+11753	14
+11763	14
+11773	14
+11783	14
+11793	14
+11803	14
+11813	14
+11823	14
+11833	14
+11843	14
+11853	14
+11863	14
+11873	14
+11883	14
+11893	14
+11903	14
+11913	14
+11923	14
+11933	14
+11943	14
+11953	14
+11963	14
+11973	14
+11983	14
+11993	14
+12003	14
+12013	14
+12023	14
+12033	14
+12043	14
+12053	14
+12063	14
+12073	14
+12083	14
+12093	14
+12103	14
+12113	14
+12123	14
+12133	14
+12143	14
+12153	14
+12163	14
+12173	14
+12183	14
+12193	14
+12203	14
+12213	14
+12223	14
+12233	14
+12243	14
+12253	14
+12263	14
+12273	14
+12283	14
+12293	14
+12303	14
+12313	14
+12323	14
+12333	14
+12343	14
+12353	14
+12363	14
+12373	14
+12383	14
+12393	14
+12403	14
+12413	14
+12423	14
+12433	14
+12443	14
+12453	14
+12463	14
+12473	14
+12483	14
+12493	14
+12503	14
+12513	14
+12523	14
+12533	14
+12543	14
+12553	14
+12563	14
+12573	14
+12583	14
+12593	14
+12603	14
+12613	14
+12623	14
+12633	14
+12643	14
+12653	14
+12663	14
+12673	14
+12683	14
+12693	14
+12703	14
+12713	14
+12723	14
+12733	14
+12743	14
+12753	14
+12763	14
+12773	14
+12783	14
+12793	14
+12803	14
+12813	14
+12823	14
+12833	14
+12843	14
+12853	14
+12863	14
+12873	14
+12883	14
+12893	14
+12903	14
+12913	14
+12923	14
+12933	14
+12943	14
+12953	14
+12963	14
+12973	14
+12983	14
+12993	14
+13003	14
+13013	14
+13023	14
+13033	14
+13043	14
+13053	14
+13063	14
+13073	14
+13083	14
+13093	14
+13103	14
+13113	14
+13123	14
+13133	14
+13143	14
+13153	14
+13163	14
+13173	14
+13183	14
+13193	14
+13203	14
+13213	14
+13223	14
+13233	14
+13243	14
+13253	14
+13263	14
+13273	14
+13283	14
+13293	14
+16374	14
+16384	14
+16394	14
+16404	14
+16414	14
+16424	14
+16434	14
+16444	14
+16454	14
+16464	14
+16474	14
+16484	14
+16494	14
+16504	14
+16514	14
+16524	14
+16534	14
+16544	14
+16554	14
+16564	14
+16574	14
+16584	14
+16594	14
+16604	14
+16614	14
+16624	14
+16634	14
+16644	14
+16654	14
+16664	14
+16674	14
+16684	14
+16694	14
+16704	14
+16714	14
+16724	14
+16734	14
+16744	14
+16754	14
+16764	14
+16774	14
+16784	14
+16794	14
+16804	14
+16814	14
+16824	14
+16834	14
+16844	14
+16854	14
+16864	14
+16874	14
+16884	14
+16894	14
+16904	14
+16914	14
+16924	14
+16934	14
+16944	14
+16954	14
+16964	14
+16974	14
+16984	14
+16994	14
+17004	14
+17014	14
+17024	14
+17034	14
+17044	14
+17054	14
+17064	14
+17074	14
+17084	14
+17094	14
+17104	14
+17114	14
+17124	14
+17134	14
+17144	14
+17154	14
+17164	14
+17174	14
+17184	14
+17194	14
+17204	14
+17214	14
+17224	14
+17234	14
+17244	14
+17254	14
+17264	14
+17274	14
+17284	14
+17294	14
+17304	14
+17314	14
+17324	14
+17334	14
+17344	14
+17354	14
+17364	14
+17374	14
+17384	14
+17394	14
+17404	14
+17414	14
+17424	14
+17434	14
+17444	14
+17454	14
+17464	14
+17474	14
+17484	14
+17494	14
+17504	14
+17514	14
+17524	14
+17534	14
+17544	14
+17554	14
+17564	14
+17574	14
+17584	14
+17594	14
+17604	14
+17614	14
+17624	14
+17634	14
+17644	14
+17654	14
+17664	14
+17674	14
+17684	14
+17694	14
+17704	14
+17714	14
+17724	14
+17734	14
+17744	14
+17754	14
+17764	14
+17774	14
+17784	14
+17794	14
+17804	14
+17814	14
+17824	14
+17834	14
+17844	14
+17854	14
+17864	14
+17874	14
+17884	14
+17894	14
+17904	14
+17914	14
+17924	14
+17934	14
+17944	14
+17954	14
+17964	14
+17974	14
+17984	14
+17994	14
+18004	14
+18014	14
+18024	14
+18034	14
+18044	14
+18054	14
+18064	14
+18074	14
+18084	14
+18094	14
+18104	14
+18114	14
+18124	14
+18134	14
+18144	14
+18154	14
+18164	14
+18174	14
+18184	14
+18194	14
+18204	14
+18214	14
+18224	14
+18234	14
+18244	14
+18254	14
+18264	14
+18274	14
+18284	14
+18294	14
+18304	14
+18314	14
+18324	14
+18334	14
+18344	14
+18354	14
+18364	14
+18374	14
+18384	14
+18394	14
+18404	14
+18414	14
+18424	14
+18434	14
+18444	14
+18454	14
+18464	14
+18474	14
+18484	14
+18494	14
+18504	14
+18514	14
+18524	14
+18534	14
+18544	14
+18554	14
+18564	14
+18574	14
+18584	14
+18594	14
+18604	14
+18614	14
+18624	14
+18634	14
+18644	14
+18654	14
+18664	14
+18674	14
+18684	14
+18694	14
+18704	14
+18714	14
+18724	14
+18734	14
+18744	14
+18754	14
+18764	14
+18774	14
+18784	14
+18794	14
+18804	14
+18814	14
+18824	14
+18834	14
+18844	14
+18854	14
+18864	14
+18874	14
+18884	14
+18894	14
+18904	14
+18914	14
+18924	14
+18934	14
+18944	14
+18954	14
+18964	14
+18974	14
+18984	14
+18994	14
+19004	14
+19014	14
+19024	14
+19034	14
+19044	14
+19054	14
+19064	14
+19074	14
+19084	14
+19094	14
+19104	14
+19114	14
+19124	14
+19134	14
+19144	14
+19154	14
+19164	14
+19174	14
+19184	14
+19194	14
+19204	14
+19214	14
+19224	14
+19234	14
+19244	14
+19254	14
+19264	14
+19274	14
+19284	14
+19294	14
+19304	14
+19314	14
+19324	14
+19334	14
+19344	14
+19354	14
+19364	14
+19374	14
+19384	14
+19394	14
+19404	14
+19414	14
+19424	14
+19434	14
+19444	14
+19454	14
+19464	14
+19474	14
+19484	14
+19494	14
+19504	14
+19514	14
+19524	14
+19534	14
+19544	14
+19554	14
+19564	14
+19574	14
+19584	14
+19594	14
+19604	14
+19614	14
+19624	14
+19634	14
+19644	14
+19654	14
+19664	14
+19674	14
+19684	14
+19694	14
+19704	14
+19714	14
+19724	14
+19734	14
+19744	14
+19754	14
+19764	14
+19774	14
+19784	14
+19794	14
+19804	14
+19814	14
+19824	14
+19834	14
+19844	14
+19854	14
+19864	14
+19874	14
+19884	14
+19894	14
+19904	14
+19914	14
+19924	14
+19934	14
+19944	14
+19954	14
+19964	14
+19974	14
+19984	14
+19994	14
+20004	14
+20014	14
+20024	14
+20034	14
+20044	14
+20054	14
+20064	14
+20074	14
+20084	14
+20094	14
+20104	14
+20114	14
+20124	14
+20134	14
+20144	14
+20154	14
+20164	14
+20174	14
+20184	14
+20194	14
+20204	14
+20214	14
+20224	14
+20234	14
+20244	14
+20254	14
+20264	14
+20274	14
+20284	14
+20294	14
+20304	14
+20314	14
+20324	14
+20334	14
+20344	14
+20354	14
+20364	14
+20374	14
+20384	14
+20394	14
+20404	14
+20414	14
+20424	14
+20434	14
+20444	14
+20454	14
+20464	14
+20474	14
+20484	14
+20494	14
+20504	14
+20514	14
+20524	14
+20534	14
+20544	14
+20554	14
+20564	14
+20574	14
+20584	14
+20594	14
+20604	14
+20614	14
+20624	14
+20634	14
+20644	14
+20654	14
+20664	14
+20674	14
+20684	14
+20694	14
+20704	14
+20714	14
+20724	14
+20734	14
+20744	14
+20754	14
+20764	14
+20774	14
+20784	14
+20794	14
+20804	14
+20814	14
+20824	14
+20834	14
+20844	14
+20854	14
+20864	14
+20874	14
+20884	14
+20894	14
+20904	14
+20914	14
+20924	14
+20934	14
+20944	14
+20954	14
+20964	14
+20974	14
+20984	14
+20994	14
+21004	14
+21014	14
+21024	14
+21034	14
+21044	14
+21054	14
+21064	14
+21074	14
+21084	14
+21094	14
+21104	14
+21114	14
+21124	14
+21134	14
+21144	14
+21154	14
+21164	14
+21174	14
+21184	14
+21194	14
+21204	14
+21214	14
+21224	14
+21234	14
+21244	14
+21254	14
+21264	14
+21274	14
+21284	14
+21294	14
+21304	14
+21314	14
+21324	14
+21334	14
+21344	14
+21354	14
+21364	14
+21374	14
+21384	14
+21394	14
+21404	14
+21414	14
+21424	14
+21434	14
+21444	14
+21454	14
+21464	14
+21474	14
+21484	14
+21494	14
+21504	14
+21514	14
+21524	14
+21534	14
+21544	14
+21554	14
+21564	14
+21574	14
+21584	14
+21594	14
+21604	14
+21614	14
+21624	14
+21634	14
+21644	14
+21654	14
+21664	14
+21674	14
+21684	14
+21694	14
+21704	14
+21714	14
+21724	14
+21734	14
+21744	14
+21754	14
+21764	14
+21774	14
+21784	14
+21794	14
+21804	14
+21814	14
+21824	14
+21834	14
+21844	14
+21854	14
+21864	14
+21874	14
+21884	14
+21894	14
+21904	14
+21914	14
+21924	14
+21934	14
+21944	14
+21954	14
+21964	14
+21974	14
+21984	14
+21994	14
+22004	14
+22014	14
+22024	14
+22034	14
+22044	14
+22054	14
+22064	14
+22074	14
+22084	14
+22094	14
+22104	14
+22114	14
+22124	14
+22134	14
+22144	14
+22154	14
+22164	14
+22174	14
+22184	14
+22194	14
+22204	14
+22214	14
+22224	14
+22234	14
+22244	14
+22254	14
+22264	14
+22274	14
+22284	14
+22294	14
+22304	14
+22314	14
+22324	14
+22334	14
+22344	14
+22354	14
+22364	14
+22374	14
+22384	14
+22394	14
+22404	14
+22414	14
+22424	14
+22434	14
+22444	14
+22454	14
+22464	14
+22474	14
+22484	14
+22494	14
+22504	14
+22514	14
+22524	14
+22534	14
+22544	14
+22554	14
+22564	14
+22574	14
+22584	14
+22594	14
+22604	14
+22614	14
+22624	14
+22634	14
+22644	14
+22654	14
+22664	14
+22674	14
+22684	14
+22694	14
+22704	14
+22714	14
+22724	14
+22734	14
+22744	14
+22754	14
+22764	14
+22774	14
+22784	14
+22794	14
+22804	14
+22814	14
+22824	14
+22834	14
+22844	14
+22854	14
+22864	14
+22874	14
+22884	14
+22894	14
+22904	14
+22914	14
+22924	14
+22934	14
+22944	14
+22954	14
+22964	14
+22974	14
+22984	14
+22994	14
+23004	14
+23014	14
+23024	14
+23034	14
+23044	14
+23054	14
+23064	14
+23074	14
+23084	14
+23094	14
+23104	14
+23114	14
+23124	14
+23134	14
+23144	14
+23154	14
+23164	14
+23174	14
+23184	14
+23194	14
+23204	14
+23214	14
+23224	14
+23234	14
+23244	14
+23254	14
+23264	14
+23274	14
+23284	14
+23294	14
+23304	14
+23314	14
+23324	14
+23334	14
+23344	14
+23354	14
+23364	14
+23374	14
+23384	14
+23394	14
+23404	14
+23414	14
+23424	14
+23434	14
+23444	14
+23454	14
+23464	14
+23474	14
+23484	14
+23494	14
+23504	14
+23514	14
+23524	14
+23534	14
+23544	14
+23554	14
+23564	14
+23574	14
+23584	14
+23594	14
+23604	14
+23614	14
+23624	14
+23634	14
+23644	14
+23654	14
+23664	14
+23674	14
+23684	14
+23694	14
+23704	14
+23714	14
+23724	14
+23734	14
+23744	14
+23754	14
+23764	14
+23774	14
+23784	14
+23794	14
+23804	14
+23814	14
+23824	14
+23834	14
+23844	14
+23854	14
+23864	14
+23874	14
+23884	14
+23894	14
+23904	14
+23914	14
+23924	14
+23934	14
+23944	14
+23954	14
+23964	14
+23974	14
+23984	14
+23994	14
+24004	14
+24014	14
+24024	14
+24034	14
+24044	14
+24054	14
+24064	14
+24074	14
+24084	14
+24094	14
+24104	14
+24114	14
+24124	14
+24134	14
+24144	14
+24154	14
+24164	14
+24174	14
+24184	14
+24194	14
+24204	14
+24214	14
+24224	14
+24234	14
+24244	14
+24254	14
+24264	14
+24274	14
+24284	14
+24294	14
+24304	14
+24314	14
+24324	14
+24334	14
+24344	14
+24354	14
+24364	14
+24374	14
+24384	14
+24394	14
+24404	14
+24414	14
+24424	14
+24434	14
+24444	14
+24454	14
+24464	14
+24474	14
+24484	14
+24494	14
+24504	14
+24514	14
+24524	14
+24534	14
+24544	14
+24554	14
+24564	14
+24574	14
+24584	14
+24594	14
+24604	14
+24614	14
+24624	14
+24634	14
+24644	14
+24654	14
+24664	14
+24674	14
+24684	14
+24694	14
+24704	14
+24714	14
+24724	14
+24734	14
+24744	14
+24754	14
+24764	14
+24774	14
+24784	14
+24794	14
+24804	14
+24814	14
+24824	14
+24834	14
+24844	14
+24854	14
+24864	14
+24874	14
+24884	14
+24894	14
+24904	14
+24914	14
+24924	14
+24934	14
+24944	14
+24954	14
+24964	14
+24974	14
+24984	14
+24994	14
+25004	14
+25014	14
+25024	14
+25034	14
+25044	14
+25054	14
+25064	14
+25074	14
+25084	14
+25094	14
+25104	14
+25114	14
+25124	14
+25134	14
+25144	14
+25154	14
+25164	14
+25174	14
+25184	14
+25194	14
+25204	14
+25214	14
+25224	14
+25234	14
+25244	14
+25254	14
+25264	14
+25274	14
+25284	14
+25294	14
+25304	14
+25314	14
+25324	14
+25334	14
+25344	14
+25354	14
+25364	14
+25374	14
+25384	14
+25394	14
+25404	14
+25414	14
+25424	14
+25434	14
+25444	14
+25454	14
+25464	14
+25474	14
+25484	14
+25494	14
+25504	14
+25514	14
+25524	14
+25534	14
+25544	14
+25554	14
+25564	14
+25574	14
+25584	14
+25594	14
+25604	14
+25614	14
+25624	14
+25634	14
+25644	14
+25654	14
+25664	14
+25674	14
+25684	14
+25694	14
+25704	14
+25714	14
+25724	14
+25734	14
+25744	14
+25754	14
+25764	14
+25774	14
+25784	14
+25794	14
+25804	14
+25814	14
+25824	14
+25834	14
+25844	14
+25854	14
+25864	14
+25874	14
+25884	14
+25894	14
+25904	14
+25914	14
+25924	14
+25934	14
+25944	14
+25954	14
+25964	14
+25974	14
+25984	14
+25994	14
+26004	14
+26014	14
+26024	14
+26034	14
+26044	14
+26054	14
+26064	14
+26074	14
+26084	14
+26094	14
+26104	14
+26114	14
+26124	14
+26134	14
+26144	14
+26154	14
+26164	14
+26174	14
+26184	14
+26194	14
+26204	14
+26214	14
+26224	14
+26234	14
+26244	14
+26254	14
+26264	14
+26274	14
+26284	14
+26294	14
+26304	14
+26314	14
+26324	14
+26334	14
+26344	14
+26354	14
+26364	14
+26374	14
+26384	14
+26394	14
+26404	14
+26414	14
+26424	14
+26434	14
+26444	14
+26454	14
+26464	14
+26474	14
+26484	14
+26494	14
+26504	14
+26514	14
+26524	14
+26534	14
+26544	14
+26554	14
+26564	14
+26574	14
+26584	14
+26594	14
+26604	14
+32757	14
+32767	14
+32777	14
+32787	14
+32797	14
+32807	14
+32817	14
+32827	14
+32837	14
+32847	14
+32857	14
+32867	14
+32877	14
+32887	14
+32897	14
+32907	14
+32917	14
+32927	14
+32937	14
+32947	14
+32957	14
+32967	14
+32977	14
+32987	14
+32997	14
+33007	14
+33017	14
+33027	14
+33037	14
+33047	14
+33057	14
+33067	14
+33077	14
+33087	14
+33097	14
+33107	14
+33117	14
+33127	14
+33137	14
+33147	14
+33157	14
+33167	14
+33177	14
+33187	14
+33197	14
+33207	14
+33217	14
+33227	14
+33237	14
+33247	14
+33257	14
+33267	14
+33277	14
+33287	14
+33297	14
+33307	14
+33317	14
+33327	14
+33337	14
+33347	14
+33357	14
+33367	14
+33377	14
+33387	14
+33397	14
+33407	14
+33417	14
+33427	14
+33437	14
+33447	14
+33457	14
+33467	14
+33477	14
+33487	14
+33497	14
+33507	14
+33517	14
+33527	14
+33537	14
+33547	14
+33557	14
+33567	14
+33577	14
+33587	14
+33597	14
+33607	14
+33617	14
+33627	14
+33637	14
+33647	14
+33657	14
+33667	14
+33677	14
+33687	14
+33697	14
+33707	14
+33717	14
+33727	14
+33737	14
+33747	14
+33757	14
+33767	14
+33777	14
+33787	14
+33797	14
+33807	14
+33817	14
+33827	14
+33837	14
+33847	14
+33857	14
+33867	14
+33877	14
+33887	14
+33897	14
+33907	14
+33917	14
+33927	14
+33937	14
+33947	14
+33957	14
+33967	14
+33977	14
+33987	14
+33997	14
+34007	14
+34017	14
+34027	14
+34037	14
+34047	14
+34057	14
+34067	14
+34077	14
+34087	14
+34097	14
+34107	14
+34117	14
+34127	14
+34137	14
+34147	14
+34157	14
+34167	14
+34177	14
+34187	14
+34197	14
+34207	14
+34217	14
+34227	14
+34237	14
+34247	14
+34257	14
+34267	14
+34277	14
+34287	14
+34297	14
+34307	14
+34317	14
+34327	14
+34337	14
+34347	14
+34357	14
+34367	14
+34377	14
+34387	14
+34397	14
+34407	14
+34417	14
+34427	14
+34437	14
+34447	14
+34457	14
+34467	14
+34477	14
+34487	14
+34497	14
+34507	14
+34517	14
+34527	14
+34537	14
+34547	14
+34557	14
+34567	14
+34577	14
+34587	14
+34597	14
+34607	14
+34617	14
+34627	14
+34637	14
+34647	14
+34657	14
+34667	14
+34677	14
+34687	14
+34697	14
+34707	14
+34717	14
+34727	14
+34737	14
+34747	14
+34757	14
+34767	14
+34777	14
+34787	14
+34797	14
+34807	14
+34817	14
+34827	14
+34837	14
+34847	14
+34857	14
+34867	14
+34877	14
+34887	14
+34897	14
+34907	14
+34917	14
+34927	14
+34937	14
+34947	14
+34957	14
+34967	14
+34977	14
+34987	14
+34997	14
+35007	14
+35017	14
+35027	14
+35037	14
+35047	14
+35057	14
+35067	14
+35077	14
+35087	14
+35097	14
+35107	14
+35117	14
+35127	14
+35137	14
+35147	14
+35157	14
+35167	14
+35177	14
+35187	14
+35197	14
+35207	14
+35217	14
+35227	14
+35237	14
+35247	14
+35257	14
+35267	14
+35277	14
+35287	14
+35297	14
+35307	14
+35317	14
+35327	14
+35337	14
+35347	14
+35357	14
+35367	14
+35377	14
+35387	14
+35397	14
+35407	14
+35417	14
+35427	14
+35437	14
+35447	14
+35457	14
+35467	14
+35477	14
+35487	14
+35497	14
+35507	14
+35517	14
+35527	14
+35537	14
+35547	14
+35557	14
+35567	14
+35577	14
+35587	14
+35597	14
+35607	14
+35617	14
+35627	14
+35637	14
+35647	14
+35657	14
+35667	14
+35677	14
+35687	14
+35697	14
+35707	14
+35717	14
+35727	14
+35737	14
+35747	14
+35757	14
+35767	14
+35777	14
+35787	14
+35797	14
+35807	14
+35817	14
+35827	14
+35837	14
+35847	14
+35857	14
+35867	14
+35877	14
+35887	14
+35897	14
+35907	14
+35917	14
+35927	14
+35937	14
+35947	14
+35957	14
+35967	14
+35977	14
+35987	14
+35997	14
+36007	14
+36017	14
+36027	14
+36037	14
+36047	14
+36057	14
+36067	14
+36077	14
+36087	14
+36097	14
+36107	14
+36117	14
+36127	14
+36137	14
+36147	14
+36157	14
+36167	14
+36177	14
+36187	14
+36197	14
+36207	14
+36217	14
+36227	14
+36237	14
+36247	14
+36257	14
+36267	14
+36277	14
+36287	14
+36297	14
+36307	14
+36317	14
+36327	14
+36337	14
+36347	14
+36357	14
+36367	14
+36377	14
+36387	14
+36397	14
+36407	14
+36417	14
+36427	14
+36437	14
+36447	14
+36457	14
+36467	14
+36477	14
+36487	14
+36497	14
+36507	14
+36517	14
+36527	14
+36537	14
+36547	14
+36557	14
+36567	14
+36577	14
+36587	14
+36597	14
+36607	14
+36617	14
+36627	14
+36637	14
+36647	14
+36657	14
+36667	14
+36677	14
+36687	14
+36697	14
+36707	14
+36717	14
+36727	14
+36737	14
+36747	14
+36757	14
+36767	14
+36777	14
+36787	14
+36797	14
+36807	14
+36817	14
+36827	14
+36837	14
+36847	14
+36857	14
+36867	14
+36877	14
+36887	14
+36897	14
+36907	14
+36917	14
+36927	14
+36937	14
+36947	14
+36957	14
+36967	14
+36977	14
+36987	14
+36997	14
+37007	14
+37017	14
+37027	14
+37037	14
+37047	14
+37057	14
+37067	14
+37077	14
+37087	14
+37097	14
+37107	14
+37117	14
+37127	14
+37137	14
+37147	14
+37157	14
+37167	14
+37177	14
+37187	14
+37197	14
+37207	14
+37217	14
+37227	14
+37237	14
+37247	14
+37257	14
+37267	14
+37277	14
+37287	14
+37297	14
+37307	14
+37317	14
+37327	14
+37337	14
+37347	14
+37357	14
+37367	14
+37377	14
+37387	14
+37397	14
+37407	14
+37417	14
+37427	14
+37437	14
+37447	14
+37457	14
+37467	14
+37477	14
+37487	14
+37497	14
+37507	14
+37517	14
+37527	14
+37537	14
+37547	14
+37557	14
+37567	14
+37577	14
+37587	14
+37597	14
+37607	14
+37617	14
+37627	14
+37637	14
+37647	14
+37657	14
+37667	14
+37677	14
+37687	14
+37697	14
+37707	14
+37717	14
+37727	14
+37737	14
+37747	14
+37757	14
+37767	14
+37777	14
+37787	14
+37797	14
+37807	14
+37817	14
+37827	14
+37837	14
+37847	14
+37857	14
+37867	14
+37877	14
+37887	14
+37897	14
+37907	14
+37917	14
+37927	14
+37937	14
+37947	14
+37957	14
+37967	14
+37977	14
+37987	14
+37997	14
+38007	14
+38017	14
+38027	14
+38037	14
+38047	14
+38057	14
+38067	14
+38077	14
+38087	14
+38097	14
+38107	14
+38117	14
+38127	14
+38137	14
+38147	14
+38157	14
+38167	14
+38177	14
+38187	14
+38197	14
+38207	14
+38217	14
+38227	14
+38237	14
+38247	14
+38257	14
+38267	14
+38277	14
+38287	14
+38297	14
+38307	14
+38317	14
+38327	14
+38337	14
+38347	14
+38357	14
+38367	14
+38377	14
+38387	14
+38397	14
+38407	14
+38417	14
+38427	14
+38437	14
+38447	14
+38457	14
+38467	14
+38477	14
+38487	14
+38497	14
+38507	14
+38517	14
+38527	14
+38537	14
+38547	14
+38557	14
+38567	14
+38577	14
+38587	14
+38597	14
+38607	14
+38617	14
+38627	14
+38637	14
+38647	14
+38657	14
+38667	14
+38677	14
+38687	14
+38697	14
+38707	14
+38717	14
+38727	14
+38737	14
+38747	14
+38757	14
+38767	14
+38777	14
+38787	14
+38797	14
+38807	14
+38817	14
+38827	14
+38837	14
+38847	14
+38857	14
+38867	14
+38877	14
+38887	14
+38897	14
+38907	14
+38917	14
+38927	14
+38937	14
+38947	14
+38957	14
+38967	14
+38977	14
+38987	14
+38997	14
+39007	14
+39017	14
+39027	14
+39037	14
+39047	14
+39057	14
+39067	14
+39077	14
+39087	14
+39097	14
+39107	14
+39117	14
+39127	14
+39137	14
+39147	14
+39157	14
+39167	14
+39177	14
+39187	14
+39197	14
+39207	14
+39217	14
+39227	14
+39237	14
+39247	14
+39257	14
+39267	14
+39277	14
+39287	14
+39297	14
+39307	14
+39317	14
+39327	14
+39337	14
+39347	14
+39357	14
+39367	14
+39377	14
+39387	14
+39397	14
+39407	14
+39417	14
+39427	14
+39437	14
+39447	14
+39457	14
+39467	14
+39477	14
+39487	14
+39497	14
+39507	14
+39517	14
+39527	14
+39537	14
+39547	14
+39557	14
+39567	14
+39577	14
+39587	14
+39597	14
+39607	14
+39617	14
+39627	14
+39637	14
+39647	14
+39657	14
+39667	14
+39677	14
+39687	14
+39697	14
+39707	14
+39717	14
+39727	14
+39737	14
+39747	14
+39757	14
+39767	14
+39777	14
+39787	14
+39797	14
+39807	14
+39817	14
+39827	14
+39837	14
+39847	14
+39857	14
+39867	14
+39877	14
+39887	14
+39897	14
+39907	14
+39917	14
+39927	14
+39937	14
+39947	14
+39957	14
+39967	14
+39977	14
+39987	14
+39997	14
+40007	14
+40017	14
+40027	14
+40037	14
+40047	14
+40057	14
+40067	14
+40077	14
+40087	14
+40097	14
+40107	14
+40117	14
+40127	14
+40137	14
+40147	14
+40157	14
+40167	14
+40177	14
+40187	14
+40197	14
+40207	14
+40217	14
+40227	14
+40237	14
+40247	14
+40257	14
+40267	14
+40277	14
+40287	14
+40297	14
+40307	14
+40317	14
+40327	14
+40337	14
+40347	14
+40357	14
+40367	14
+40377	14
+40387	14
+40397	14
+40407	14
+40417	14
+40427	14
+40437	14
+40447	14
+40457	14
+40467	14
+40477	14
+40487	14
+40497	14
+40507	14
+40517	14
+40527	14
+40537	14
+40547	14
+40557	14
+40567	14
+40577	14
+40587	14
+40597	14
+40607	14
+40617	14
+40627	14
+40637	14
+40647	14
+40657	14
+40667	14
+40677	14
+40687	14
+40697	14
+40707	14
+40717	14
+40727	14
+40737	14
+40747	14
+40757	14
+40767	14
+40777	14
+40787	14
+40797	14
+40807	14
+40817	14
+40827	14
+40837	14
+40847	14
+40857	14
+40867	14
+40877	14
+40887	14
+40897	14
+40907	14
+40917	14
+40927	14
+40937	14
+40947	14
+40957	14
+40967	14
+40977	14
+40987	14
+40997	14
+41007	14
+41017	14
+41027	14
+41037	14
+41047	14
+41057	14
+41067	14
+41077	14
+41087	14
+41097	14
+41107	14
+41117	14
+41127	14
+41137	14
+41147	14
+41157	14
+41167	14
+41177	14
+41187	14
+41197	14
+41207	14
+41217	14
+41227	14
+41237	14
+41247	14
+41257	14
+41267	14
+41277	14
+41287	14
+41297	14
+41307	14
+41317	14
+41327	14
+41337	14
+41347	14
+41357	14
+41367	14
+41377	14
+41387	14
+41397	14
+41407	14
+41417	14
+41427	14
+41437	14
+41447	14
+41457	14
+41467	14
+41477	14
+41487	14
+41497	14
+41507	14
+41517	14
+41527	14
+41537	14
+41547	14
+41557	14
+41567	14
+41577	14
+41587	14
+41597	14
+41607	14
+41617	14
+41627	14
+41637	14
+41647	14
+41657	14
+41667	14
+41677	14
+41687	14
+41697	14
+41707	14
+41717	14
+41727	14
+41737	14
+41747	14
+41757	14
+41767	14
+41777	14
+41787	14
+41797	14
+41807	14
+41817	14
+41827	14
+41837	14
+41847	14
+41857	14
+41867	14
+41877	14
+41887	14
+41897	14
+41907	14
+41917	14
+41927	14
+41937	14
+41947	14
+41957	14
+41967	14
+41977	14
+41987	14
+41997	14
+42007	14
+42017	14
+42027	14
+42037	14
+42047	14
+42057	14
+42067	14
+42077	14
+42087	14
+42097	14
+42107	14
+42117	14
+42127	14
+42137	14
+42147	14
+42157	14
+42167	14
+42177	14
+42187	14
+42197	14
+42207	14
+42217	14
+42227	14
+42237	14
+42247	14
+42257	14
+42267	14
+42277	14
+42287	14
+42297	14
+42307	14
+42317	14
+42327	14
+42337	14
+42347	14
+42357	14
+42367	14
+42377	14
+42387	14
+42397	14
+42407	14
+42417	14
+42427	14
+42437	14
+42447	14
+42457	14
+42467	14
+42477	14
+42487	14
+42497	14
+42507	14
+42517	14
+42527	14
+42537	14
+42547	14
+42557	14
+42567	14
+42577	14
+42587	14
+42597	14
+42607	14
+42617	14
+42627	14
+42637	14
+42647	14
+42657	14
+42667	14
+42677	14
+42687	14
+42697	14
+42707	14
+42717	14
+42727	14
+42737	14
+42747	14
+42757	14
+42767	14
+42777	14
+42787	14
+42797	14
+42807	14
+42817	14
+42827	14
+42837	14
+42847	14
+42857	14
+42867	14
+42877	14
+42887	14
+42897	14
+42907	14
+42917	14
+42927	14
+42937	14
+42947	14
+42957	14
+42967	14
+42977	14
+42987	14
+42997	14
+43007	14
+43017	14
+43027	14
+43037	14
+43047	14
+43057	14
+43067	14
+43077	14
+43087	14
+43097	14
+43107	14
+43117	14
+43127	14
+43137	14
+43147	14
+43157	14
+43167	14
+43177	14
+43187	14
+43197	14
+43207	14
+43217	14
+43227	14
+43237	14
+43247	14
+43257	14
+43267	14
+43277	14
+43287	14
+43297	14
+43307	14
+43317	14
+43327	14
+43337	14
+43347	14
+43357	14
+43367	14
+43377	14
+43387	14
+43397	14
+43407	14
+43417	14
+43427	14
+43437	14
+43447	14
+43457	14
+43467	14
+43477	14
+43487	14
+43497	14
+43507	14
+43517	14
+43527	14
+43537	14
+43547	14
+43557	14
+43567	14
+43577	14
+43587	14
+43597	14
+43607	14
+43617	14
+43627	14
+43637	14
+43647	14
+43657	14
+43667	14
+43677	14
+43687	14
+43697	14
+43707	14
+43717	14
+43727	14
+43737	14
+43747	14
+43757	14
+43767	14
+43777	14
+43787	14
+43797	14
+43807	14
+43817	14
+43827	14
+43837	14
+43847	14
+43857	14
+43867	14
+43877	14
+43887	14
+43897	14
+43907	14
+43917	14
+43927	14
+43937	14
+43947	14
+43957	14
+43967	14
+43977	14
+43987	14
+43997	14
+44007	14
+44017	14
+44027	14
+44037	14
+44047	14
+44057	14
+44067	14
+44077	14
+44087	14
+44097	14
+44107	14
+44117	14
+44127	14
+44137	14
+44147	14
+44157	14
+44167	14
+44177	14
+44187	14
+44197	14
+44207	14
+44217	14
+44227	14
+44237	14
+44247	14
+44257	14
+44267	14
+44277	14
+44287	14
+44297	14
+44307	14
+44317	14
+44327	14
+44337	14
+44347	14
+44357	14
+44367	14
+44377	14
+44387	14
+44397	14
+44407	14
+44417	14
+44427	14
+44437	14
+44447	14
+44457	14
+44467	14
+44477	14
+44487	14
+44497	14
+44507	14
+44517	14
+44527	14
+44537	14
+44547	14
+44557	14
+44567	14
+44577	14
+44587	14
+44597	14
+44607	14
+44617	14
+44627	14
+44637	14
+44647	14
+44657	14
+44667	14
+44677	14
+44687	14
+44697	14
+44707	14
+44717	14
+44727	14
+44737	14
+44747	14
+44757	14
+44767	14
+44777	14
+44787	14
+44797	14
+44807	14
+44817	14
+44827	14
+44837	14
+44847	14
+44857	14
+44867	14
+44877	14
+44887	14
+44897	14
+44907	14
+44917	14
+44927	14
+44937	14
+44947	14
+44957	14
+44967	14
+44977	14
+44987	14
+44997	14
+45007	14
+45017	14
+45027	14
+45037	14
+45047	14
+45057	14
+45067	14
+45077	14
+45087	14
+45097	14
+45107	14
+45117	14
+45127	14
+45137	14
+45147	14
+45157	14
+45167	14
+45177	14
+45187	14
+45197	14
+45207	14
+45217	14
+45227	14
+45237	14
+45247	14
+45257	14
+45267	14
+45277	14
+45287	14
+45297	14
+45307	14
+45317	14
+45327	14
+45337	14
+45347	14
+45357	14
+45367	14
+45377	14
+45387	14
+45397	14
+45407	14
+45417	14
+45427	14
+45437	14
+45447	14
+45457	14
+45467	14
+45477	14
+45487	14
+45497	14
+45507	14
+45517	14
+45527	14
+45537	14
+45547	14
+45557	14
+45567	14
+45577	14
+45587	14
+45597	14
+45607	14
+45617	14
+45627	14
+45637	14
+45647	14
+45657	14
+45667	14
+45677	14
+45687	14
+45697	14
+45707	14
+45717	14
+45727	14
+45737	14
+45747	14
+45757	14
+45767	14
+45777	14
+45787	14
+45797	14
+45807	14
+45817	14
+45827	14
+45837	14
+45847	14
+45857	14
+45867	14
+45877	14
+45887	14
+45897	14
+45907	14
+45917	14
+45927	14
+45937	14
+45947	14
+45957	14
+45967	14
+45977	14
+45987	14
+45997	14
+46007	14
+46017	14
+46027	14
+46037	14
+46047	14
+46057	14
+46067	14
+46077	14
+46087	14
+46097	14
+46107	14
+46117	14
+46127	14
+46137	14
+46147	14
+46157	14
+46167	14
+46177	14
+46187	14
+46197	14
+46207	14
+46217	14
+46227	14
+46237	14
+46247	14
+46257	14
+46267	14
+46277	14
+46287	14
+46297	14
+46307	14
+46317	14
+46327	14
+46337	14
+46347	14
+46357	14
+46367	14
+46377	14
+46387	14
+46397	14
+46407	14
+46417	14
+46427	14
+46437	14
+46447	14
+46457	14
+46467	14
+46477	14
+46487	14
+46497	14
+46507	14
+46517	14
+46527	14
+46537	14
+46547	14
+46557	14
+46567	14
+46577	14
+46587	14
+46597	14
+46607	14
+46617	14
+46627	14
+46637	14
+46647	14
+46657	14
+46667	14
+46677	14
+46687	14
+46697	14
+46707	14
+46717	14
+46727	14
+46737	14
+46747	14
+46757	14
+46767	14
+46777	14
+46787	14
+46797	14
+46807	14
+46817	14
+46827	14
+46837	14
+46847	14
+46857	14
+46867	14
+46877	14
+46887	14
+46897	14
+46907	14
+46917	14
+46927	14
+46937	14
+46947	14
+46957	14
+46967	14
+46977	14
+46987	14
+46997	14
+47007	14
+47017	14
+47027	14
+47037	14
+47047	14
+47057	14
+47067	14
+47077	14
+47087	14
+47097	14
+47107	14
+47117	14
+47127	14
+47137	14
+47147	14
+47157	14
+47167	14
+47177	14
+47187	14
+47197	14
+47207	14
+47217	14
+47227	14
+47237	14
+47247	14
+47257	14
+47267	14
+47277	14
+47287	14
+47297	14
+47307	14
+47317	14
+47327	14
+47337	14
+47347	14
+47357	14
+47367	14
+47377	14
+47387	14
+47397	14
+47407	14
+47417	14
+47427	14
+47437	14
+47447	14
+47457	14
+47467	14
+47477	14
+47487	14
+47497	14
+47507	14
+47517	14
+47527	14
+47537	14
+47547	14
+47557	14
+47567	14
+47577	14
+47587	14
+47597	14
+47607	14
+47617	14
+47627	14
+47637	14
+47647	14
+47657	14
+47667	14
+47677	14
+47687	14
+47697	14
+47707	14
+47717	14
+47727	14
+47737	14
+47747	14
+47757	14
+47767	14
+47777	14
+47787	14
+47797	14
+47807	14
+47817	14
+47827	14
+47837	14
+47847	14
+47857	14
+47867	14
+47877	14
+47887	14
+47897	14
+47907	14
+47917	14
+47927	14
+47937	14
+47947	14
+47957	14
+47967	14
+47977	14
+47987	14
+47997	14
+48007	14
+48017	14
+48027	14
+48037	14
+48047	14
+48057	14
+48067	14
+48077	14
+48087	14
+48097	14
+48107	14
+48117	14
+48127	14
+48137	14
+48147	14
+48157	14
+48167	14
+48177	14
+48187	14
+48197	14
+48207	14
+48217	14
+48227	14
+48237	14
+48247	14
+48257	14
+48267	14
+48277	14
+48287	14
+48297	14
+48307	14
+48317	14
+48327	14
+48337	14
+48347	14
+48357	14
+48367	14
+48377	14
+48387	14
+48397	14
+48407	14
+48417	14
+48427	14
+48437	14
+48447	14
+48457	14
+48467	14
+48477	14
+48487	14
+48497	14
+48507	14
+48517	14
+48527	14
+48537	14
+48547	14
+48557	14
+48567	14
+48577	14
+48587	14
+48597	14
+48607	14
+48617	14
+48627	14
+48637	14
+48647	14
+48657	14
+48667	14
+48677	14
+48687	14
+48697	14
+48707	14
+48717	14
+48727	14
+48737	14
+48747	14
+48757	14
+48767	14
+48777	14
+48787	14
+48797	14
+48807	14
+48817	14
+48827	14
+48837	14
+48847	14
+48857	14
+48867	14
+48877	14
+48887	14
+48897	14
+48907	14
+48917	14
+48927	14
+48937	14
+48947	14
+48957	14
+48967	14
+48977	14
+48987	14
+48997	14
+49007	14
+49017	14
+49027	14
+49037	14
+49047	14
+49057	14
+49067	14
+49077	14
+49087	14
+49097	14
+49107	14
+49117	14
+49127	14
+49137	14
+49147	14
+49157	14
+49167	14
+49177	14
+49187	14
+49197	14
+49207	14
+49217	14
+49227	14
+49237	14
+49247	14
+49257	14
+49267	14
+49277	14
+49287	14
+49297	14
+49307	14
+49317	14
+49327	14
+49337	14
+49347	14
+49357	14
+49367	14
+49377	14
+49387	14
+49397	14
+49407	14
+49417	14
+49427	14
+49437	14
+49447	14
+49457	14
+49467	14
+49477	14
+49487	14
+49497	14
+49507	14
+49517	14
+49527	14
+49537	14
+49547	14
+49557	14
+49567	14
+49577	14
+49587	14
+49597	14
+49607	14
+49617	14
+49627	14
+49637	14
+49647	14
+49657	14
+49667	14
+49677	14
+49687	14
+49697	14
+49707	14
+49717	14
+49727	14
+49737	14
+49747	14
+49757	14
+49767	14
+49777	14
+49787	14
+49797	14
+49807	14
+49817	14
+49827	14
+49837	14
+49847	14
+49857	14
+49867	14
+49877	14
+49887	14
+49897	14
+49907	14
+49917	14
+49927	14
+49937	14
+49947	14
+49957	14
+49967	14
+49977	14
+49987	14
+49997	14
+50007	14
+50017	14
+50027	14
+50037	14
+50047	14
+50057	14
+50067	14
+50077	14
+50087	14
+50097	14
+50107	14
+50117	14
+50127	14
+50137	14
+50147	14
+50157	14
+50167	14
+50177	14
+50187	14
+50197	14
+50207	14
+50217	14
+50227	14
+50237	14
+50247	14
+50257	14
+50267	14
+50277	14
+50287	14
+50297	14
+50307	14
+50317	14
+50327	14
+50337	14
+50347	14
+50357	14
+50367	14
+50377	14
+50387	14
+50397	14
+50407	14
+50417	14
+50427	14
+50437	14
+50447	14
+50457	14
+50467	14
+50477	14
+50487	14
+50497	14
+50507	14
+50517	14
+50527	14
+50537	14
+50547	14
+50557	14
+50567	14
+50577	14
+50587	14
+50597	14
+50607	14
+50617	14
+50627	14
+50637	14
+50647	14
+50657	14
+50667	14
+50677	14
+50687	14
+50697	14
+50707	14
+50717	14
+50727	14
+50737	14
+50747	14
+50757	14
+50767	14
+50777	14
+50787	14
+50797	14
+50807	14
+50817	14
+50827	14
+50837	14
+50847	14
+50857	14
+50867	14
+50877	14
+50887	14
+50897	14
+50907	14
+50917	14
+50927	14
+50937	14
+50947	14
+50957	14
+50967	14
+50977	14
+50987	14
+50997	14
+51007	14
+51017	14
+51027	14
+51037	14
+51047	14
+51057	14
+51067	14
+51077	14
+51087	14
+51097	14
+51107	14
+51117	14
+51127	14
+51137	14
+51147	14
+51157	14
+51167	14
+51177	14
+51187	14
+51197	14
+51207	14
+51217	14
+51227	14
+51237	14
+51247	14
+51257	14
+51267	14
+51277	14
+51287	14
+51297	14
+51307	14
+51317	14
+51327	14
+51337	14
+51347	14
+51357	14
+51367	14
+51377	14
+51387	14
+51397	14
+51407	14
+51417	14
+51427	14
+51437	14
+51447	14
+51457	14
+51467	14
+51477	14
+51487	14
+51497	14
+51507	14
+51517	14
+51527	14
+51537	14
+51547	14
+51557	14
+51567	14
+51577	14
+51587	14
+51597	14
+51607	14
+51617	14
+51627	14
+51637	14
+51647	14
+51657	14
+51667	14
+51677	14
+51687	14
+51697	14
+51707	14
+51717	14
+51727	14
+51737	14
+51747	14
+51757	14
+51767	14
+51777	14
+51787	14
+51797	14
+51807	14
+51817	14
+51827	14
+51837	14
+51847	14
+51857	14
+51867	14
+51877	14
+51887	14
+51897	14
+51907	14
+51917	14
+51927	14
+51937	14
+51947	14
+51957	14
+51967	14
+51977	14
+51987	14
+51997	14
+52007	14
+52017	14
+52027	14
+52037	14
+52047	14
+52057	14
+52067	14
+52077	14
+52087	14
+52097	14
+52107	14
+52117	14
+52127	14
+52137	14
+52147	14
+52157	14
+52167	14
+52177	14
+52187	14
+52197	14
+52207	14
+52217	14
+52227	14
+52237	14
+52247	14
+52257	14
+52267	14
+SELECT id,c3 FROM t2 WHERE c2 BETWEEN 10 AND 12 ORDER BY c3 LIMIT 20;
+id	c3
+6	14
+16	14
+31	14
+41	14
+62	14
+72	14
+82	14
+92	14
+125	14
+135	14
+145	14
+155	14
+165	14
+175	14
+185	14
+195	14
+252	14
+262	14
+272	14
+282	14
+SELECT id,c3 FROM t2 WHERE c2 BETWEEN 20 AND 30 ORDER BY c3 LIMIT 4000;
+id	c3
+6600	11
+5200	11
+5100	11
+5000	11
+4900	11
+4800	11
+6500	11
+4600	11
+4500	11
+4300	11
+4200	11
+5300	11
+5400	11
+6400	11
+6300	11
+6200	11
+6100	11
+6000	11
+5900	11
+5800	11
+5700	11
+5600	11
+5500	11
+4100	11
+1500	11
+1300	11
+1600	11
+1200	11
+1100	11
+4700	11
+1400	11
+4400	11
+40800	15
+41300	15
+41200	15
+41100	15
+41000	15
+40500	15
+40600	15
+40900	15
+40700	15
+39200	15
+39300	15
+39400	15
+39500	15
+39600	15
+39700	15
+39800	15
+39900	15
+40000	15
+40100	15
+40200	15
+40300	15
+40400	15
+41400	15
+41500	15
+43000	15
+42900	15
+42800	15
+42700	15
+42600	15
+42500	15
+42100	15
+42400	15
+42300	15
+43100	15
+43200	15
+43300	15
+41600	15
+41700	15
+41800	15
+41900	15
+42000	15
+43700	15
+43600	15
+43500	15
+43400	15
+42200	15
+39100	15
+34400	15
+35800	15
+35900	15
+36000	15
+36100	15
+35200	15
+36200	15
+36300	15
+36400	15
+36500	15
+35700	15
+35600	15
+35500	15
+34500	15
+34600	15
+34700	15
+34800	15
+34900	15
+35000	15
+35100	15
+35300	15
+35400	15
+36600	15
+36700	15
+38100	15
+38200	15
+38300	15
+38400	15
+38500	15
+38600	15
+38700	15
+38800	15
+38900	15
+38000	15
+37800	15
+37700	15
+36800	15
+36900	15
+37000	15
+37100	15
+37200	15
+37300	15
+37400	15
+37500	15
+37600	15
+39000	15
+43800	15
+48700	15
+50000	15
+50100	15
+50200	15
+50300	15
+50400	15
+50500	15
+50600	15
+50700	15
+50800	15
+49900	15
+49800	15
+49700	15
+48800	15
+48900	15
+49000	15
+49100	15
+49200	15
+49300	15
+49400	15
+49500	15
+49600	15
+50900	15
+51000	15
+52200	15
+52300	15
+52400	15
+52500	15
+52600	15
+52700	15
+52800	15
+52900	15
+53000	15
+52100	15
+52000	15
+51900	15
+51100	15
+51200	15
+51300	15
+51400	15
+53200	15
+51500	15
+51600	15
+51700	15
+51800	15
+53100	15
+48600	15
+43900	15
+45200	15
+45300	15
+45400	15
+45500	15
+45600	15
+45700	15
+45800	15
+45900	15
+46000	15
+45100	15
+45000	15
+44900	15
+44000	15
+44100	15
+44200	15
+44300	15
+44400	15
+44500	15
+44600	15
+44700	15
+44800	15
+46100	15
+46200	15
+47500	15
+47600	15
+47700	15
+47800	15
+47900	15
+48000	15
+48200	15
+48300	15
+48400	15
+47400	15
+47300	15
+47200	15
+46300	15
+46400	15
+46500	15
+46600	15
+46700	15
+46800	15
+46900	15
+47000	15
+47100	15
+48500	15
+34300	15
+34200	15
+33100	15
+33000	15
+32900	15
+32800	15
+600	15
+700	15
+800	15
+48100	15
+33200	15
+33300	15
+34100	15
+34000	15
+33900	15
+33800	15
+37900	15
+33700	15
+33600	15
+33500	15
+33400	15
+11400	31
+11500	31
+11600	31
+11700	31
+11800	31
+11300	31
+11200	31
+11100	31
+11000	31
+10900	31
+10800	31
+10700	31
+11900	31
+12000	31
+13100	31
+13000	31
+12900	31
+12800	31
+12700	31
+12600	31
+12500	31
+12400	31
+12300	31
+12200	31
+12100	31
+13200	31
+8300	31
+9300	31
+9200	31
+9100	31
+9000	31
+8900	31
+8800	31
+8600	31
+8500	31
+8700	31
+8400	31
+8200	31
+9400	31
+9500	31
+10600	31
+10500	31
+10400	31
+10300	31
+10200	31
+10100	31
+10000	31
+9900	31
+9800	31
+9700	31
+9600	31
+400	35
+300	35
+17700	38
+17600	38
+17500	38
+18400	38
+17800	38
+17900	38
+18000	38
+18100	38
+18200	38
+18300	38
+17400	38
+17300	38
+25800	38
+16400	38
+16500	38
+16600	38
+16700	38
+16800	38
+16900	38
+17000	38
+17100	38
+17200	38
+18500	38
+18600	38
+26500	38
+24500	38
+24400	38
+24300	38
+24200	38
+24100	38
+24000	38
+23900	38
+23800	38
+23700	38
+23600	38
+23500	38
+23400	38
+23300	38
+23200	38
+23100	38
+23000	38
+22900	38
+24600	38
+21600	38
+24700	38
+26400	38
+26300	38
+26200	38
+26600	38
+26100	38
+26000	38
+25900	38
+25700	38
+25600	38
+25500	38
+25400	38
+25300	38
+25200	38
+25100	38
+25000	38
+24900	38
+24800	38
+22800	38
+22700	38
+18700	38
+20400	38
+20300	38
+20200	38
+20100	38
+20000	38
+19900	38
+19800	38
+19700	38
+19600	38
+19500	38
+19400	38
+19300	38
+19200	38
+19100	38
+19000	38
+18900	38
+18800	38
+20500	38
+20600	38
+20700	38
+21900	38
+22000	38
+22100	38
+22600	38
+22500	38
+22400	38
+22300	38
+22200	38
+21800	38
+21700	38
+20800	38
+20900	38
+21000	38
+21100	38
+21200	38
+21300	38
+21400	38
+21500	38
+2100	39
+2200	39
+2300	39
+2400	39
+2500	39
+2600	39
+2800	39
+2900	39
+3000	39
+3100	39
+3200	39
+3300	39
+2700	39
+SELECT id,c3 FROM t2 WHERE c2=11 ORDER BY c3 LIMIT 20;
+id	c3
+6	14
+16	14
+31	14
+41	14
+62	14
+72	14
+82	14
+92	14
+125	14
+135	14
+145	14
+155	14
+165	14
+175	14
+185	14
+195	14
+252	14
+262	14
+272	14
+282	14
+DROP TABLE t1,t2;
+CREATE TABLE t1 (
+a INT,
+b INT,
+PRIMARY KEY (a),
+KEY ab(a, b)
+);
+INSERT INTO t1 VALUES (1,1),(2,2),(3,3),(4,4);
+INSERT INTO t1 SELECT a + 4, b + 4 FROM t1;
+INSERT INTO t1 SELECT a + 8, b + 8 FROM t1;
+INSERT INTO t1 SELECT a +16, b +16 FROM t1;
+INSERT INTO t1 SELECT a +32, b +32 FROM t1;
+INSERT INTO t1 SELECT a +64, b +64 FROM t1;
+SELECT a FROM t1 IGNORE INDEX FOR GROUP BY (a, ab) GROUP BY a;
+a
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+SELECT a FROM t1 IGNORE INDEX FOR GROUP BY (a, ab) GROUP BY a;
+a
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+SELECT a FROM t1 IGNORE INDEX FOR ORDER BY (a, ab) ORDER BY a;
+a
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+SELECT a FROM t1 IGNORE INDEX FOR ORDER BY (a, ab) ORDER BY a;
+a
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+drop table t1;
+#
+# Bug#31590: Wrong error message on sort buffer being too small.
+#
+create table t1(a int, b tinytext);
+insert into t1 values (1,2),(3,2);
+set session sort_buffer_size= 30000;
+set session max_sort_length= 2180;
+select * from t1 order by b;
+ERROR HY001: Out of sort memory, consider increasing server sort buffer size
+drop table t1;
+#
+# Bug #39844: Query Crash Mysql Server 5.0.67
+#
+CREATE TABLE t1 (a INT PRIMARY KEY);
+CREATE TABLE t2 (a INT PRIMARY KEY, b INT);
+CREATE TABLE t3 (c INT);
+INSERT INTO t1 (a) VALUES (1), (2);
+INSERT INTO t2 (a,b) VALUES (1,2), (2,3);
+INSERT INTO t3 (c) VALUES (1), (2);
+SELECT
+(SELECT t1.a FROM t1, t2 WHERE t1.a = t2.b AND t2.a = t3.c ORDER BY t1.a)
+FROM t3;
+(SELECT t1.a FROM t1, t2 WHERE t1.a = t2.b AND t2.a = t3.c ORDER BY t1.a)
+2
+NULL
+DROP TABLE t1, t2, t3;
+#
+# Bug #42760: Select doesn't return desired results when we have null
+# values
+#
+CREATE TABLE t1 (
+a INT,
+c INT,
+UNIQUE KEY a_c (a,c),
+KEY (a));
+INSERT INTO t1 VALUES (1, 10), (2, NULL);
+# Must use ref-or-null on the a_c index
+SELECT 1 AS col FROM t1 WHERE a=2 AND (c=10 OR c IS NULL) ORDER BY c;
+col
+1
+# Must return 1 row
+SELECT 1 AS col FROM t1 WHERE a=2 AND (c=10 OR c IS NULL) ORDER BY c;
+col
+1
+# Must use ref-or-null on the a_c index
+SELECT 1 AS col FROM t1 WHERE a=2 AND (c=10 OR c IS NULL) ORDER BY c DESC;
+col
+x
+# Must return 1 row
+SELECT 1 AS col FROM t1 WHERE a=2 AND (c=10 OR c IS NULL) ORDER BY c DESC;
+col
+1
+DROP TABLE t1;
+End of 5.0 tests
+CREATE TABLE t2 (a varchar(32), b int(11), c float, d double, 
+UNIQUE KEY a (a,b,c), KEY b (b), KEY c (c));
+CREATE TABLE t1 (a varchar(32), b char(3), UNIQUE KEY a (a,b), KEY b (b));
+CREATE TABLE t3 (a varchar(32), b char(3), UNIQUE KEY a (a,b));
+INSERT INTO t3 SELECT * FROM t1;
+SELECT d FROM t1, t2
+WHERE t2.b=14 AND t2.a=t1.a AND 5.1<t2.c AND t1.b='DE'
+ORDER BY t2.c LIMIT 1;
+d
+52.5
+SELECT d FROM t1, t2
+WHERE t2.b=14 AND t2.a=t1.a AND 5.1<t2.c AND t1.b='DE'
+ORDER BY t2.c LIMIT 1;
+d
+52.5
+SELECT d FROM t3 AS t1, t2 AS t2 
+WHERE t2.b=14 AND t2.a=t1.a AND 5.1<t2.c AND t1.b='DE'
+ORDER BY t2.c LIMIT 1;
+d
+52.5
+SELECT d FROM t3 AS t1, t2 AS t2 
+WHERE t2.b=14 AND t2.a=t1.a AND 5.1<t2.c AND t1.b='DE'
+ORDER BY t2.c LIMIT 1;
+d
+52.5
+DROP TABLE t1,t2,t3;
+CREATE TABLE t1 (
+id1 INT NULL,
+id2 INT  NOT NULL,
+junk INT NOT NULL,
+PRIMARY KEY (id1, id2, junk),
+INDEX id2_j_id1 (id2, junk, id1)
+);
+INSERT INTO t1 VALUES (1, 1, 1), (2, 1, 2), (3, 1, 3), (4, 1, 4);
+INSERT INTO t1 VALUES (5, 2, 1), (6, 2, 2), (7, 2, 3), (8, 2, 4);
+INSERT INTO t1 VALUES (9, 3, 1), (10, 3, 2), (11, 3, 3), (12, 3, 4);
+INSERT INTO t1 VALUES (13, 4, 1), (14, 4, 2), (15, 4, 3), (16, 4, 4);
+INSERT INTO t1 VALUES (17, 5, 1), (18, 5, 2), (19, 5, 3), (20, 5, 4);
+INSERT INTO t1 VALUES (21, 6, 1), (22, 6, 2), (23, 6, 3), (24, 6, 4);
+INSERT INTO t1 VALUES (25, 7, 1), (26, 7, 2), (27, 7, 3), (28, 7, 4);
+INSERT INTO t1 VALUES (29, 8, 1), (30, 8, 2), (31, 8, 3), (32, 8, 4);
+INSERT INTO t1 VALUES (33, 9, 1), (34, 9, 2), (35, 9, 3), (36, 9, 4);
+SELECT id1 FROM t1 WHERE id2 = 4 ORDER BY id1;
+id1
+13
+14
+15
+16
+SELECT id1 FROM t1 WHERE id2 = 4 ORDER BY id1;
+id1
+13
+14
+15
+16
+DROP TABLE t1;
+CREATE TABLE t1 (
+a INT,
+b INT NOT NULL,
+c char(100),
+KEY (b, c),
+KEY (b, a, c)
+)
+DEFAULT CHARSET = utf8;
+INSERT INTO t1 VALUES 
+(1,  1, 1),
+(2,  2, 2),
+(3,  3, 3),
+(4,  4, 4),
+(5,  5, 5),
+(6,  6, 6),
+(7,  7, 7),
+(8,  8, 8),
+(9,  9, 9);
+INSERT INTO t1 SELECT a + 10,  b, c FROM t1;
+INSERT INTO t1 SELECT a + 20,  b, c FROM t1;
+INSERT INTO t1 SELECT a + 40,  b, c FROM t1;
+INSERT INTO t1 SELECT a + 80,  b, c FROM t1;
+INSERT INTO t1 SELECT a + 160, b, c FROM t1;
+INSERT INTO t1 SELECT a + 320, b, c FROM t1;
+INSERT INTO t1 SELECT a + 640, b, c FROM t1;
+INSERT INTO t1 SELECT a + 1280, b, c FROM t1 LIMIT 80;
+SELECT a FROM t1 WHERE b = 1 ORDER BY c DESC LIMIT 9;
+a
+621
+451
+441
+431
+421
+411
+401
+391
+381
+SELECT a FROM t1 WHERE b = 1 ORDER BY c DESC LIMIT 9;
+a
+621
+451
+441
+431
+421
+411
+401
+391
+381
+SELECT DISTINCT a FROM t1 WHERE b = 1 ORDER BY c DESC LIMIT 0, 9;
+a
+XXXXX
+XXXXX
+XXXXX
+XXXXX
+XXXXX
+XXXXX
+XXXXX
+XXXXX
+XXXXX
+DROP TABLE t1;
+#
+# Bug #43029: FORCE INDEX FOR ORDER BY is ignored when join buffering 
+#   is used
+#
+CREATE TABLE t1 (a INT, b INT, KEY (a));
+INSERT INTO t1 VALUES (0, NULL), (1, NULL), (2, NULL), (3, NULL);
+INSERT INTO t1 SELECT a+4, b FROM t1;
+INSERT INTO t1 SELECT a+8, b FROM t1;
+CREATE TABLE t2 (a INT, b INT);
+INSERT INTO t2 VALUES (0,NULL), (1,NULL), (2,NULL), (3,NULL), (4,NULL);
+INSERT INTO t2 SELECT a+4, b FROM t2;
+# shouldn't have "using filesort"
+SELECT * FROM t1 FORCE INDEX FOR ORDER BY (a), t2 WHERE t1.a < 2 ORDER BY t1.a;
+a	b	a	b
+0	NULL	0	NULL
+0	NULL	1	NULL
+0	NULL	2	NULL
+0	NULL	3	NULL
+0	NULL	4	NULL
+0	NULL	4	NULL
+0	NULL	5	NULL
+0	NULL	6	NULL
+0	NULL	7	NULL
+0	NULL	8	NULL
+1	NULL	0	NULL
+1	NULL	1	NULL
+1	NULL	2	NULL
+1	NULL	3	NULL
+1	NULL	4	NULL
+1	NULL	4	NULL
+1	NULL	5	NULL
+1	NULL	6	NULL
+1	NULL	7	NULL
+1	NULL	8	NULL
+# should have "using filesort"
+SELECT * FROM t1 USE INDEX FOR ORDER BY (a), t2 WHERE t1.a < 2 ORDER BY t1.a;
+a	b	a	b
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+# should have "using filesort"
+SELECT * FROM t1 FORCE INDEX FOR JOIN (a), t2 WHERE t1.a < 2 ORDER BY t1.a;
+a	b	a	b
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+0	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+1	NULL	***	NULL
+DROP TABLE t1, t2;
+#
+# Bug #50394: Regression in  with index scan, LIMIT, GROUP BY and
+# ORDER BY computed col
+#
+CREATE TABLE t1 ( a INT NOT NULL, b INT NOT NULL, KEY( a, b ) );
+INSERT INTO t1 VALUES (1, 1), (2, 2), (3, 3), (4, 4), (5, 5);
+INSERT INTO t1 SELECT a + 5, b + 5 FROM t1;
+CREATE TABLE t2( a INT PRIMARY KEY, b INT );
+INSERT INTO t2 VALUES (1, 1), (2, 2), (3, 3), (4, 4), (5, 5);
+INSERT INTO t2 SELECT a + 5, b + 5 FROM t2;
+SELECT count(*) AS c, t1.a
+FROM t1 JOIN t2 ON t1.b = t2.a
+WHERE t2.b = 1
+GROUP BY t1.a
+ORDER by c
+LIMIT 2;
+c	a
+1	1
+DROP TABLE t1, t2;
+#
+# Bug #59110: Memory leak of QUICK_SELECT_I allocated memory 
+#  and
+# Bug #59308: Incorrect result for 
+SELECT DISTINCT <col>... ORDER BY <col> DESC 
+
+# Use Valgrind to detect #59110!
+#
+CREATE TABLE t1 (a INT,KEY (a));
+INSERT INTO t1 VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10);
+SELECT DISTINCT a,1 FROM t1 WHERE a <> 1 ORDER BY a DESC;
+a	1
+10	1
+9	1
+8	1
+7	1
+6	1
+5	1
+4	1
+3	1
+2	1
+SELECT DISTINCT a,1 FROM t1 WHERE a <> 1 ORDER BY a DESC;
+a	1
+10	1
+9	1
+8	1
+7	1
+6	1
+5	1
+4	1
+3	1
+2	1
+DROP TABLE t1;
+#
+# Bug#11765255 58201:
+# VALGRIND/CRASH WHEN ORDERING BY MULTIPLE AGGREGATE FUNCTIONS
+#
+select 1 order by max(1) + min(1);
+1
+1
+End of 5.1 tests
+#
+# Bug #38745: MySQL 5.1 optimizer uses filesort for ORDER BY
+#             when it should use index
+#
+CREATE TABLE t1 (i1 integer NOT NULL PRIMARY KEY);
+CREATE TABLE t2 (i2 integer NOT NULL PRIMARY KEY);
+CREATE TABLE t3 (i3 integer);
+INSERT INTO t1 VALUES (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), (11), (12);
+INSERT INTO t2 SELECT * FROM t1;
+SELECT t1.*, t2.* FROM t1 JOIN t2 ON t1.i1 = t2.i2 
+LEFT JOIN t3 ON t2.i2 = t3.i3
+ORDER BY t1.i1 LIMIT 5;
+i1	i2
+1	1
+2	2
+3	3
+4	4
+5	5
+SELECT t1.*, t2.* FROM t1 JOIN t2 ON t1.i1 = t2.i2 
+LEFT JOIN t3 ON t2.i2 = t3.i3
+ORDER BY t1.i1 LIMIT 5;
+i1	i2
+1	1
+2	2
+3	3
+4	4
+5	5
+DROP TABLE t1, t2, t3;

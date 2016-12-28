@@ -1,0 +1,65 @@
+SET SESSION transaction_prealloc_size=1024*1024*1024*1;
+SHOW PROCESSLIST;
+Id	User	Host	db	Command	Time	State	Info	Rows_sent	Rows_examined	Rows_read
+<Id>	root	<Host>	NULL	Sleep	<Time>		NULL	0	8	8
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	1	1	1
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Query	<Time>	NULL	SHOW PROCESSLIST	0	0	0
+SET SESSION transaction_prealloc_size=1024*1024*1024*2;
+SHOW PROCESSLIST;
+Id	User	Host	db	Command	Time	State	Info	Rows_sent	Rows_examined	Rows_read
+<Id>	root	<Host>	NULL	Sleep	<Time>		NULL	0	8	8
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	1	1	1
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Query	<Time>	NULL	SHOW PROCESSLIST	0	0	0
+SET SESSION transaction_prealloc_size=1024*1024*1024*3;
+SHOW PROCESSLIST;
+Id	User	Host	db	Command	Time	State	Info	Rows_sent	Rows_examined	Rows_read
+<Id>	root	<Host>	NULL	Sleep	<Time>		NULL	0	8	8
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	1	1	1
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Query	<Time>	NULL	SHOW PROCESSLIST	0	0	0
+SET SESSION transaction_prealloc_size=1024*1024*1024*4;
+SHOW PROCESSLIST;
+Id	User	Host	db	Command	Time	State	Info	Rows_sent	Rows_examined	Rows_read
+<Id>	root	<Host>	NULL	Sleep	<Time>		NULL	0	8	8
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	1	1	1
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Query	<Time>	NULL	SHOW PROCESSLIST	0	0	0
+SET SESSION transaction_prealloc_size=1024*1024*1024*5;
+SHOW PROCESSLIST;
+Id	User	Host	db	Command	Time	State	Info	Rows_sent	Rows_examined	Rows_read
+<Id>	root	<Host>	NULL	Sleep	<Time>		NULL	0	8	8
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	1	1	1
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Sleep	<Time>		NULL	0	0	0
+<Id>	dbproxy_test	<Host>	test	Query	<Time>	NULL	SHOW PROCESSLIST	0	0	0

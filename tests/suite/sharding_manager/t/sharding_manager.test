@@ -1,0 +1,45 @@
+#sharding_manager
+drop table if exists sharding_test_table_0;
+drop table if exists sharding_test_table_1;
+drop table if exists sharding_test_table_2;
+
+create table sharding_test_table_0 (a int, b int not null primary key);
+create table sharding_test_table_1 (a int, b int not null primary key);
+create table sharding_test_table_2 (a int, b int not null primary key);
+
+#grant all privileges on test.* to dbproxy_test@'%' identified by '123456';
+
+connect (conn0,localhost,dbproxy_test,'123456','*NO-ONE*',6018);
+connect (conn1,localhost,dbproxy_test,'123456',test,6003);
+
+connection conn0;
+show tables;
+add tables 'test.sharding_test_table.a.3';
+show tables;
+
+connection conn1;
+use test;
+insert into sharding_test_table values (1, 2);
+insert into sharding_test_table values (2, 3);
+insert into sharding_test_table values (3, 4);
+select * from sharding_test_table where a=1;
+select * from sharding_test_table where a=2;
+select * from sharding_test_table where a=3;
+select * from sharding_test_table where a in (1, 2, 3);
+select * from sharding_test_table where a=1 or b=2;
+--error 1146
+select * from sharding_test_table where a > 0;
+insert into sharding_test_table values(4, 5), (5, 6), (6, 7);
+select * from sharding_test_table where a in (4, 5, 6);
+
+connection conn0;
+remove tables like 'test.sharding_test_table';
+show tables;
+
+connection conn1;
+--error 1146
+select * from sharding_test_table where a=1;
+ 
+drop table if exists sharding_test_table_0;
+drop table if exists sharding_test_table_1;
+drop table if exists sharding_test_table_2;

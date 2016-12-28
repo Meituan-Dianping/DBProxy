@@ -1,0 +1,2 @@
+SHOW VARIABLES LIKE 'slow_query_log_use_global_control';
+SHOW GLOBAL VARIABLES LIKE 'slow_query_log_use_global_control';

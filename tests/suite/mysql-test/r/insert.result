@@ -1,0 +1,360 @@
+drop table if exists t1,t2,t3;
+create table t1 (a int not null);
+insert into t1 values (1);
+insert into t1 values (a+2);
+insert into t1 values (a+3),(a+4);
+insert into t1 values (5),(a+6);
+select * from t1;
+a
+1
+2
+3
+4
+5
+6
+drop table t1;
+create table t1 (id int not null auto_increment primary key, username varchar(32) not null, unique (username));
+insert into t1 values (0,"mysql");
+insert into t1 values (0,"mysql ab");
+insert into t1 values (0,"mysql a");
+insert into t1 values (0,"r1manic");
+insert into t1 values (0,"r1man");
+drop table t1;
+create table t1 (a int not null auto_increment, primary key (a), t timestamp, c char(10) default "hello", i int);
+insert into t1 values (default,default,default,default), (default,default,default,default), (4,0,"a",5),(default,default,default,default);
+select a,t>0,c,i from t1;
+a	t>0	c	i
+1	1	hello	NULL
+2	1	hello	NULL
+4	0	a	5
+5	1	hello	NULL
+truncate table t1;
+insert into t1 set a=default,t=default,c=default;
+insert into t1 set a=default,t=default,c=default,i=default;
+insert into t1 set a=4,t=0,c="a",i=5;
+insert into t1 set a=5,t=0,c="a",i=null;
+insert into t1 set a=default,t=default,c=default,i=default;
+select a,t>0,c,i from t1;
+a	t>0	c	i
+1	1	hello	NULL
+2	1	hello	NULL
+4	0	a	5
+5	0	a	NULL
+6	1	hello	NULL
+drop table t1;
+create table t1 (id int NOT NULL DEFAULT 8);
+insert into t1 values(NULL);
+ERROR 23000: Column 'id' cannot be null
+insert into t1 values (1), (NULL), (2);
+select * from t1;
+id
+1
+0
+2
+drop table t1;
+create table t1 (email varchar(50));
+create table t2(id int not null auto_increment primary key, t2 varchar(50), unique(t2));
+select * from t2;
+id	t2
+drop table t1,t2;
+create table t1(number int auto_increment primary key, original_value varchar(50), f_double double, f_float float, f_double_7_2 double(7,2), f_float_4_3 float (4,3), f_double_u double unsigned, f_float_u float unsigned, f_double_15_1_u double(15,1) unsigned, f_float_3_1_u float (3,1) unsigned);
+select * from t1 where number =last_insert_id();
+select * from t1 where number =last_insert_id();
+select * from t1 where number =last_insert_id();
+select * from t1 where number =last_insert_id();
+select * from t1 where number =last_insert_id();
+select * from t1 where number =last_insert_id();
+select * from t1 where number =last_insert_id();
+select * from t1 where number =last_insert_id();
+select * from t1 where number =last_insert_id();
+drop table t1;
+create table t1(id1 int not null auto_increment primary key, t char(12));
+create table t2(id2 int not null, t char(12));
+create table t3(id3 int not null, t char(12), index(id3));
+select count(*) from t2;
+count(*)
+500
+insert into  t2 select t1.* from t1, t2 t, t3 where  t1.id1 = t.id2 and t.id2 = t3.id3;
+select count(*) from t2;
+count(*)
+25500
+drop table t1,t2,t3;
+create table t1 (a int, b int);
+insert into t1 (a,b) values (a,b);
+insert into t1 SET a=1, b=a+1;
+insert into t1 (a,b) select 1,2;
+INSERT INTO t1 ( a ) SELECT 0 ON DUPLICATE KEY UPDATE a = a + VALUES (a);
+insert into t1 (a,b,b) values (1,1,1);
+ERROR 42000: Column 'b' specified twice
+insert into t1 (a,a) values (1,1,1);
+ERROR 21S01: Column count doesn't match value count at row 1
+insert into t1 (a,a) values (1,1);
+ERROR 42000: Column 'a' specified twice
+insert into t1 SET a=1,b=2,a=1;
+ERROR 42000: Column 'a' specified twice
+insert into t1 (b,b) select 1,2;
+ERROR 42000: Column 'b' specified twice
+INSERT INTO t1 (b,b) SELECT 0,0 ON DUPLICATE KEY UPDATE a = a + VALUES (a);
+ERROR 42000: Column 'b' specified twice
+drop table t1;
+create table t1 (id int primary key, data int);
+insert into t1 values (1, 1), (2, 2), (3, 3);
+select row_count();
+row_count()
+3
+insert ignore into t1 values (1, 1);
+replace into t1 values (1, 11);
+select row_count();
+row_count()
+2
+replace into t1 values (4, 4);
+select row_count();
+row_count()
+1
+insert into t1 values (2, 2) on duplicate key update data= data + 10;
+select row_count();
+row_count()
+2
+insert into t1 values (5, 5) on duplicate key update data= data + 10;
+select row_count();
+row_count()
+1
+drop table t1;
+create table t1 (f1 int unique, f2 int);
+create table t2 (f3 int, f4 int);
+create view v1 as select * from t1, t2 where f1= f3;
+insert into t1 values (1,11), (2,22);
+insert into t2 values (1,12), (2,24);
+insert into v1 (f1) values (3) on duplicate key update f3= f3 + 10;
+ERROR HY000: Can not modify more than one base table through a join view 'test.v1'
+insert into v1 (f1) values (3) on duplicate key update f1= f3 + 10;
+ERROR HY000: Can not modify more than one base table through a join view 'test.v1'
+select * from t1;
+f1	f2
+1	11
+2	22
+insert into v1 (f1) values (3) on duplicate key update f1= f3 + 10;
+ERROR HY000: Can not modify more than one base table through a join view 'test.v1'
+select * from t1;
+f1	f2
+1	11
+2	22
+drop view v1;
+drop table t1,t2;
+create table t1 (id int primary key auto_increment, data int, unique(data));
+insert ignore into t1 values(NULL,100),(NULL,110),(NULL,120);
+insert ignore into t1 values(NULL,10),(NULL,20),(NULL,110),(NULL,120),(NULL,100),(NULL,90);
+insert ignore into t1 values(NULL,130),(NULL,140),(500,110),(550,120),(450,100),(NULL,150);
+select * from t1 order by id;
+id	data
+1	100
+2	110
+3	120
+4	10
+5	20
+6	90
+10	130
+11	140
+12	150
+drop table t1;
+DROP TABLE IF EXISTS t1, t2;
+CREATE TABLE t1 (i INT);
+CREATE TABLE t2 (i INT);
+CREATE TRIGGER t1_bi BEFORE INSERT ON t1 FOR EACH ROW
+INSERT DELAYED INTO t2 VALUES (NEW.i);
+CREATE TRIGGER t1_bu BEFORE UPDATE ON t1 FOR EACH ROW
+INSERT DELAYED INTO t2 VALUES (NEW.i);
+CREATE TRIGGER t1_bd BEFORE DELETE ON t1 FOR EACH ROW
+INSERT DELAYED INTO t2 VALUES (OLD.i);
+INSERT INTO t1 VALUES (1);
+INSERT DELAYED INTO t1 VALUES (2);
+SELECT * FROM t1;
+i
+1
+2
+UPDATE t1 SET i = 3 WHERE i = 1;
+SELECT * FROM t1;
+i
+3
+2
+DELETE FROM t1 WHERE i = 3;
+SELECT * FROM t1;
+i
+2
+SELECT * FROM t2;
+i
+1
+2
+3
+3
+DROP TABLE t1, t2;
+CREATE TABLE t1 (
+a char(20) NOT NULL,
+b char(7) DEFAULT NULL,
+c char(4) DEFAULT NULL
+);
+INSERT INTO t1(a,b,c) VALUES (9.999999e+0, 9.999999e+0, 9.999e+0);
+INSERT INTO t1(a,b,c) VALUES (1.225e-05, 1.225e-05, 1.225e-05);
+INSERT INTO t1(a,b) VALUES (1.225e-04, 1.225e-04);
+INSERT INTO t1(a,b) VALUES (1.225e-01, 1.225e-01);
+INSERT INTO t1(a,b) VALUES (1.225877e-01, 1.225877e-01);
+INSERT INTO t1(a,b) VALUES (1.225e+01, 1.225e+01);
+INSERT INTO t1(a,b,c) VALUES (1.225e+01, 1.225e+01, 1.225e+01);
+INSERT INTO t1(a,b) VALUES (1.225e+05, 1.225e+05);
+INSERT INTO t1(a,b) VALUES (1.225e+10, 1.225e+10);
+INSERT INTO t1(a,b) VALUES (1.225e+15, 1.225e+15);
+INSERT INTO t1(a,b) VALUES (5000000e+0, 5000000e+0);
+INSERT INTO t1(a,b) VALUES (1.25e+78, 1.25e+78);
+INSERT INTO t1(a,b) VALUES (1.25e-94, 1.25e-94);
+INSERT INTO t1(a,b) VALUES (1.25e+203, 1.25e+203);
+INSERT INTO t1(a,b) VALUES (1.25e-175, 1.25e-175);
+INSERT INTO t1(a,c) VALUES (1.225e+0, 1.225e+0);
+INSERT INTO t1(a,c) VALUES (1.37e+0, 1.37e+0);
+INSERT INTO t1(a,c) VALUES (-1.37e+0, -1.37e+0);
+INSERT INTO t1(a,c) VALUES (1.87e-3, 1.87e-3);
+INSERT INTO t1(a,c) VALUES (-1.87e-2, -1.87e-2);
+INSERT INTO t1(a,c) VALUES (5000e+0, 5000e+0);
+INSERT INTO t1(a,c) VALUES (-5000e+0, -5000e+0);
+SELECT * FROM t1;
+a	b	c
+9.999999	10	10
+0.00001225	1.22e-5	1e-5
+0.0001225	1.22e-4	NULL
+0.1225	0.1225	NULL
+0.1225877	0.12259	NULL
+12.25	12.25	NULL
+12.25	12.25	12.2
+122500	122500	NULL
+12250000000	1.22e10	NULL
+1.225e15	1.22e15	NULL
+5000000	5000000	NULL
+1.25e78	1.25e78	NULL
+1.25e-94	1.2e-94	NULL
+1.25e203	1.2e203	NULL
+1.25e-175	1e-175	NULL
+1.225	NULL	1.23
+1.37	NULL	1.37
+-1.37	NULL	-1.4
+0.00187	NULL	2e-3
+-0.0187	NULL	0
+5000	NULL	5000
+-5000	NULL	-5e3
+DROP TABLE t1;
+CREATE TABLE t1 (
+a char(20) NOT NULL,
+b char(7) DEFAULT NULL,
+c char(5)
+);
+INSERT INTO t1(a,b,c) VALUES (9.999999e+0, 9.999999e+0, 9.999e+0);
+INSERT INTO t1(a,b,c) VALUES (1.225e-05, 1.225e-05, 1.225e-05);
+INSERT INTO t1(a,b) VALUES (1.225e-04, 1.225e-04);
+INSERT INTO t1(a,b) VALUES (1.225e-01, 1.225e-01);
+INSERT INTO t1(a,b) VALUES (1.225877e-01, 1.225877e-01);
+INSERT INTO t1(a,b) VALUES (1.225e+01, 1.225e+01);
+INSERT INTO t1(a,b,c) VALUES (1.225e+01, 1.225e+01, 1.225e+01);
+INSERT INTO t1(a,b) VALUES (1.225e+05, 1.225e+05);
+INSERT INTO t1(a,b) VALUES (1.225e+10, 1.225e+10);
+INSERT INTO t1(a,b) VALUES (1.225e+15, 1.225e+15);
+INSERT INTO t1(a,b) VALUES (5000000e+0, 5000000e+0);
+INSERT INTO t1(a,b) VALUES (1.25e+78, 1.25e+78);
+INSERT INTO t1(a,b) VALUES (1.25e-94, 1.25e-94);
+INSERT INTO t1(a,b) VALUES (1.25e+203, 1.25e+203);
+INSERT INTO t1(a,b) VALUES (1.25e-175, 1.25e-175);
+INSERT INTO t1(a,c) VALUES (1.225e+0, 1.225e+0);
+INSERT INTO t1(a,c) VALUES (1.37e+0, 1.37e+0);
+INSERT INTO t1(a,c) VALUES (-1.37e+0, -1.37e+0);
+INSERT INTO t1(a,c) VALUES (1.87e-3, 1.87e-3);
+INSERT INTO t1(a,c) VALUES (-1.87e-2, -1.87e-2);
+INSERT INTO t1(a,c) VALUES (5000e+0, 5000e+0);
+INSERT INTO t1(a,c) VALUES (-5000e+0, -5000e+0);
+SELECT * FROM t1;
+a	b	c
+9.999999	10	9.999
+0.00001225	1.22e-5	1e-5
+0.0001225	1.22e-4	NULL
+0.1225	0.1225	NULL
+0.1225877	0.12259	NULL
+12.25	12.25	NULL
+12.25	12.25	12.25
+122500	122500	NULL
+12250000000	1.22e10	NULL
+1.225e15	1.22e15	NULL
+5000000	5000000	NULL
+1.25e78	1.25e78	NULL
+1.25e-94	1.2e-94	NULL
+1.25e203	1.2e203	NULL
+1.25e-175	1e-175	NULL
+1.225	NULL	1.225
+1.37	NULL	1.37
+-1.37	NULL	-1.37
+0.00187	NULL	0.002
+-0.0187	NULL	-0.02
+5000	NULL	5000
+-5000	NULL	-5000
+DROP TABLE t1;
+CREATE TABLE t (a CHAR(10),b INT);
+INSERT INTO t VALUES (),(),();
+INSERT INTO t(a) SELECT rand() FROM t;
+DROP TABLE t;
+CREATE TABLE t1 (c1 INT NOT NULL);
+INSERT INTO t1 VALUES(4188.32999999999992724042385816574096679687500),
+('4188.32999999999992724042385816574096679687500'), (4188);
+SELECT * FROM t1;
+c1
+4188
+4188
+4188
+CREATE TABLE t2 (c1 BIGINT);
+INSERT INTO t2 VALUES('15449237462.0000000000');
+SELECT * FROM t2;
+c1
+15449237462
+DROP TABLE t1, t2;
+CREATE TABLE t1(f1 FLOAT);
+INSERT INTO t1 VALUES (1.23);
+CREATE TABLE t2(f1 CHAR(1));
+INSERT INTO t2 SELECT f1 FROM t1;
+DROP TABLE t1, t2;
+End of 5.0 tests.
+#
+# Bug#34898 "mysql_info() reports 0 warnings while
+# mysql_warning_count() reports 1"
+# Check that the number of warnings reported by
+# mysql_info() is correct.
+#
+drop table if exists t1;
+create table t1 (data varchar(4) not null);
+set sql_mode='error_for_division_by_zero';
+#
+# Demonstrate that the number of warnings matches
+# the information in mysql_info().
+#
+insert t1 (data) values ('letter'), (1/0);
+affected rows: 2
+info: Records: 2  Duplicates: 0  Warnings: 3
+update t1 set data='envelope' where 1/0 or 1;
+affected rows: 2
+info: Rows matched: 2  Changed: 2  Warnings: 3
+insert t1 (data) values (default), (1/0), ('dead beef');
+affected rows: 3
+info: Records: 3  Duplicates: 0  Warnings: 4
+set sql_mode=default;
+drop table t1;
+#
+# End of 5.4 tests
+#
+#
+# Bug#54106 assert in Protocol::end_statement,
+#           INSERT IGNORE ... SELECT ... UNION SELECT ...
+#
+DROP TABLE IF EXISTS t1;
+CREATE TABLE t1 (a INT);
+INSERT INTO t1 (a, a) VALUES (1, 1);
+ERROR 42000: Column 'a' specified twice
+INSERT IGNORE t1 (a, a) VALUES (1, 1);
+ERROR 42000: Column 'a' specified twice
+INSERT IGNORE t1 (a, a) SELECT 1,1;
+ERROR 42000: Column 'a' specified twice
+INSERT IGNORE t1 (a, a) SELECT 1,1 UNION SELECT 2,2;
+ERROR 42000: Column 'a' specified twice
+DROP TABLE t1;

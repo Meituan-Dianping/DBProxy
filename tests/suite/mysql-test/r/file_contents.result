@@ -1,0 +1,8 @@
+
+Checking 'INFO_SRC' and 'INFO_BIN'
+Cannot open 'INFO_SRC' in '/Docs' (starting from bindir '')
+INFO_SRC: No line 'MySQL source #.#.#' / No line 'revision-id: .....'
+Cannot open 'INFO_BIN' in '/Docs' (starting from bindir '')
+INFO_BIN: No line about compiler information / No line 'Feature flags'
+
+End of tests

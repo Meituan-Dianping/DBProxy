@@ -1,0 +1,67 @@
+SET NAMES utf8;
+"BEGIN ctype_german.inc"
+drop table if exists t1;
+create table t1 as select repeat(' ', 64) as s1;
+select collation(s1) from t1;
+collation(s1)
+utf8_general_ci
+delete from t1;
+INSERT INTO t1 VALUES ('ud'),('uf');
+INSERT INTO t1 VALUES ('od'),('of');
+INSERT INTO t1 VALUES ('e');
+INSERT INTO t1 VALUES ('ad'),('af');
+insert into t1 values ('a'),('ae'),(_latin1 0xE4);
+insert into t1 values ('o'),('oe'),(_latin1 0xF6);
+insert into t1 values ('s'),('ss'),(_latin1 0xDF);
+insert into t1 values ('u'),('ue'),(_latin1 0xFC);
+INSERT INTO t1 VALUES (_latin1 0xE6), (_latin1 0xC6);
+INSERT INTO t1 VALUES (_latin1 0x9C), (_latin1 0x8C);
+select s1, hex(s1) from t1 order by s1, binary s1;
+s1	hex(s1)
+a	61
+ä	C3A4
+ad	6164
+ae	6165
+af	6166
+e	65
+o	6F
+ö	C3B6
+od	6F64
+oe	6F65
+of	6F66
+s	73
+ß	C39F
+ss	7373
+u	75
+ü	C3BC
+ud	7564
+ue	7565
+uf	7566
+Æ	C386
+æ	C3A6
+Œ	C592
+œ	C593
+select group_concat(s1 order by binary s1) from t1 group by s1;
+group_concat(s1 order by binary s1)
+a,ä
+ad
+ae
+af
+e
+o,ö
+od
+oe
+of
+s,ß
+ss
+u,ü
+ud
+ue
+uf
+Æ,æ
+Œ,œ
+SELECT s1, hex(s1) FROM t1 WHERE s1='ae' ORDER BY s1, BINARY(s1);
+s1	hex(s1)
+ae	6165
+drop table t1;
+"END ctype_german.inc"

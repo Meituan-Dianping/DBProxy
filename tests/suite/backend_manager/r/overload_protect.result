@@ -1,0 +1,16 @@
+show variables like 'backend-max-thread-running';
+Variable_name	Group	Value	Set mode
+backend-max-thread-running	main	0	Dynamic
+set backend-max-thread-running = 3;
+status
+show variables like 'backend-max-thread-running';
+Variable_name	Group	Value	Set mode
+backend-max-thread-running	main	3	Dynamic
+show variables like 'thread-running-sleep-delay';
+Variable_name	Group	Value	Set mode
+thread-running-sleep-delay	main	1(ms)	Dynamic
+set thread-running-sleep-delay = 20;
+status
+show variables like 'thread-running-sleep-delay';
+Variable_name	Group	Value	Set mode
+thread-running-sleep-delay	main	20(ms)	Dynamic

@@ -1,0 +1,52 @@
+insert into mysql.help_category(help_category_id,name)values(10001,'impossible_category_1');
+Warnings:
+Warning	1364	Field 'url' doesn't have a default value
+insert into mysql.help_category(help_category_id,name)values(10002,'impossible_category_2');
+Warnings:
+Warning	1364	Field 'url' doesn't have a default value
+insert into mysql.help_keyword(help_keyword_id,name)values(10201,'impossible_function_1');
+insert into mysql.help_keyword(help_keyword_id,name)values(10202,'impossible_function_5');
+insert into mysql.help_keyword(help_keyword_id,name)values(10203,'impossible_function_6');
+help 'function_of_my_dream';
+name	is_it_category
+help '%possible_f%';
+name	is_it_category
+help 'impossible_func%';
+name	is_it_category
+help 'impossible_category%';
+name	is_it_category
+impossible_category_1	Y
+impossible_category_2	Y
+help 'impossible_%';
+name	is_it_category
+impossible_category_1	Y
+impossible_category_2	Y
+help '%function_1';
+name	is_it_category
+help '%function_2';
+name	is_it_category
+help '%function_3';
+name	is_it_category
+help '%function_4';
+name	is_it_category
+help '%function_5';
+name	is_it_category
+help '%function_6';
+name	is_it_category
+help '%function_7';
+name	is_it_category
+help '%category_2';
+source_category_name	name	is_it_category
+help 'impossible_function_1';
+name	is_it_category
+help 'impossible_category_1';
+source_category_name	name	is_it_category
+End of 4.1 tests.
+DROP TABLE IF EXISTS t1;
+CREATE TABLE t1 (i INT);
+LOCK TABLES t1 WRITE;
+HELP no_such_topic;
+name	is_it_category
+UNLOCK TABLES;
+DROP TABLE t1;
+End of 5.1 tests.

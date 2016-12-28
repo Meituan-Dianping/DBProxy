@@ -1,0 +1,31 @@
+#hint_function
+drop table if exists hint_function_test;
+create table hint_function_test(a int, b int not null primary key);
+#grant all privileges on test.hint_function_test to dbproxy_test@'%' identified by '123456';
+#flush privileges;
+
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+connect (conn1, 127.0.0.1, dbproxy_test, '123456', 'test', 6003);
+
+#case1: /*slave@tag_name*/
+connection conn0;
+select * from backends;
+add slave tag tag_mt 2;
+select * from backends;
+
+select * from pwds;
+add user backends dbproxy_test@tag_mt;
+select * from pwds;
+
+connection conn1;
+/*slave@tag_mt*/select * from hint_function_test limit 1;
+
+connection conn0;
+remove user backends dbproxy_test;
+remove slave tag tag_mt 2;
+
+#case2: /*master*/
+connection conn1;
+/*master*/select * from hint_function_test limit 1;
+
+drop table if exists hint_function_test;

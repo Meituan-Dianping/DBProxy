@@ -1,0 +1,15 @@
+#mutable-test
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+
+connection conn0;
+#case1 version
+show variables like 'version';
+
+#case2 mysql-version
+show variables like 'mysql-version';
+
+#case3 show variables
+show variables; 
+
+#case4 show processlist
+show processlist;

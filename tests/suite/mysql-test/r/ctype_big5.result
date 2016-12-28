@@ -1,0 +1,1051 @@
+drop table if exists t1;
+CREATE DATABASE d1;
+CREATE TABLE t1 (c CHAR(10), KEY(c));
+SHOW FULL COLUMNS FROM t1;
+Field	Type	Collation	Null	Key	Default	Extra	Privileges	Comment
+c	char(10)	utf8mb4_unicode_ci	YES	MUL	NULL			
+INSERT INTO t1 VALUES ('aaa'),('aaaa'),('aaaaa');
+SELECT c as want3results FROM t1 WHERE c LIKE 'aaa%';
+want3results
+aaa
+aaaa
+aaaaa
+DROP TABLE t1;
+CREATE TABLE t1 (c1 varchar(15), KEY c1 (c1(2)));
+SHOW FULL COLUMNS FROM t1;
+Field	Type	Collation	Null	Key	Default	Extra	Privileges	Comment
+c1	varchar(15)	utf8mb4_unicode_ci	YES	MUL	NULL			
+INSERT INTO t1 VALUES ('location'),('loberge'),('lotre'),('boabab');
+SELECT c1 as want3results from t1 where c1 like 'l%';
+want3results
+location
+loberge
+lotre
+SELECT c1 as want3results from t1 where c1 like 'lo%';
+want3results
+location
+loberge
+lotre
+SELECT c1 as want1result  from t1 where c1 like 'loc%';
+want1result
+location
+SELECT c1 as want1result  from t1 where c1 like 'loca%';
+want1result
+location
+SELECT c1 as want1result  from t1 where c1 like 'locat%';
+want1result
+location
+SELECT c1 as want1result  from t1 where c1 like 'locati%';
+want1result
+location
+SELECT c1 as want1result  from t1 where c1 like 'locatio%';
+want1result
+location
+SELECT c1 as want1result  from t1 where c1 like 'location%';
+want1result
+location
+DROP TABLE t1;
+create table t1 (a set('a') not null);
+insert into t1 values (),();
+select cast(a as char(1)) from t1;
+cast(a as char(1))
+
+
+select a sounds like a from t1;
+a sounds like a
+1
+1
+select 1 from t1 order by cast(a as char(1));
+1
+1
+1
+drop table t1;
+set names utf8;
+create table t1 (
+name varchar(10),
+level smallint unsigned);
+show create table t1;
+Table	Create Table
+t1	CREATE TABLE `t1` (
+  `name` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `level` smallint(5) unsigned DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+insert into t1 values ('string',1);
+select concat(name,space(level)), concat(name, repeat(' ',level)) from t1;
+concat(name,space(level))	concat(name, repeat(' ',level))
+string 	string 
+drop table t1;
+DROP DATABASE d1;
+SET NAMES big5;
+create table t1 select repeat('a',4000) a;
+delete from t1;
+insert into t1 values ('a'), ('a '), ('a\t');
+select collation(a),hex(a) from t1 order by a;
+collation(a)	hex(a)
+big5_chinese_ci	6109
+big5_chinese_ci	61
+big5_chinese_ci	6120
+drop table t1;
+create table t1 engine=innodb select repeat('a',50) as c1;
+alter table t1 add index(c1(5));
+insert into t1 values ('abcdefg'),('abcde100'),('abcde110'),('abcde111');
+select collation(c1) from t1 limit 1;
+collation(c1)
+big5_chinese_ci
+select c1 from t1 where c1 like 'abcdef%' order by c1;
+c1
+abcdefg
+select c1 from t1 where c1 like 'abcde1%' order by c1;
+c1
+abcde100
+abcde110
+abcde111
+select c1 from t1 where c1 like 'abcde11%' order by c1;
+c1
+abcde110
+abcde111
+select c1 from t1 where c1 like 'abcde111%' order by c1;
+c1
+abcde111
+drop table t1;
+select @@collation_connection;
+@@collation_connection
+big5_chinese_ci
+create table t1 ROW_FORMAT=DYNAMIC select repeat('a',50) as c1 ;
+insert into t1 values('abcdef');
+insert into t1 values('_bcdef');
+insert into t1 values('a_cdef');
+insert into t1 values('ab_def');
+insert into t1 values('abc_ef');
+insert into t1 values('abcd_f');
+insert into t1 values('abcde_');
+select c1 as c1u from t1 where c1 like 'ab\_def';
+c1u
+ab_def
+select c1 as c2h from t1 where c1 like 'ab#_def' escape '#';
+c2h
+ab_def
+drop table t1;
+CREATE TABLE t1 AS
+SELECT 10 AS a, REPEAT('a',20) AS b, REPEAT('a',8) AS c, REPEAT('a',8) AS d;
+ALTER TABLE t1 ADD PRIMARY KEY(a), ADD KEY(b);
+INSERT INTO t1 (a, b) VALUES (1, repeat(0xF1F2,5));
+INSERT INTO t1 (a, b) VALUES (2, repeat(0xF1F2,10));
+INSERT INTO t1 (a, b) VALUES (3, repeat(0xF1F2,11));
+INSERT INTO t1 (a, b) VALUES (4, repeat(0xF1F2,12));
+SELECT hex(concat(repeat(0xF1F2, 10), '%'));
+hex(concat(repeat(0xF1F2, 10), '%'))
+F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F225
+3 rows expected
+SELECT a, hex(b), c FROM t1 WHERE b LIKE concat(repeat(0xF1F2,10), '%');
+a	hex(b)	c
+2	F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2	
+3	F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2	
+4	F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2	
+DROP TABLE t1;
+create table t1 select repeat('a',4000) a;
+delete from t1;
+insert into t1 values ('a'), ('a '), ('a\t');
+select collation(a),hex(a) from t1 order by a;
+collation(a)	hex(a)
+big5_chinese_ci	6109
+big5_chinese_ci	61
+big5_chinese_ci	6120
+drop table t1;
+create table t1 engine=innodb select repeat('a',50) as c1;
+alter table t1 add index(c1(5));
+insert into t1 values ('abcdefg'),('abcde100'),('abcde110'),('abcde111');
+select collation(c1) from t1 limit 1;
+collation(c1)
+big5_chinese_ci
+select c1 from t1 where c1 like 'abcdef%' order by c1;
+c1
+abcdefg
+select c1 from t1 where c1 like 'abcde1%' order by c1;
+c1
+abcde100
+abcde110
+abcde111
+select c1 from t1 where c1 like 'abcde11%' order by c1;
+c1
+abcde110
+abcde111
+select c1 from t1 where c1 like 'abcde111%' order by c1;
+c1
+abcde111
+drop table t1;
+select @@collation_connection;
+@@collation_connection
+big5_chinese_ci
+create table t1 ROW_FORMAT=DYNAMIC select repeat('a',50) as c1 ;
+insert into t1 values('abcdef');
+insert into t1 values('_bcdef');
+insert into t1 values('a_cdef');
+insert into t1 values('ab_def');
+insert into t1 values('abc_ef');
+insert into t1 values('abcd_f');
+insert into t1 values('abcde_');
+select c1 as c1u from t1 where c1 like 'ab\_def';
+c1u
+ab_def
+select c1 as c2h from t1 where c1 like 'ab#_def' escape '#';
+c2h
+ab_def
+drop table t1;
+CREATE TABLE t1 AS
+SELECT 10 AS a, REPEAT('a',20) AS b, REPEAT('a',8) AS c, REPEAT('a',8) AS d;
+ALTER TABLE t1 ADD PRIMARY KEY(a), ADD KEY(b);
+INSERT INTO t1 (a, b) VALUES (1, repeat(0xF1F2,5));
+INSERT INTO t1 (a, b) VALUES (2, repeat(0xF1F2,10));
+INSERT INTO t1 (a, b) VALUES (3, repeat(0xF1F2,11));
+INSERT INTO t1 (a, b) VALUES (4, repeat(0xF1F2,12));
+SELECT hex(concat(repeat(0xF1F2, 10), '%'));
+hex(concat(repeat(0xF1F2, 10), '%'))
+F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F225
+3 rows expected
+SELECT a, hex(b), c FROM t1 WHERE b LIKE concat(repeat(0xF1F2,10), '%');
+a	hex(b)	c
+2	F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2	
+3	F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2	
+4	F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2F1F2	
+DROP TABLE t1;
+SET NAMES big5;
+CREATE TABLE t1 (a text) character set big5;
+INSERT INTO t1 VALUES ('��');
+SELECT * FROM t1;
+a
+��
+DROP TABLE t1;
+set names big5;
+create table t1 (a char character set big5);
+insert into t1 values (0xF9D6),(0xF9D7),(0xF9D8),(0xF9D9);
+insert into t1 values (0xF9DA),(0xF9DB),(0xF9DC);
+alter table t1 convert to character set utf8;
+select hex(a) from t1 where a = _big5 0xF9DC;
+hex(a)
+E5ABBA
+drop table t1;
+select hex(convert(_big5 0xC84041 using ucs2));
+hex(convert(_big5 0xC84041 using ucs2))
+003F0041
+End of 4.1 tests
+End of 5.0 tests
+#
+# Start of 5.5 tests
+#
+#
+# Testing WL#4583 Case conversion in Asian character sets 
+#
+SET NAMES utf8;
+CREATE TABLE t1 (b VARCHAR(2));
+INSERT INTO t1 VALUES ('0'),('1'),('2'),('3'),('4'),('5'),('6'),('7');
+INSERT INTO t1 VALUES ('8'),('9'),('A'),('B'),('C'),('D'),('E'),('F');
+CREATE TEMPORARY TABLE head AS SELECT concat(b1.b, b2.b) AS head FROM t1 b1, t1 b2;
+CREATE TEMPORARY TABLE tail AS SELECT concat(b1.b, b2.b) AS tail FROM t1 b1, t1 b2;
+DROP TABLE t1;
+CREATE TABLE t1 AS
+SELECT concat(head, tail) AS code, ' ' AS a
+FROM head, tail
+WHERE (head BETWEEN '80' AND 'FF') AND (tail BETWEEN '20' AND 'FF')
+ORDER BY head, tail;
+DROP TEMPORARY TABLE head, tail;
+SHOW CREATE TABLE t1;
+Table	Create Table
+t1	CREATE TABLE `t1` (
+  `code` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `a` varchar(1) CHARACTER SET utf8 NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SELECT COUNT(*) FROM t1;
+COUNT(*)
+28672
+UPDATE t1 SET a=unhex(code) ORDER BY code;
+SELECT COUNT(*) FROM t1 WHERE a<>'';
+COUNT(*)
+1920
+SELECT code, hex(upper(a)), hex(lower(a)),a, upper(a), lower(a) FROM t1 WHERE hex(a)<>hex(upper(a)) OR hex(a)<>hex(lower(a));
+code	hex(upper(a))	hex(lower(a))	a	upper(a)	lower(a)
+C2B5	CE9C	C2B5	µ	Μ	µ
+C380	C380	C3A0	À	À	à
+C381	C381	C3A1	Á	Á	á
+C382	C382	C3A2	Â	Â	â
+C383	C383	C3A3	Ã	Ã	ã
+C384	C384	C3A4	Ä	Ä	ä
+C385	C385	C3A5	Å	Å	å
+C386	C386	C3A6	Æ	Æ	æ
+C387	C387	C3A7	Ç	Ç	ç
+C388	C388	C3A8	È	È	è
+C389	C389	C3A9	É	É	é
+C38A	C38A	C3AA	Ê	Ê	ê
+C38B	C38B	C3AB	Ë	Ë	ë
+C38C	C38C	C3AC	Ì	Ì	ì
+C38D	C38D	C3AD	Í	Í	í
+C38E	C38E	C3AE	Î	Î	î
+C38F	C38F	C3AF	Ï	Ï	ï
+C390	C390	C3B0	Ð	Ð	ð
+C391	C391	C3B1	Ñ	Ñ	ñ
+C392	C392	C3B2	Ò	Ò	ò
+C393	C393	C3B3	Ó	Ó	ó
+C394	C394	C3B4	Ô	Ô	ô
+C395	C395	C3B5	Õ	Õ	õ
+C396	C396	C3B6	Ö	Ö	ö
+C398	C398	C3B8	Ø	Ø	ø
+C399	C399	C3B9	Ù	Ù	ù
+C39A	C39A	C3BA	Ú	Ú	ú
+C39B	C39B	C3BB	Û	Û	û
+C39C	C39C	C3BC	Ü	Ü	ü
+C39D	C39D	C3BD	Ý	Ý	ý
+C39E	C39E	C3BE	Þ	Þ	þ
+C3A0	C380	C3A0	à	À	à
+C3A1	C381	C3A1	á	Á	á
+C3A2	C382	C3A2	â	Â	â
+C3A3	C383	C3A3	ã	Ã	ã
+C3A4	C384	C3A4	ä	Ä	ä
+C3A5	C385	C3A5	å	Å	å
+C3A6	C386	C3A6	æ	Æ	æ
+C3A7	C387	C3A7	ç	Ç	ç
+C3A8	C388	C3A8	è	È	è
+C3A9	C389	C3A9	é	É	é
+C3AA	C38A	C3AA	ê	Ê	ê
+C3AB	C38B	C3AB	ë	Ë	ë
+C3AC	C38C	C3AC	ì	Ì	ì
+C3AD	C38D	C3AD	í	Í	í
+C3AE	C38E	C3AE	î	Î	î
+C3AF	C38F	C3AF	ï	Ï	ï
+C3B0	C390	C3B0	ð	Ð	ð
+C3B1	C391	C3B1	ñ	Ñ	ñ
+C3B2	C392	C3B2	ò	Ò	ò
+C3B3	C393	C3B3	ó	Ó	ó
+C3B4	C394	C3B4	ô	Ô	ô
+C3B5	C395	C3B5	õ	Õ	õ
+C3B6	C396	C3B6	ö	Ö	ö
+C3B8	C398	C3B8	ø	Ø	ø
+C3B9	C399	C3B9	ù	Ù	ù
+C3BA	C39A	C3BA	ú	Ú	ú
+C3BB	C39B	C3BB	û	Û	û
+C3BC	C39C	C3BC	ü	Ü	ü
+C3BD	C39D	C3BD	ý	Ý	ý
+C3BE	C39E	C3BE	þ	Þ	þ
+C3BF	C5B8	C3BF	ÿ	Ÿ	ÿ
+C480	C480	C481	Ā	Ā	ā
+C481	C480	C481	ā	Ā	ā
+C482	C482	C483	Ă	Ă	ă
+C483	C482	C483	ă	Ă	ă
+C484	C484	C485	Ą	Ą	ą
+C485	C484	C485	ą	Ą	ą
+C486	C486	C487	Ć	Ć	ć
+C487	C486	C487	ć	Ć	ć
+C488	C488	C489	Ĉ	Ĉ	ĉ
+C489	C488	C489	ĉ	Ĉ	ĉ
+C48A	C48A	C48B	Ċ	Ċ	ċ
+C48B	C48A	C48B	ċ	Ċ	ċ
+C48C	C48C	C48D	Č	Č	č
+C48D	C48C	C48D	č	Č	č
+C48E	C48E	C48F	Ď	Ď	ď
+C48F	C48E	C48F	ď	Ď	ď
+C490	C490	C491	Đ	Đ	đ
+C491	C490	C491	đ	Đ	đ
+C492	C492	C493	Ē	Ē	ē
+C493	C492	C493	ē	Ē	ē
+C494	C494	C495	Ĕ	Ĕ	ĕ
+C495	C494	C495	ĕ	Ĕ	ĕ
+C496	C496	C497	Ė	Ė	ė
+C497	C496	C497	ė	Ė	ė
+C498	C498	C499	Ę	Ę	ę
+C499	C498	C499	ę	Ę	ę
+C49A	C49A	C49B	Ě	Ě	ě
+C49B	C49A	C49B	ě	Ě	ě
+C49C	C49C	C49D	Ĝ	Ĝ	ĝ
+C49D	C49C	C49D	ĝ	Ĝ	ĝ
+C49E	C49E	C49F	Ğ	Ğ	ğ
+C49F	C49E	C49F	ğ	Ğ	ğ
+C4A0	C4A0	C4A1	Ġ	Ġ	ġ
+C4A1	C4A0	C4A1	ġ	Ġ	ġ
+C4A2	C4A2	C4A3	Ģ	Ģ	ģ
+C4A3	C4A2	C4A3	ģ	Ģ	ģ
+C4A4	C4A4	C4A5	Ĥ	Ĥ	ĥ
+C4A5	C4A4	C4A5	ĥ	Ĥ	ĥ
+C4A6	C4A6	C4A7	Ħ	Ħ	ħ
+C4A7	C4A6	C4A7	ħ	Ħ	ħ
+C4A8	C4A8	C4A9	Ĩ	Ĩ	ĩ
+C4A9	C4A8	C4A9	ĩ	Ĩ	ĩ
+C4AA	C4AA	C4AB	Ī	Ī	ī
+C4AB	C4AA	C4AB	ī	Ī	ī
+C4AC	C4AC	C4AD	Ĭ	Ĭ	ĭ
+C4AD	C4AC	C4AD	ĭ	Ĭ	ĭ
+C4AE	C4AE	C4AF	Į	Į	į
+C4AF	C4AE	C4AF	į	Į	į
+C4B0	C4B0	69	İ	İ	i
+C4B1	49	C4B1	ı	I	ı
+C4B2	C4B2	C4B3	Ĳ	Ĳ	ĳ
+C4B3	C4B2	C4B3	ĳ	Ĳ	ĳ
+C4B4	C4B4	C4B5	Ĵ	Ĵ	ĵ
+C4B5	C4B4	C4B5	ĵ	Ĵ	ĵ
+C4B6	C4B6	C4B7	Ķ	Ķ	ķ
+C4B7	C4B6	C4B7	ķ	Ķ	ķ
+C4B9	C4B9	C4BA	Ĺ	Ĺ	ĺ
+C4BA	C4B9	C4BA	ĺ	Ĺ	ĺ
+C4BB	C4BB	C4BC	Ļ	Ļ	ļ
+C4BC	C4BB	C4BC	ļ	Ļ	ļ
+C4BD	C4BD	C4BE	Ľ	Ľ	ľ
+C4BE	C4BD	C4BE	ľ	Ľ	ľ
+C4BF	C4BF	C580	Ŀ	Ŀ	ŀ
+C580	C4BF	C580	ŀ	Ŀ	ŀ
+C581	C581	C582	Ł	Ł	ł
+C582	C581	C582	ł	Ł	ł
+C583	C583	C584	Ń	Ń	ń
+C584	C583	C584	ń	Ń	ń
+C585	C585	C586	Ņ	Ņ	ņ
+C586	C585	C586	ņ	Ņ	ņ
+C587	C587	C588	Ň	Ň	ň
+C588	C587	C588	ň	Ň	ň
+C58A	C58A	C58B	Ŋ	Ŋ	ŋ
+C58B	C58A	C58B	ŋ	Ŋ	ŋ
+C58C	C58C	C58D	Ō	Ō	ō
+C58D	C58C	C58D	ō	Ō	ō
+C58E	C58E	C58F	Ŏ	Ŏ	ŏ
+C58F	C58E	C58F	ŏ	Ŏ	ŏ
+C590	C590	C591	Ő	Ő	ő
+C591	C590	C591	ő	Ő	ő
+C592	C592	C593	Œ	Œ	œ
+C593	C592	C593	œ	Œ	œ
+C594	C594	C595	Ŕ	Ŕ	ŕ
+C595	C594	C595	ŕ	Ŕ	ŕ
+C596	C596	C597	Ŗ	Ŗ	ŗ
+C597	C596	C597	ŗ	Ŗ	ŗ
+C598	C598	C599	Ř	Ř	ř
+C599	C598	C599	ř	Ř	ř
+C59A	C59A	C59B	Ś	Ś	ś
+C59B	C59A	C59B	ś	Ś	ś
+C59C	C59C	C59D	Ŝ	Ŝ	ŝ
+C59D	C59C	C59D	ŝ	Ŝ	ŝ
+C59E	C59E	C59F	Ş	Ş	ş
+C59F	C59E	C59F	ş	Ş	ş
+C5A0	C5A0	C5A1	Š	Š	š
+C5A1	C5A0	C5A1	š	Š	š
+C5A2	C5A2	C5A3	Ţ	Ţ	ţ
+C5A3	C5A2	C5A3	ţ	Ţ	ţ
+C5A4	C5A4	C5A5	Ť	Ť	ť
+C5A5	C5A4	C5A5	ť	Ť	ť
+C5A6	C5A6	C5A7	Ŧ	Ŧ	ŧ
+C5A7	C5A6	C5A7	ŧ	Ŧ	ŧ
+C5A8	C5A8	C5A9	Ũ	Ũ	ũ
+C5A9	C5A8	C5A9	ũ	Ũ	ũ
+C5AA	C5AA	C5AB	Ū	Ū	ū
+C5AB	C5AA	C5AB	ū	Ū	ū
+C5AC	C5AC	C5AD	Ŭ	Ŭ	ŭ
+C5AD	C5AC	C5AD	ŭ	Ŭ	ŭ
+C5AE	C5AE	C5AF	Ů	Ů	ů
+C5AF	C5AE	C5AF	ů	Ů	ů
+C5B0	C5B0	C5B1	Ű	Ű	ű
+C5B1	C5B0	C5B1	ű	Ű	ű
+C5B2	C5B2	C5B3	Ų	Ų	ų
+C5B3	C5B2	C5B3	ų	Ų	ų
+C5B4	C5B4	C5B5	Ŵ	Ŵ	ŵ
+C5B5	C5B4	C5B5	ŵ	Ŵ	ŵ
+C5B6	C5B6	C5B7	Ŷ	Ŷ	ŷ
+C5B7	C5B6	C5B7	ŷ	Ŷ	ŷ
+C5B8	C5B8	C3BF	Ÿ	Ÿ	ÿ
+C5B9	C5B9	C5BA	Ź	Ź	ź
+C5BA	C5B9	C5BA	ź	Ź	ź
+C5BB	C5BB	C5BC	Ż	Ż	ż
+C5BC	C5BB	C5BC	ż	Ż	ż
+C5BD	C5BD	C5BE	Ž	Ž	ž
+C5BE	C5BD	C5BE	ž	Ž	ž
+C5BF	53	C5BF	ſ	S	ſ
+C681	C681	C993	Ɓ	Ɓ	ɓ
+C682	C682	C683	Ƃ	Ƃ	ƃ
+C683	C682	C683	ƃ	Ƃ	ƃ
+C684	C684	C685	Ƅ	Ƅ	ƅ
+C685	C684	C685	ƅ	Ƅ	ƅ
+C686	C686	C994	Ɔ	Ɔ	ɔ
+C687	C687	C688	Ƈ	Ƈ	ƈ
+C688	C687	C688	ƈ	Ƈ	ƈ
+C689	C689	C996	Ɖ	Ɖ	ɖ
+C68A	C68A	C997	Ɗ	Ɗ	ɗ
+C68B	C68B	C68C	Ƌ	Ƌ	ƌ
+C68C	C68B	C68C	ƌ	Ƌ	ƌ
+C68E	C68E	C79D	Ǝ	Ǝ	ǝ
+C68F	C68F	C999	Ə	Ə	ə
+C690	C690	C99B	Ɛ	Ɛ	ɛ
+C691	C691	C692	Ƒ	Ƒ	ƒ
+C692	C691	C692	ƒ	Ƒ	ƒ
+C693	C693	C9A0	Ɠ	Ɠ	ɠ
+C694	C694	C9A3	Ɣ	Ɣ	ɣ
+C695	C7B6	C695	ƕ	Ƕ	ƕ
+C696	C696	C9A9	Ɩ	Ɩ	ɩ
+C697	C697	C9A8	Ɨ	Ɨ	ɨ
+C698	C698	C699	Ƙ	Ƙ	ƙ
+C699	C698	C699	ƙ	Ƙ	ƙ
+C69C	C69C	C9AF	Ɯ	Ɯ	ɯ
+C69D	C69D	C9B2	Ɲ	Ɲ	ɲ
+C69F	C69F	C9B5	Ɵ	Ɵ	ɵ
+C6A0	C6A0	C6A1	Ơ	Ơ	ơ
+C6A1	C6A0	C6A1	ơ	Ơ	ơ
+C6A2	C6A2	C6A3	Ƣ	Ƣ	ƣ
+C6A3	C6A2	C6A3	ƣ	Ƣ	ƣ
+C6A4	C6A4	C6A5	Ƥ	Ƥ	ƥ
+C6A5	C6A4	C6A5	ƥ	Ƥ	ƥ
+C6A6	C6A6	CA80	Ʀ	Ʀ	ʀ
+C6A7	C6A7	C6A8	Ƨ	Ƨ	ƨ
+C6A8	C6A7	C6A8	ƨ	Ƨ	ƨ
+C6A9	C6A9	CA83	Ʃ	Ʃ	ʃ
+C6AC	C6AC	C6AD	Ƭ	Ƭ	ƭ
+C6AD	C6AC	C6AD	ƭ	Ƭ	ƭ
+C6AE	C6AE	CA88	Ʈ	Ʈ	ʈ
+C6AF	C6AF	C6B0	Ư	Ư	ư
+C6B0	C6AF	C6B0	ư	Ư	ư
+C6B1	C6B1	CA8A	Ʊ	Ʊ	ʊ
+C6B2	C6B2	CA8B	Ʋ	Ʋ	ʋ
+C6B3	C6B3	C6B4	Ƴ	Ƴ	ƴ
+C6B4	C6B3	C6B4	ƴ	Ƴ	ƴ
+C6B5	C6B5	C6B6	Ƶ	Ƶ	ƶ
+C6B6	C6B5	C6B6	ƶ	Ƶ	ƶ
+C6B7	C6B7	CA92	Ʒ	Ʒ	ʒ
+C6B8	C6B8	C6B9	Ƹ	Ƹ	ƹ
+C6B9	C6B8	C6B9	ƹ	Ƹ	ƹ
+C6BC	C6BC	C6BD	Ƽ	Ƽ	ƽ
+C6BD	C6BC	C6BD	ƽ	Ƽ	ƽ
+C6BF	C7B7	C6BF	ƿ	Ƿ	ƿ
+C784	C784	C786	Ǆ	Ǆ	ǆ
+C785	C784	C786	ǅ	Ǆ	ǆ
+C786	C784	C786	ǆ	Ǆ	ǆ
+C787	C787	C789	Ǉ	Ǉ	ǉ
+C788	C787	C789	ǈ	Ǉ	ǉ
+C789	C787	C789	ǉ	Ǉ	ǉ
+C78A	C78A	C78C	Ǌ	Ǌ	ǌ
+C78B	C78A	C78C	ǋ	Ǌ	ǌ
+C78C	C78A	C78C	ǌ	Ǌ	ǌ
+C78D	C78D	C78E	Ǎ	Ǎ	ǎ
+C78E	C78D	C78E	ǎ	Ǎ	ǎ
+C78F	C78F	C790	Ǐ	Ǐ	ǐ
+C790	C78F	C790	ǐ	Ǐ	ǐ
+C791	C791	C792	Ǒ	Ǒ	ǒ
+C792	C791	C792	ǒ	Ǒ	ǒ
+C793	C793	C794	Ǔ	Ǔ	ǔ
+C794	C793	C794	ǔ	Ǔ	ǔ
+C795	C795	C796	Ǖ	Ǖ	ǖ
+C796	C795	C796	ǖ	Ǖ	ǖ
+C797	C797	C798	Ǘ	Ǘ	ǘ
+C798	C797	C798	ǘ	Ǘ	ǘ
+C799	C799	C79A	Ǚ	Ǚ	ǚ
+C79A	C799	C79A	ǚ	Ǚ	ǚ
+C79B	C79B	C79C	Ǜ	Ǜ	ǜ
+C79C	C79B	C79C	ǜ	Ǜ	ǜ
+C79D	C68E	C79D	ǝ	Ǝ	ǝ
+C79E	C79E	C79F	Ǟ	Ǟ	ǟ
+C79F	C79E	C79F	ǟ	Ǟ	ǟ
+C7A0	C7A0	C7A1	Ǡ	Ǡ	ǡ
+C7A1	C7A0	C7A1	ǡ	Ǡ	ǡ
+C7A2	C7A2	C7A3	Ǣ	Ǣ	ǣ
+C7A3	C7A2	C7A3	ǣ	Ǣ	ǣ
+C7A4	C7A4	C7A5	Ǥ	Ǥ	ǥ
+C7A5	C7A4	C7A5	ǥ	Ǥ	ǥ
+C7A6	C7A6	C7A7	Ǧ	Ǧ	ǧ
+C7A7	C7A6	C7A7	ǧ	Ǧ	ǧ
+C7A8	C7A8	C7A9	Ǩ	Ǩ	ǩ
+C7A9	C7A8	C7A9	ǩ	Ǩ	ǩ
+C7AA	C7AA	C7AB	Ǫ	Ǫ	ǫ
+C7AB	C7AA	C7AB	ǫ	Ǫ	ǫ
+C7AC	C7AC	C7AD	Ǭ	Ǭ	ǭ
+C7AD	C7AC	C7AD	ǭ	Ǭ	ǭ
+C7AE	C7AE	C7AF	Ǯ	Ǯ	ǯ
+C7AF	C7AE	C7AF	ǯ	Ǯ	ǯ
+C7B1	C7B1	C7B3	Ǳ	Ǳ	ǳ
+C7B2	C7B1	C7B3	ǲ	Ǳ	ǳ
+C7B3	C7B1	C7B3	ǳ	Ǳ	ǳ
+C7B4	C7B4	C7B5	Ǵ	Ǵ	ǵ
+C7B5	C7B4	C7B5	ǵ	Ǵ	ǵ
+C7B6	C7B6	C695	Ƕ	Ƕ	ƕ
+C7B7	C7B7	C6BF	Ƿ	Ƿ	ƿ
+C7B8	C7B8	C7B9	Ǹ	Ǹ	ǹ
+C7B9	C7B8	C7B9	ǹ	Ǹ	ǹ
+C7BA	C7BA	C7BB	Ǻ	Ǻ	ǻ
+C7BB	C7BA	C7BB	ǻ	Ǻ	ǻ
+C7BC	C7BC	C7BD	Ǽ	Ǽ	ǽ
+C7BD	C7BC	C7BD	ǽ	Ǽ	ǽ
+C7BE	C7BE	C7BF	Ǿ	Ǿ	ǿ
+C7BF	C7BE	C7BF	ǿ	Ǿ	ǿ
+C880	C880	C881	Ȁ	Ȁ	ȁ
+C881	C880	C881	ȁ	Ȁ	ȁ
+C882	C882	C883	Ȃ	Ȃ	ȃ
+C883	C882	C883	ȃ	Ȃ	ȃ
+C884	C884	C885	Ȅ	Ȅ	ȅ
+C885	C884	C885	ȅ	Ȅ	ȅ
+C886	C886	C887	Ȇ	Ȇ	ȇ
+C887	C886	C887	ȇ	Ȇ	ȇ
+C888	C888	C889	Ȉ	Ȉ	ȉ
+C889	C888	C889	ȉ	Ȉ	ȉ
+C88A	C88A	C88B	Ȋ	Ȋ	ȋ
+C88B	C88A	C88B	ȋ	Ȋ	ȋ
+C88C	C88C	C88D	Ȍ	Ȍ	ȍ
+C88D	C88C	C88D	ȍ	Ȍ	ȍ
+C88E	C88E	C88F	Ȏ	Ȏ	ȏ
+C88F	C88E	C88F	ȏ	Ȏ	ȏ
+C890	C890	C891	Ȑ	Ȑ	ȑ
+C891	C890	C891	ȑ	Ȑ	ȑ
+C892	C892	C893	Ȓ	Ȓ	ȓ
+C893	C892	C893	ȓ	Ȓ	ȓ
+C894	C894	C895	Ȕ	Ȕ	ȕ
+C895	C894	C895	ȕ	Ȕ	ȕ
+C896	C896	C897	Ȗ	Ȗ	ȗ
+C897	C896	C897	ȗ	Ȗ	ȗ
+C898	C898	C899	Ș	Ș	ș
+C899	C898	C899	ș	Ș	ș
+C89A	C89A	C89B	Ț	Ț	ț
+C89B	C89A	C89B	ț	Ț	ț
+C89C	C89C	C89D	Ȝ	Ȝ	ȝ
+C89D	C89C	C89D	ȝ	Ȝ	ȝ
+C89E	C89E	C89F	Ȟ	Ȟ	ȟ
+C89F	C89E	C89F	ȟ	Ȟ	ȟ
+C8A2	C8A2	C8A3	Ȣ	Ȣ	ȣ
+C8A3	C8A2	C8A3	ȣ	Ȣ	ȣ
+C8A4	C8A4	C8A5	Ȥ	Ȥ	ȥ
+C8A5	C8A4	C8A5	ȥ	Ȥ	ȥ
+C8A6	C8A6	C8A7	Ȧ	Ȧ	ȧ
+C8A7	C8A6	C8A7	ȧ	Ȧ	ȧ
+C8A8	C8A8	C8A9	Ȩ	Ȩ	ȩ
+C8A9	C8A8	C8A9	ȩ	Ȩ	ȩ
+C8AA	C8AA	C8AB	Ȫ	Ȫ	ȫ
+C8AB	C8AA	C8AB	ȫ	Ȫ	ȫ
+C8AC	C8AC	C8AD	Ȭ	Ȭ	ȭ
+C8AD	C8AC	C8AD	ȭ	Ȭ	ȭ
+C8AE	C8AE	C8AF	Ȯ	Ȯ	ȯ
+C8AF	C8AE	C8AF	ȯ	Ȯ	ȯ
+C8B0	C8B0	C8B1	Ȱ	Ȱ	ȱ
+C8B1	C8B0	C8B1	ȱ	Ȱ	ȱ
+C8B2	C8B2	C8B3	Ȳ	Ȳ	ȳ
+C8B3	C8B2	C8B3	ȳ	Ȳ	ȳ
+C993	C681	C993	ɓ	Ɓ	ɓ
+C994	C686	C994	ɔ	Ɔ	ɔ
+C996	C689	C996	ɖ	Ɖ	ɖ
+C997	C68A	C997	ɗ	Ɗ	ɗ
+C999	C68F	C999	ə	Ə	ə
+C99B	C690	C99B	ɛ	Ɛ	ɛ
+C9A0	C693	C9A0	ɠ	Ɠ	ɠ
+C9A3	C694	C9A3	ɣ	Ɣ	ɣ
+C9A8	C697	C9A8	ɨ	Ɨ	ɨ
+C9A9	C696	C9A9	ɩ	Ɩ	ɩ
+C9AF	C69C	C9AF	ɯ	Ɯ	ɯ
+C9B2	C69D	C9B2	ɲ	Ɲ	ɲ
+C9B5	C69F	C9B5	ɵ	Ɵ	ɵ
+CA80	C6A6	CA80	ʀ	Ʀ	ʀ
+CA83	C6A9	CA83	ʃ	Ʃ	ʃ
+CA88	C6AE	CA88	ʈ	Ʈ	ʈ
+CA8A	C6B1	CA8A	ʊ	Ʊ	ʊ
+CA8B	C6B2	CA8B	ʋ	Ʋ	ʋ
+CA92	C6B7	CA92	ʒ	Ʒ	ʒ
+CD85	CE99	CD85	ͅ	Ι	ͅ
+CE86	CE86	CEAC	Ά	Ά	ά
+CE88	CE88	CEAD	Έ	Έ	έ
+CE89	CE89	CEAE	Ή	Ή	ή
+CE8A	CE8A	CEAF	Ί	Ί	ί
+CE8C	CE8C	CF8C	Ό	Ό	ό
+CE8E	CE8E	CF8D	Ύ	Ύ	ύ
+CE8F	CE8F	CF8E	Ώ	Ώ	ώ
+CE91	CE91	CEB1	Α	Α	α
+CE92	CE92	CEB2	Β	Β	β
+CE93	CE93	CEB3	Γ	Γ	γ
+CE94	CE94	CEB4	Δ	Δ	δ
+CE95	CE95	CEB5	Ε	Ε	ε
+CE96	CE96	CEB6	Ζ	Ζ	ζ
+CE97	CE97	CEB7	Η	Η	η
+CE98	CE98	CEB8	Θ	Θ	θ
+CE99	CE99	CEB9	Ι	Ι	ι
+CE9A	CE9A	CEBA	Κ	Κ	κ
+CE9B	CE9B	CEBB	Λ	Λ	λ
+CE9C	CE9C	CEBC	Μ	Μ	μ
+CE9D	CE9D	CEBD	Ν	Ν	ν
+CE9E	CE9E	CEBE	Ξ	Ξ	ξ
+CE9F	CE9F	CEBF	Ο	Ο	ο
+CEA0	CEA0	CF80	Π	Π	π
+CEA1	CEA1	CF81	Ρ	Ρ	ρ
+CEA3	CEA3	CF83	Σ	Σ	σ
+CEA4	CEA4	CF84	Τ	Τ	τ
+CEA5	CEA5	CF85	Υ	Υ	υ
+CEA6	CEA6	CF86	Φ	Φ	φ
+CEA7	CEA7	CF87	Χ	Χ	χ
+CEA8	CEA8	CF88	Ψ	Ψ	ψ
+CEA9	CEA9	CF89	Ω	Ω	ω
+CEAA	CEAA	CF8A	Ϊ	Ϊ	ϊ
+CEAB	CEAB	CF8B	Ϋ	Ϋ	ϋ
+CEAC	CE86	CEAC	ά	Ά	ά
+CEAD	CE88	CEAD	έ	Έ	έ
+CEAE	CE89	CEAE	ή	Ή	ή
+CEAF	CE8A	CEAF	ί	Ί	ί
+CEB1	CE91	CEB1	α	Α	α
+CEB2	CE92	CEB2	β	Β	β
+CEB3	CE93	CEB3	γ	Γ	γ
+CEB4	CE94	CEB4	δ	Δ	δ
+CEB5	CE95	CEB5	ε	Ε	ε
+CEB6	CE96	CEB6	ζ	Ζ	ζ
+CEB7	CE97	CEB7	η	Η	η
+CEB8	CE98	CEB8	θ	Θ	θ
+CEB9	CE99	CEB9	ι	Ι	ι
+CEBA	CE9A	CEBA	κ	Κ	κ
+CEBB	CE9B	CEBB	λ	Λ	λ
+CEBC	CE9C	CEBC	μ	Μ	μ
+CEBD	CE9D	CEBD	ν	Ν	ν
+CEBE	CE9E	CEBE	ξ	Ξ	ξ
+CEBF	CE9F	CEBF	ο	Ο	ο
+CF80	CEA0	CF80	π	Π	π
+CF81	CEA1	CF81	ρ	Ρ	ρ
+CF82	CEA3	CF82	ς	Σ	ς
+CF83	CEA3	CF83	σ	Σ	σ
+CF84	CEA4	CF84	τ	Τ	τ
+CF85	CEA5	CF85	υ	Υ	υ
+CF86	CEA6	CF86	φ	Φ	φ
+CF87	CEA7	CF87	χ	Χ	χ
+CF88	CEA8	CF88	ψ	Ψ	ψ
+CF89	CEA9	CF89	ω	Ω	ω
+CF8A	CEAA	CF8A	ϊ	Ϊ	ϊ
+CF8B	CEAB	CF8B	ϋ	Ϋ	ϋ
+CF8C	CE8C	CF8C	ό	Ό	ό
+CF8D	CE8E	CF8D	ύ	Ύ	ύ
+CF8E	CE8F	CF8E	ώ	Ώ	ώ
+CF90	CE92	CF90	ϐ	Β	ϐ
+CF91	CE98	CF91	ϑ	Θ	ϑ
+CF95	CEA6	CF95	ϕ	Φ	ϕ
+CF96	CEA0	CF96	ϖ	Π	ϖ
+CF9A	CF9A	CF9B	Ϛ	Ϛ	ϛ
+CF9B	CF9A	CF9B	ϛ	Ϛ	ϛ
+CF9C	CF9C	CF9D	Ϝ	Ϝ	ϝ
+CF9D	CF9C	CF9D	ϝ	Ϝ	ϝ
+CF9E	CF9E	CF9F	Ϟ	Ϟ	ϟ
+CF9F	CF9E	CF9F	ϟ	Ϟ	ϟ
+CFA0	CFA0	CFA1	Ϡ	Ϡ	ϡ
+CFA1	CFA0	CFA1	ϡ	Ϡ	ϡ
+CFA2	CFA2	CFA3	Ϣ	Ϣ	ϣ
+CFA3	CFA2	CFA3	ϣ	Ϣ	ϣ
+CFA4	CFA4	CFA5	Ϥ	Ϥ	ϥ
+CFA5	CFA4	CFA5	ϥ	Ϥ	ϥ
+CFA6	CFA6	CFA7	Ϧ	Ϧ	ϧ
+CFA7	CFA6	CFA7	ϧ	Ϧ	ϧ
+CFA8	CFA8	CFA9	Ϩ	Ϩ	ϩ
+CFA9	CFA8	CFA9	ϩ	Ϩ	ϩ
+CFAA	CFAA	CFAB	Ϫ	Ϫ	ϫ
+CFAB	CFAA	CFAB	ϫ	Ϫ	ϫ
+CFAC	CFAC	CFAD	Ϭ	Ϭ	ϭ
+CFAD	CFAC	CFAD	ϭ	Ϭ	ϭ
+CFAE	CFAE	CFAF	Ϯ	Ϯ	ϯ
+CFAF	CFAE	CFAF	ϯ	Ϯ	ϯ
+CFB0	CE9A	CFB0	ϰ	Κ	ϰ
+CFB1	CEA1	CFB1	ϱ	Ρ	ϱ
+CFB2	CEA3	CFB2	ϲ	Σ	ϲ
+D080	D080	D190	Ѐ	Ѐ	ѐ
+D081	D081	D191	Ё	Ё	ё
+D082	D082	D192	Ђ	Ђ	ђ
+D083	D083	D193	Ѓ	Ѓ	ѓ
+D084	D084	D194	Є	Є	є
+D085	D085	D195	Ѕ	Ѕ	ѕ
+D086	D086	D196	І	І	і
+D087	D087	D197	Ї	Ї	ї
+D088	D088	D198	Ј	Ј	ј
+D089	D089	D199	Љ	Љ	љ
+D08A	D08A	D19A	Њ	Њ	њ
+D08B	D08B	D19B	Ћ	Ћ	ћ
+D08C	D08C	D19C	Ќ	Ќ	ќ
+D08D	D08D	D19D	Ѝ	Ѝ	ѝ
+D08E	D08E	D19E	Ў	Ў	ў
+D08F	D08F	D19F	Џ	Џ	џ
+D090	D090	D0B0	А	А	а
+D091	D091	D0B1	Б	Б	б
+D092	D092	D0B2	В	В	в
+D093	D093	D0B3	Г	Г	г
+D094	D094	D0B4	Д	Д	д
+D095	D095	D0B5	Е	Е	е
+D096	D096	D0B6	Ж	Ж	ж
+D097	D097	D0B7	З	З	з
+D098	D098	D0B8	И	И	и
+D099	D099	D0B9	Й	Й	й
+D09A	D09A	D0BA	К	К	к
+D09B	D09B	D0BB	Л	Л	л
+D09C	D09C	D0BC	М	М	м
+D09D	D09D	D0BD	Н	Н	н
+D09E	D09E	D0BE	О	О	о
+D09F	D09F	D0BF	П	П	п
+D0A0	D0A0	D180	Р	Р	р
+D0A1	D0A1	D181	С	С	с
+D0A2	D0A2	D182	Т	Т	т
+D0A3	D0A3	D183	У	У	у
+D0A4	D0A4	D184	Ф	Ф	ф
+D0A5	D0A5	D185	Х	Х	х
+D0A6	D0A6	D186	Ц	Ц	ц
+D0A7	D0A7	D187	Ч	Ч	ч
+D0A8	D0A8	D188	Ш	Ш	ш
+D0A9	D0A9	D189	Щ	Щ	щ
+D0AA	D0AA	D18A	Ъ	Ъ	ъ
+D0AB	D0AB	D18B	Ы	Ы	ы
+D0AC	D0AC	D18C	Ь	Ь	ь
+D0AD	D0AD	D18D	Э	Э	э
+D0AE	D0AE	D18E	Ю	Ю	ю
+D0AF	D0AF	D18F	Я	Я	я
+D0B0	D090	D0B0	а	А	а
+D0B1	D091	D0B1	б	Б	б
+D0B2	D092	D0B2	в	В	в
+D0B3	D093	D0B3	г	Г	г
+D0B4	D094	D0B4	д	Д	д
+D0B5	D095	D0B5	е	Е	е
+D0B6	D096	D0B6	ж	Ж	ж
+D0B7	D097	D0B7	з	З	з
+D0B8	D098	D0B8	и	И	и
+D0B9	D099	D0B9	й	Й	й
+D0BA	D09A	D0BA	к	К	к
+D0BB	D09B	D0BB	л	Л	л
+D0BC	D09C	D0BC	м	М	м
+D0BD	D09D	D0BD	н	Н	н
+D0BE	D09E	D0BE	о	О	о
+D0BF	D09F	D0BF	п	П	п
+D180	D0A0	D180	р	Р	р
+D181	D0A1	D181	с	С	с
+D182	D0A2	D182	т	Т	т
+D183	D0A3	D183	у	У	у
+D184	D0A4	D184	ф	Ф	ф
+D185	D0A5	D185	х	Х	х
+D186	D0A6	D186	ц	Ц	ц
+D187	D0A7	D187	ч	Ч	ч
+D188	D0A8	D188	ш	Ш	ш
+D189	D0A9	D189	щ	Щ	щ
+D18A	D0AA	D18A	ъ	Ъ	ъ
+D18B	D0AB	D18B	ы	Ы	ы
+D18C	D0AC	D18C	ь	Ь	ь
+D18D	D0AD	D18D	э	Э	э
+D18E	D0AE	D18E	ю	Ю	ю
+D18F	D0AF	D18F	я	Я	я
+D190	D080	D190	ѐ	Ѐ	ѐ
+D191	D081	D191	ё	Ё	ё
+D192	D082	D192	ђ	Ђ	ђ
+D193	D083	D193	ѓ	Ѓ	ѓ
+D194	D084	D194	є	Є	є
+D195	D085	D195	ѕ	Ѕ	ѕ
+D196	D086	D196	і	І	і
+D197	D087	D197	ї	Ї	ї
+D198	D088	D198	ј	Ј	ј
+D199	D089	D199	љ	Љ	љ
+D19A	D08A	D19A	њ	Њ	њ
+D19B	D08B	D19B	ћ	Ћ	ћ
+D19C	D08C	D19C	ќ	Ќ	ќ
+D19D	D08D	D19D	ѝ	Ѝ	ѝ
+D19E	D08E	D19E	ў	Ў	ў
+D19F	D08F	D19F	џ	Џ	џ
+D1A0	D1A0	D1A1	Ѡ	Ѡ	ѡ
+D1A1	D1A0	D1A1	ѡ	Ѡ	ѡ
+D1A2	D1A2	D1A3	Ѣ	Ѣ	ѣ
+D1A3	D1A2	D1A3	ѣ	Ѣ	ѣ
+D1A4	D1A4	D1A5	Ѥ	Ѥ	ѥ
+D1A5	D1A4	D1A5	ѥ	Ѥ	ѥ
+D1A6	D1A6	D1A7	Ѧ	Ѧ	ѧ
+D1A7	D1A6	D1A7	ѧ	Ѧ	ѧ
+D1A8	D1A8	D1A9	Ѩ	Ѩ	ѩ
+D1A9	D1A8	D1A9	ѩ	Ѩ	ѩ
+D1AA	D1AA	D1AB	Ѫ	Ѫ	ѫ
+D1AB	D1AA	D1AB	ѫ	Ѫ	ѫ
+D1AC	D1AC	D1AD	Ѭ	Ѭ	ѭ
+D1AD	D1AC	D1AD	ѭ	Ѭ	ѭ
+D1AE	D1AE	D1AF	Ѯ	Ѯ	ѯ
+D1AF	D1AE	D1AF	ѯ	Ѯ	ѯ
+D1B0	D1B0	D1B1	Ѱ	Ѱ	ѱ
+D1B1	D1B0	D1B1	ѱ	Ѱ	ѱ
+D1B2	D1B2	D1B3	Ѳ	Ѳ	ѳ
+D1B3	D1B2	D1B3	ѳ	Ѳ	ѳ
+D1B4	D1B4	D1B5	Ѵ	Ѵ	ѵ
+D1B5	D1B4	D1B5	ѵ	Ѵ	ѵ
+D1B6	D1B6	D1B7	Ѷ	Ѷ	ѷ
+D1B7	D1B6	D1B7	ѷ	Ѷ	ѷ
+D1B8	D1B8	D1B9	Ѹ	Ѹ	ѹ
+D1B9	D1B8	D1B9	ѹ	Ѹ	ѹ
+D1BA	D1BA	D1BB	Ѻ	Ѻ	ѻ
+D1BB	D1BA	D1BB	ѻ	Ѻ	ѻ
+D1BC	D1BC	D1BD	Ѽ	Ѽ	ѽ
+D1BD	D1BC	D1BD	ѽ	Ѽ	ѽ
+D1BE	D1BE	D1BF	Ѿ	Ѿ	ѿ
+D1BF	D1BE	D1BF	ѿ	Ѿ	ѿ
+D280	D280	D281	Ҁ	Ҁ	ҁ
+D281	D280	D281	ҁ	Ҁ	ҁ
+D28C	D28C	D28D	Ҍ	Ҍ	ҍ
+D28D	D28C	D28D	ҍ	Ҍ	ҍ
+D28E	D28E	D28F	Ҏ	Ҏ	ҏ
+D28F	D28E	D28F	ҏ	Ҏ	ҏ
+D290	D290	D291	Ґ	Ґ	ґ
+D291	D290	D291	ґ	Ґ	ґ
+D292	D292	D293	Ғ	Ғ	ғ
+D293	D292	D293	ғ	Ғ	ғ
+D294	D294	D295	Ҕ	Ҕ	ҕ
+D295	D294	D295	ҕ	Ҕ	ҕ
+D296	D296	D297	Җ	Җ	җ
+D297	D296	D297	җ	Җ	җ
+D298	D298	D299	Ҙ	Ҙ	ҙ
+D299	D298	D299	ҙ	Ҙ	ҙ
+D29A	D29A	D29B	Қ	Қ	қ
+D29B	D29A	D29B	қ	Қ	қ
+D29C	D29C	D29D	Ҝ	Ҝ	ҝ
+D29D	D29C	D29D	ҝ	Ҝ	ҝ
+D29E	D29E	D29F	Ҟ	Ҟ	ҟ
+D29F	D29E	D29F	ҟ	Ҟ	ҟ
+D2A0	D2A0	D2A1	Ҡ	Ҡ	ҡ
+D2A1	D2A0	D2A1	ҡ	Ҡ	ҡ
+D2A2	D2A2	D2A3	Ң	Ң	ң
+D2A3	D2A2	D2A3	ң	Ң	ң
+D2A4	D2A4	D2A5	Ҥ	Ҥ	ҥ
+D2A5	D2A4	D2A5	ҥ	Ҥ	ҥ
+D2A6	D2A6	D2A7	Ҧ	Ҧ	ҧ
+D2A7	D2A6	D2A7	ҧ	Ҧ	ҧ
+D2A8	D2A8	D2A9	Ҩ	Ҩ	ҩ
+D2A9	D2A8	D2A9	ҩ	Ҩ	ҩ
+D2AA	D2AA	D2AB	Ҫ	Ҫ	ҫ
+D2AB	D2AA	D2AB	ҫ	Ҫ	ҫ
+D2AC	D2AC	D2AD	Ҭ	Ҭ	ҭ
+D2AD	D2AC	D2AD	ҭ	Ҭ	ҭ
+D2AE	D2AE	D2AF	Ү	Ү	ү
+D2AF	D2AE	D2AF	ү	Ү	ү
+D2B0	D2B0	D2B1	Ұ	Ұ	ұ
+D2B1	D2B0	D2B1	ұ	Ұ	ұ
+D2B2	D2B2	D2B3	Ҳ	Ҳ	ҳ
+D2B3	D2B2	D2B3	ҳ	Ҳ	ҳ
+D2B4	D2B4	D2B5	Ҵ	Ҵ	ҵ
+D2B5	D2B4	D2B5	ҵ	Ҵ	ҵ
+D2B6	D2B6	D2B7	Ҷ	Ҷ	ҷ
+D2B7	D2B6	D2B7	ҷ	Ҷ	ҷ
+D2B8	D2B8	D2B9	Ҹ	Ҹ	ҹ
+D2B9	D2B8	D2B9	ҹ	Ҹ	ҹ
+D2BA	D2BA	D2BB	Һ	Һ	һ
+D2BB	D2BA	D2BB	һ	Һ	һ
+D2BC	D2BC	D2BD	Ҽ	Ҽ	ҽ
+D2BD	D2BC	D2BD	ҽ	Ҽ	ҽ
+D2BE	D2BE	D2BF	Ҿ	Ҿ	ҿ
+D2BF	D2BE	D2BF	ҿ	Ҿ	ҿ
+D381	D381	D382	Ӂ	Ӂ	ӂ
+D382	D381	D382	ӂ	Ӂ	ӂ
+D383	D383	D384	Ӄ	Ӄ	ӄ
+D384	D383	D384	ӄ	Ӄ	ӄ
+D387	D387	D388	Ӈ	Ӈ	ӈ
+D388	D387	D388	ӈ	Ӈ	ӈ
+D38B	D38B	D38C	Ӌ	Ӌ	ӌ
+D38C	D38B	D38C	ӌ	Ӌ	ӌ
+D390	D390	D391	Ӑ	Ӑ	ӑ
+D391	D390	D391	ӑ	Ӑ	ӑ
+D392	D392	D393	Ӓ	Ӓ	ӓ
+D393	D392	D393	ӓ	Ӓ	ӓ
+D394	D394	D395	Ӕ	Ӕ	ӕ
+D395	D394	D395	ӕ	Ӕ	ӕ
+D396	D396	D397	Ӗ	Ӗ	ӗ
+D397	D396	D397	ӗ	Ӗ	ӗ
+D398	D398	D399	Ә	Ә	ә
+D399	D398	D399	ә	Ә	ә
+D39A	D39A	D39B	Ӛ	Ӛ	ӛ
+D39B	D39A	D39B	ӛ	Ӛ	ӛ
+D39C	D39C	D39D	Ӝ	Ӝ	ӝ
+D39D	D39C	D39D	ӝ	Ӝ	ӝ
+D39E	D39E	D39F	Ӟ	Ӟ	ӟ
+D39F	D39E	D39F	ӟ	Ӟ	ӟ
+D3A0	D3A0	D3A1	Ӡ	Ӡ	ӡ
+D3A1	D3A0	D3A1	ӡ	Ӡ	ӡ
+D3A2	D3A2	D3A3	Ӣ	Ӣ	ӣ
+D3A3	D3A2	D3A3	ӣ	Ӣ	ӣ
+D3A4	D3A4	D3A5	Ӥ	Ӥ	ӥ
+D3A5	D3A4	D3A5	ӥ	Ӥ	ӥ
+D3A6	D3A6	D3A7	Ӧ	Ӧ	ӧ
+D3A7	D3A6	D3A7	ӧ	Ӧ	ӧ
+D3A8	D3A8	D3A9	Ө	Ө	ө
+D3A9	D3A8	D3A9	ө	Ө	ө
+D3AA	D3AA	D3AB	Ӫ	Ӫ	ӫ
+D3AB	D3AA	D3AB	ӫ	Ӫ	ӫ
+D3AC	D3AC	D3AD	Ӭ	Ӭ	ӭ
+D3AD	D3AC	D3AD	ӭ	Ӭ	ӭ
+D3AE	D3AE	D3AF	Ӯ	Ӯ	ӯ
+D3AF	D3AE	D3AF	ӯ	Ӯ	ӯ
+D3B0	D3B0	D3B1	Ӱ	Ӱ	ӱ
+D3B1	D3B0	D3B1	ӱ	Ӱ	ӱ
+D3B2	D3B2	D3B3	Ӳ	Ӳ	ӳ
+D3B3	D3B2	D3B3	ӳ	Ӳ	ӳ
+D3B4	D3B4	D3B5	Ӵ	Ӵ	ӵ
+D3B5	D3B4	D3B5	ӵ	Ӵ	ӵ
+D3B8	D3B8	D3B9	Ӹ	Ӹ	ӹ
+D3B9	D3B8	D3B9	ӹ	Ӹ	ӹ
+D4B1	D4B1	D5A1	Ա	Ա	ա
+D4B2	D4B2	D5A2	Բ	Բ	բ
+D4B3	D4B3	D5A3	Գ	Գ	գ
+D4B4	D4B4	D5A4	Դ	Դ	դ
+D4B5	D4B5	D5A5	Ե	Ե	ե
+D4B6	D4B6	D5A6	Զ	Զ	զ
+D4B7	D4B7	D5A7	Է	Է	է
+D4B8	D4B8	D5A8	Ը	Ը	ը
+D4B9	D4B9	D5A9	Թ	Թ	թ
+D4BA	D4BA	D5AA	Ժ	Ժ	ժ
+D4BB	D4BB	D5AB	Ի	Ի	ի
+D4BC	D4BC	D5AC	Լ	Լ	լ
+D4BD	D4BD	D5AD	Խ	Խ	խ
+D4BE	D4BE	D5AE	Ծ	Ծ	ծ
+D4BF	D4BF	D5AF	Կ	Կ	կ
+D580	D580	D5B0	Հ	Հ	հ
+D581	D581	D5B1	Ձ	Ձ	ձ
+D582	D582	D5B2	Ղ	Ղ	ղ
+D583	D583	D5B3	Ճ	Ճ	ճ
+D584	D584	D5B4	Մ	Մ	մ
+D585	D585	D5B5	Յ	Յ	յ
+D586	D586	D5B6	Ն	Ն	ն
+D587	D587	D5B7	Շ	Շ	շ
+D588	D588	D5B8	Ո	Ո	ո
+D589	D589	D5B9	Չ	Չ	չ
+D58A	D58A	D5BA	Պ	Պ	պ
+D58B	D58B	D5BB	Ջ	Ջ	ջ
+D58C	D58C	D5BC	Ռ	Ռ	ռ
+D58D	D58D	D5BD	Ս	Ս	ս
+D58E	D58E	D5BE	Վ	Վ	վ
+D58F	D58F	D5BF	Տ	Տ	տ
+D590	D590	D680	Ր	Ր	ր
+D591	D591	D681	Ց	Ց	ց
+D592	D592	D682	Ւ	Ւ	ւ
+D593	D593	D683	Փ	Փ	փ
+D594	D594	D684	Ք	Ք	ք
+D595	D595	D685	Օ	Օ	օ
+D596	D596	D686	Ֆ	Ֆ	ֆ
+D5A1	D4B1	D5A1	ա	Ա	ա
+D5A2	D4B2	D5A2	բ	Բ	բ
+D5A3	D4B3	D5A3	գ	Գ	գ
+D5A4	D4B4	D5A4	դ	Դ	դ
+D5A5	D4B5	D5A5	ե	Ե	ե
+D5A6	D4B6	D5A6	զ	Զ	զ
+D5A7	D4B7	D5A7	է	Է	է
+D5A8	D4B8	D5A8	ը	Ը	ը
+D5A9	D4B9	D5A9	թ	Թ	թ
+D5AA	D4BA	D5AA	ժ	Ժ	ժ
+D5AB	D4BB	D5AB	ի	Ի	ի
+D5AC	D4BC	D5AC	լ	Լ	լ
+D5AD	D4BD	D5AD	խ	Խ	խ
+D5AE	D4BE	D5AE	ծ	Ծ	ծ
+D5AF	D4BF	D5AF	կ	Կ	կ
+D5B0	D580	D5B0	հ	Հ	հ
+D5B1	D581	D5B1	ձ	Ձ	ձ
+D5B2	D582	D5B2	ղ	Ղ	ղ
+D5B3	D583	D5B3	ճ	Ճ	ճ
+D5B4	D584	D5B4	մ	Մ	մ
+D5B5	D585	D5B5	յ	Յ	յ
+D5B6	D586	D5B6	ն	Ն	ն
+D5B7	D587	D5B7	շ	Շ	շ
+D5B8	D588	D5B8	ո	Ո	ո
+D5B9	D589	D5B9	չ	Չ	չ
+D5BA	D58A	D5BA	պ	Պ	պ
+D5BB	D58B	D5BB	ջ	Ջ	ջ
+D5BC	D58C	D5BC	ռ	Ռ	ռ
+D5BD	D58D	D5BD	ս	Ս	ս
+D5BE	D58E	D5BE	վ	Վ	վ
+D5BF	D58F	D5BF	տ	Տ	տ
+D680	D590	D680	ր	Ր	ր
+D681	D591	D681	ց	Ց	ց
+D682	D592	D682	ւ	Ւ	ւ
+D683	D593	D683	փ	Փ	փ
+D684	D594	D684	ք	Ք	ք
+D685	D595	D685	օ	Օ	օ
+D686	D596	D686	ֆ	Ֆ	ֆ
+SELECT * FROM t1
+WHERE HEX(CAST(LOWER(a) AS CHAR CHARACTER SET utf8)) <>
+HEX(LOWER(CAST(a AS CHAR CHARACTER SET utf8))) ORDER BY code;
+code	a
+SELECT * FROM t1
+WHERE HEX(CAST(UPPER(a) AS CHAR CHARACTER SET utf8)) <>
+HEX(UPPER(CAST(a AS CHAR CHARACTER SET utf8))) ORDER BY code;
+code	a
+DROP TABLE t1;
+#
+# End of 5.5 tests
+#

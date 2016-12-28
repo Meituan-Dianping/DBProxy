@@ -1,0 +1,7 @@
+#
+# Bug#17733 Flushing logs causes daily server crash
+#
+flush logs;
+show variables like 'log_bin%';
+flush logs;
+show variables like 'log_bin%';

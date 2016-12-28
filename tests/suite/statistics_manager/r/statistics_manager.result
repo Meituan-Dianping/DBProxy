@@ -1,0 +1,192 @@
+show variables like 'percentile-value';
+Variable_name	Group	Value	Set mode
+percentile-value	proxy	64	Dynamic
+set percentile-value = ;
+ERROR 07000: use 'SELECT * FROM help' to see the supported commands
+set percentile-value = 33;
+status
+show variables like 'percentile-value';
+Variable_name	Group	Value	Set mode
+percentile-value	proxy	33	Dynamic
+set percentile-value = 3.14;
+ERROR 07000: invalid operation value: 3.14
+set percentile-value = 0;
+ERROR 07000: invalid operation value: 0
+set percentile-value = 100;
+status
+show variables like 'percentile-value';
+Variable_name	Group	Value	Set mode
+percentile-value	proxy	100	Dynamic
+set percentile-value = 120;
+ERROR 07000: invalid operation value: 120
+set percentile-value = abc;
+ERROR 07000: invalid operation value: abc
+set percentile-switch = ;
+ERROR 07000: use 'SELECT * FROM help' to see the supported commands
+set percentile-switch = abc;
+ERROR 07000: invalid operation value: abc
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	OFF	Dynamic
+set percentile-switch = off;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	OFF	Dynamic
+set percentile-switch = oN;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	ON	Dynamic
+set percentile-switch = oFf;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	OFF	Dynamic
+set percentile-switch = On;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	ON	Dynamic
+set percentile-switch = ofF;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	OFF	Dynamic
+set percentile-switch = ON;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	ON	Dynamic
+set percentile-switch = Off;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	OFF	Dynamic
+set percentile-switch = on;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	ON	Dynamic
+set percentile-switch = OFf;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	OFF	Dynamic
+set percentile-switch = on;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	ON	Dynamic
+set percentile-switch = oFF;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	OFF	Dynamic
+set percentile-switch = on;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	ON	Dynamic
+set percentile-switch = OfF;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	OFF	Dynamic
+set percentile-switch = on;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	ON	Dynamic
+set percentile-switch = OFF;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	OFF	Dynamic
+set percentile-switch = off;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	OFF	Dynamic
+show percentile;
+ERROR 07000: the percentile_switch is off
+set percentile-switch = on;
+status
+show variables like 'percentile-switch';
+Variable_name	Group	Value	Set mode
+percentile-switch	proxy	ON	Dynamic
+show percentile;
+percentile(μs)
+64.000000
+show percentile 5m;
+percentile(μs)
+64.000000
+show percentile 5h;
+percentile(μs)
+64.000000
+show percentile 24h;
+ERROR 07000: invalid operation value: 24h
+show percentile 60m;
+ERROR 07000: invalid operation value: 60m
+show percentile 0h;
+ERROR 07000: invalid operation value: 0h
+show percentile 0m;
+ERROR 07000: invalid operation value: 0m
+show percentile 3mh;
+ERROR 07000: invalid operation value: 3mh
+show percentile 4;
+ERROR 07000: invalid operation value: 4
+show variables like 'query-response-time-stats';
+Variable_name	Group	Value	Set mode
+query-response-time-stats	main	1	Dynamic
+set query-response-time-stats = 1024;
+status
+show variables like 'query-response-time-stats';
+Variable_name	Group	Value	Set mode
+query-response-time-stats	main	1024	Dynamic
+set query-response-time-stats = 0;
+status
+show variables like 'query-response-time-stats';
+Variable_name	Group	Value	Set mode
+query-response-time-stats	main	0	Dynamic
+set query-response-time-stats = -1;
+ERROR 07000: invalid operation value: -1
+show variables like 'long-query-time';
+Variable_name	Group	Value	Set mode
+long-query-time	main	0(ms)	Dynamic
+set long-query-time = 1024;
+status
+show variables like 'long-query-time';
+Variable_name	Group	Value	Set mode
+long-query-time	main	1024(ms)	Dynamic
+set long-query-time = 0;
+status
+show variables like 'long-query-time';
+Variable_name	Group	Value	Set mode
+long-query-time	main	0(ms)	Dynamic
+set long-query-time = -1;
+ERROR 07000: invalid operation value: -1
+show variables like 'query-response-time-range-base';
+Variable_name	Group	Value	Set mode
+query-response-time-range-base	main	2	Dynamic
+set query-response-time-range-base = 4;
+status
+show variables like 'query-response-time-range-base';
+Variable_name	Group	Value	Set mode
+query-response-time-range-base	main	4	Dynamic
+set query-response-time-range-base = 3;
+status
+show variables like 'query-response-time-range-base';
+Variable_name	Group	Value	Set mode
+query-response-time-range-base	main	3	Dynamic
+set query-response-time-range-base = 0;
+ERROR 07000: invalid operation value: 0
+set query-response-time-range-base = -1;
+ERROR 07000: invalid operation value: -1
+set query-response-time-range-base = 1.4;
+ERROR 07000: invalid operation value: 1.4
+show query_response_time;
+time	type	count	total	min_time	max_time
+ALL	read	0	0	0	0
+ALL	write	0	0	0	0
+ALL	other	0	0	0	0

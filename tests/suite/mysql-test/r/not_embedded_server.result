@@ -1,0 +1,16 @@
+SHOW VARIABLES like 'slave_skip_errors';
+Variable_name	Value
+slave_skip_errors	OFF
+#
+# Bug#58026: massive recursion and crash in regular expression handling
+#
+SELECT '1' RLIKE RPAD('1', 10000, '(');
+#
+# WL#4284: Transactional DDL locking
+#
+# FLUSH PRIVILEGES should not implicitly unlock locked tables.
+#
+DROP TABLE IF EXISTS t1;
+CREATE TABLE t1 (c1 INT);
+FLUSH PRIVILEGES;
+DROP TABLE t1;

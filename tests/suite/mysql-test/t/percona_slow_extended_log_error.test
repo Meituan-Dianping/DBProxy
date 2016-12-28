@@ -1,0 +1,24 @@
+#
+# Test last_errno in extended slow query log
+# 
+
+--disable_warnings
+DROP TABLE IF EXISTS t1;
+--enable_warnings
+
+SET SESSION min_examined_row_limit=0;
+SET long_query_time=0;
+
+--let log_file=percona.slow_extended.log_error_1
+CREATE TABLE t1(a INT);
+--let grep_pattern = ^.*Last_errno: 0 .*\$
+
+--let log_file=percona.slow_extended.log_error_2
+--error ER_TABLE_EXISTS_ERROR
+CREATE TABLE t1(a INT);
+--let grep_pattern = ^.*Last_errno: 1050 .*\$
+
+DROP TABLE t1;
+
+SET long_query_time=default;
+SET SESSION min_examined_row_limit=default;

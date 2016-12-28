@@ -1,0 +1,38 @@
+#
+#
+
+--disable_warnings
+drop table if exists t1,t2;
+--enable_warnings
+
+create table t1 ( n int auto_increment primary key);
+insert into t1 values(NULL);
+check table t1;
+insert into t1 values(NULL);
+check table t1;
+insert into t1 values(NULL);
+check table t1;
+insert into t1 values(NULL);
+check table t1;
+insert into t1 values(NULL);
+check table t1;
+insert into t1 values(NULL);
+check table t1;
+drop table t1;
+
+#
+# Test of locking and delete of files
+#
+
+CREATE TABLE t1 (a int);
+CREATE TABLE t2 (a int);
+drop table t1,t2;
+
+CREATE TABLE t1 (a int);
+CREATE TABLE t2 (a int);
+drop table t2,t1;
+
+# End of 4.1 tests
+
+
+# End of 5.0 tests

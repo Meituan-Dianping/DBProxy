@@ -1,0 +1,17 @@
+########################################################################
+# Byg #1170103: Memory leak @ read_view_open_now...
+########################################################################
+
+--source include/have_query_cache.inc
+--source include/have_innodb.inc
+
+CREATE TABLE t(a INT) ENGINE=InnoDB;
+INSERT INTO t VALUES (1), (2), (3);
+
+
+
+SELECT * FROM t;
+SELECT * FROM t;
+
+
+DROP TABLE t;

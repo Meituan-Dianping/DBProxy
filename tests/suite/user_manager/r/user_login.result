@@ -1,0 +1,14 @@
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+show databases;
+Database
+information_schema
+benchmarksql
+mysql
+performance_schema
+test
+add pwd slave_tag1:123456;
+status

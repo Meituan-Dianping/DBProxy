@@ -1,0 +1,80 @@
+drop table if exists filter_function_test;
+create table filter_function_test(a int, b int not null primary key);
+set select-where-limit = OFF;
+status
+show variables like 'select-where-limit';
+Variable_name	Group	Value	Set mode
+select-where-limit	proxy	OFF	Dynamic
+select * from filter_function_test limit 1;
+a	b
+set select-where-limit = ON;
+status
+show variables like 'select-where-limit';
+Variable_name	Group	Value	Set mode
+select-where-limit	proxy	ON	Dynamic
+select * from filter_function_test limit 1;
+ERROR 07000: Proxy Warning - Syntax Forbidden Query:select * from filter_function_test limit 1
+set manual-filter-flag = ON;
+status
+show variables like 'manual-filter-flag';
+Variable_name	Group	Value	Set mode
+manual-filter-flag	main	ON	Dynamic
+select * from filter_function_test where a > 1 limit 1;
+a	b
+show blacklists;
+filter_hashcode	filter	is_enabled	filter_status	hit_times
+add blacklist 'select * from filter_function_test where a > 1 limit 1' 1;
+status
+show blacklists;
+filter_hashcode	filter	is_enabled	filter_status	hit_times
+5d5bab548151b358bdc630934749a6ac	select * from filter_function_test where a > ? limit ?	1	manual added	0
+select * from filter_function_test where a > 1 limit 1;
+ERROR 07000: Proxy Warning - Blacklist Forbidden
+set manual-filter-flag = OFF;
+status
+add blacklist 'select * from filter_function_test where a=1' 1;
+status
+show blacklists;
+filter_hashcode	filter	is_enabled	filter_status	hit_times
+77387e0e2ac6ad14a2418a7bee81d387	select * from filter_function_test where a = ?	1	manual added	0
+5d5bab548151b358bdc630934749a6ac	select * from filter_function_test where a > ? limit ?	1	manual added	1
+add blacklist 'select * from filter_function_test where a=<1023' 0;
+status
+show blacklists;
+filter_hashcode	filter	is_enabled	filter_status	hit_times
+77387e0e2ac6ad14a2418a7bee81d387	select * from filter_function_test where a = ?	1	manual added	0
+9a0c6193eb757dedc9c4cde996b69681	select * from filter_function_test where a = < ?	0	manual added	0
+5d5bab548151b358bdc630934749a6ac	select * from filter_function_test where a > ? limit ?	1	manual added	1
+add blacklist 'select * from filter_function_test where b=1' 1;
+status
+add blacklist 'select * from filter_function_test where b=<1023' 0;
+status
+show blacklists;
+filter_hashcode	filter	is_enabled	filter_status	hit_times
+51282f34809ad1ec64b8a74de2f5693d	select * from filter_function_test where b = ?	1	manual added	0
+5d5bab548151b358bdc630934749a6ac	select * from filter_function_test where a > ? limit ?	1	manual added	1
+77387e0e2ac6ad14a2418a7bee81d387	select * from filter_function_test where a = ?	1	manual added	0
+9a0c6193eb757dedc9c4cde996b69681	select * from filter_function_test where a = < ?	0	manual added	0
+d45e1432f3f02732ef7d616150867a0d	select * from filter_function_test where b = < ?	0	manual added	0
+save blacklists;
+status
+show blacklists;
+filter_hashcode	filter	is_enabled	filter_status	hit_times
+51282f34809ad1ec64b8a74de2f5693d	select * from filter_function_test where b = ?	1	manual added	0
+5d5bab548151b358bdc630934749a6ac	select * from filter_function_test where a > ? limit ?	1	manual added	1
+77387e0e2ac6ad14a2418a7bee81d387	select * from filter_function_test where a = ?	1	manual added	0
+9a0c6193eb757dedc9c4cde996b69681	select * from filter_function_test where a = < ?	0	manual added	0
+d45e1432f3f02732ef7d616150867a0d	select * from filter_function_test where b = < ?	0	manual added	0
+clear blacklists;
+status
+clear blacklists;
+status
+show blacklists;
+filter_hashcode	filter	is_enabled	filter_status	hit_times
+add blacklist 'select * from filter_function_test where b=1' 1;
+status
+show blacklists;
+filter_hashcode	filter	is_enabled	filter_status	hit_times
+51282f34809ad1ec64b8a74de2f5693d	select * from filter_function_test where b = ?	1	manual added	0
+select * from filter_function_test where b=1024;
+ERROR 07000: Proxy Warning - Blacklist Forbidden

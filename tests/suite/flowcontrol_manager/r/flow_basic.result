@@ -1,0 +1,175 @@
+show variables like 'manual-filter-flag';
+Variable_name	Group	Value	Set mode
+manual-filter-flag	main	OFF	Dynamic
+set manual-filter-flag = ON;
+status
+show variables like 'manual-filter-flag';
+Variable_name	Group	Value	Set mode
+manual-filter-flag	main	ON	Dynamic
+set manual-filter-flag = on;
+status
+show variables like 'manual-filter-flag';
+Variable_name	Group	Value	Set mode
+manual-filter-flag	main	ON	Dynamic
+set manual-filter-flag = OFF;
+status
+show variables like 'manual-filter-flag';
+Variable_name	Group	Value	Set mode
+manual-filter-flag	main	OFF	Dynamic
+set manual-filter-flag = off;
+status
+show variables like 'manual-filter-flag';
+Variable_name	Group	Value	Set mode
+manual-filter-flag	main	OFF	Dynamic
+show variables like 'auto-filter-flag';
+Variable_name	Group	Value	Set mode
+auto-filter-flag	main	OFF	Dynamic
+set auto-filter-flag = ON;
+status
+show variables like 'auto-filter-flag';
+Variable_name	Group	Value	Set mode
+auto-filter-flag	main	OFF	Dynamic
+set auto-filter-flag = on;
+status
+show variables like 'auto-filter-flag';
+Variable_name	Group	Value	Set mode
+auto-filter-flag	main	OFF	Dynamic
+set auto-filter-flag = OFF;
+status
+show variables like 'auto-filter-flag';
+Variable_name	Group	Value	Set mode
+auto-filter-flag	main	OFF	Dynamic
+set auto-filter-flag = off;
+status
+show variables like 'auto-filter-flag';
+Variable_name	Group	Value	Set mode
+auto-filter-flag	main	OFF	Dynamic
+show variables like 'lastest-query-num';
+Variable_name	Group	Value	Set mode
+lastest-query-num	main	0	Dynamic
+set lastest-query-num = 1024;
+status
+show variables like 'lastest-query-num';
+Variable_name	Group	Value	Set mode
+lastest-query-num	main	1024	Dynamic
+set lastest-query-num = 0;
+status
+show variables like 'lastest-query-num';
+Variable_name	Group	Value	Set mode
+lastest-query-num	main	0	Dynamic
+set lastest-query-num = -1;
+ERROR 07000: invalid operation value: -1
+show lastest_queries;
+query_rewrite	fist_access_time	last_access_time	query_times	lastest_query_times
+show variables like 'select-where-limit';
+Variable_name	Group	Value	Set mode
+select-where-limit	proxy	ON	Dynamic
+set select-where-limit = ON;
+status
+show variables like 'select-where-limit';
+Variable_name	Group	Value	Set mode
+select-where-limit	proxy	ON	Dynamic
+set select-where-limit = on;
+status
+show variables like 'select-where-limit';
+Variable_name	Group	Value	Set mode
+select-where-limit	proxy	ON	Dynamic
+set select-where-limit = OFF;
+status
+show variables like 'select-where-limit';
+Variable_name	Group	Value	Set mode
+select-where-limit	proxy	OFF	Dynamic
+set select-where-limit = off;
+status
+show variables like 'select-where-limit';
+Variable_name	Group	Value	Set mode
+select-where-limit	proxy	OFF	Dynamic
+show variables like 'access-num-per-time-window';
+Variable_name	Group	Value	Set mode
+access-num-per-time-window	main	5	Dynamic
+set access-num-per-time-window = 1024;
+status
+show variables like 'access-num-per-time-window';
+Variable_name	Group	Value	Set mode
+access-num-per-time-window	main	1024	Dynamic
+set access-num-per-time-window = 1;
+status
+show variables like 'access-num-per-time-window';
+Variable_name	Group	Value	Set mode
+access-num-per-time-window	main	1	Dynamic
+set access-num-per-time-window = 0;
+ERROR 07000: invalid operation value: 0
+show variables like 'query-filter-frequent-threshold';
+Variable_name	Group	Value	Set mode
+query-filter-frequent-threshold	main	0.000000	Dynamic
+set query-filter-frequent-threshold = 1024;
+status
+show variables like 'query-filter-frequent-threshold';
+Variable_name	Group	Value	Set mode
+query-filter-frequent-threshold	main	1024.000000	Dynamic
+set query-filter-frequent-threshold = 3.1415;
+status
+show variables like 'query-filter-frequent-threshold';
+Variable_name	Group	Value	Set mode
+query-filter-frequent-threshold	main	3.141500	Dynamic
+set query-filter-frequent-threshold = 1;
+status
+show variables like 'query-filter-frequent-threshold';
+Variable_name	Group	Value	Set mode
+query-filter-frequent-threshold	main	1.000000	Dynamic
+set query-filter-frequent-threshold = 0;
+ERROR 07000: invalid operation value: 0
+show variables like 'query-filter-time-threshold';
+Variable_name	Group	Value	Set mode
+query-filter-time-threshold	main	-1	Dynamic
+set query-filter-time-threshold = 1024;
+status
+show variables like 'query-filter-time-threshold';
+Variable_name	Group	Value	Set mode
+query-filter-time-threshold	main	1024	Dynamic
+set query-filter-time-threshold = 1;
+status
+show variables like 'query-filter-time-threshold';
+Variable_name	Group	Value	Set mode
+query-filter-time-threshold	main	1	Dynamic
+set query-filter-time-threshold = 0;
+status
+show variables like 'query-filter-time-threshold';
+Variable_name	Group	Value	Set mode
+query-filter-time-threshold	main	0	Dynamic
+set query-filter-time-threshold = -1;
+status
+show variables like 'query-filter-time-threshold';
+Variable_name	Group	Value	Set mode
+query-filter-time-threshold	main	-1	Dynamic
+set query-filter-time-threshold = -2;
+ERROR 07000: invalid operation value: -2
+show blacklists;
+filter_hashcode	filter	is_enabled	filter_status	hit_times
+51282f34809ad1ec64b8a74de2f5693d	select * from filter_function_test where b = ?	1	manual added	1
+add blacklist 'select * from abc';
+status
+add blacklist 'select * from def join ghi';
+status
+add blacklist 'select * from jkl where id>5';
+status
+show blacklists;
+filter_hashcode	filter	is_enabled	filter_status	hit_times
+51282f34809ad1ec64b8a74de2f5693d	select * from filter_function_test where b = ?	1	manual added	1
+664f6ec172445a2aaae62a4204a01ad0	select * from abc	0	manual added	0
+35b284302cb62bcbb5da3593beac3e4b	select * from def join ghi	0	manual added	0
+409ebc61bdff42924a51cadf516becf3	select * from jkl where id > ?	0	manual added	0
+remove blacklist '1234567890';
+status
+set blacklist '1234567890' 1;
+status
+set blacklist '1234567890' 0;
+status
+set blacklist '1234567890' 7;
+ERROR 07000: invalid filter flag: 7
+clear blacklists;
+status
+save blacklists;
+status
+load blacklists;
+status

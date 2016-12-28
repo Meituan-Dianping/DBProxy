@@ -1,0 +1,23 @@
+
+--disable_warnings
+drop table if exists t;
+--enable_warnings
+
+create table t(id INT PRIMARY KEY);
+insert into t values(1);
+insert into t values(2);
+insert into t values(3);
+
+--let log_file=percona.slow_extended.min_examined_row_limit
+
+SELECT 1;
+
+
+SELECT * FROM t AS t1, t AS t2;
+SELECT 1;
+
+
+
+--let grep_pattern = Query_time
+
+DROP TABLE t;

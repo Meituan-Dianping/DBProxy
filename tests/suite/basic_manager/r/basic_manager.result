@@ -1,0 +1,85 @@
+show variables like 'shutdown-timeout';
+Variable_name	Group	Value	Set mode
+shutdown-timeout	main	1(s)	Dynamic
+set shutdown-timeout = 1234;
+status
+show variables like 'shutdown-timeout';
+Variable_name	Group	Value	Set mode
+shutdown-timeout	main	1234(s)	Dynamic
+set shutdown-timeout = 1;
+status
+show variables like 'shutdown-timeout';
+Variable_name	Group	Value	Set mode
+shutdown-timeout	main	1(s)	Dynamic
+set shutdown-timeout = 0;
+ERROR 07000: invalid operation value: 0
+set shutdown-timeout = a;
+ERROR 07000: invalid operation value: a
+save config;
+status
+select * from help;
+command	description
+SELECT * FROM help	shows this help
+SELECT * FROM backends	lists the backends and their state
+SET OFFLINE $backend_id [timeout $int]	offline backend server, $backend_id is backend_ndx's id, timeout in seconds
+SET ONLINE $backend_id	online backend server, ...
+ADD MASTER $backend	example: "add master 127.0.0.1:3306", ...
+ADD SLAVE $backend	example: "add slave 127.0.0.1:3306$slave_tag", ...
+REMOVE BACKEND $backend_id [timeout $int]	example: "remove backend 1",  timeout in seconds ...
+SET remove-backend-timeout = $int	online set the global timeout of remove/offline backend in seconds.
+SELECT * FROM clients	lists the clients
+ADD CLIENT $client	example: "add client 192.168.1.2", ...
+REMOVE CLIENT $client	example: "remove client 192.168.1.2", ...
+SELECT * FROM pwds	lists the pwds and user host
+ADD PWD $pwd	example: "add pwd user:raw_password", ...
+ADD ENPWD $pwd	example: "add enpwd user:encrypted_password", ...
+REMOVE PWD $pwd	example: "remove pwd user", ...
+ADD USER HOSTS $user_ips	example: "add user hosts usr@ip1|ip2",  ...
+REMOVE USER HOSTS $user_ips	example: "remove user hosts usr[@ip1|ip2]",  ...
+ADD USER BACKENDS $user_backends	example: "add user backends usr@lave_tag1[|slave_tag2]",  ...
+REMOVE USER BACKENDS $user_backends	example: "remove user backends usr[@lave_tag1[|slave_tag2]]",  ...
+ADD SLAVE TAG $tag_name $backend_idx	example: "add slave tag tag_name backend_idx[,backend_idx]",  ...
+REMOVE SLAVE TAG $tag_name $backend_idx	example: "add slave tag tag_name backend_idx[,backend_idx]",  ...
+ALTER SLAVE WEIGHT $backendIndx $weight	example: "alter slave weight backendIndx weight",  ...
+ADD ADMIN USER HOSTS $ips	example: "add admin user host ip1[,ip2,...]",  ...
+REMOVE ADMIN USER HOSTS $ips	example: "remove admin user host ip1[,ip2...]",  ...
+ALTER ADMIN USER $pwd	example: "alter admin user user:raw_password",  ...
+SAVE CONFIG	save the backends to config file
+SELECT VERSION	display the version of dbproxy
+SHOW proxy STATUS	list the status or variables
+SHOW processlist	list the connections and their status
+SHOW events waits STATUS	list the statistics of the wait event
+SHOW query_response_time	list the statistics of the query response time
+SHOW blacklists	list the content of the blacklist
+SHOW TABLES [ LIKE '$table_name[%]']	list the content of sharding table.
+ADD TABLES '$table_name'	add sharding table_name: db.tbl.col.shard_num.
+REMOVE TABLES [ LIKE '$table_name[%]']	list the content of sharding table.
+SHOW VARIABLES [ LIKE '$var_name[%]' ]	list the variables value
+CLEAR blacklists	clear the content of the blacklist
+LOAD blacklists	load the content of the blacklist from blacklist_file
+SAVE blacklists	save the content of the blacklist to blacklist_file
+ADD blacklist 'sql_raw' [0|1]	add new blacklist
+REMOVE blacklist 'hash_code'	remove blacklist
+SET blacklist 'hash_code' 0|1	update blacklist status
+SHOW lastest_queries	list the lastest queries
+SET sql-log = ON|OFF|REALTIME	online set sql-log option
+SET sql-log-max-size = $int	online set sql-log-max-size in bytes
+SET sql-log-file-num  = $int	online set sql-log-file-num
+SET log-level = DEBUG|INFO|MESSAGE|WARNING|CRITICAL|ERROR	online set log-level option
+SET sql-log-mode=ALL|CLIENT|BACKEND	online set sql log mode
+SET log-trace-modules = $int	online set debug trace modules, combinated value of : none: 0x00 connection_pool:0x01 event:0x02 sql: 0x04 con_status:0x08 shard: 0x10 all:0x1F
+SET lastest-query-num = $int	online set reserved queries number
+SET query-filter-time-threshold = $int	online set filter query time threshold
+SET query-filter-frequent-threshold = $float	online set filter query's frequency threshold(access times per-second)
+SET access-num-per-time-window = $int	online set the query' threashold of accessing times.
+SET auto-filter-flag = on|off	online set auto added filter's flag
+SET manual-filter-flag = on|off	online set manual added filter's default flag
+SET blacklist-file = $file_path	online set blacklist file
+SET backend-max-thread-running = $int	online set backend's max thread running number
+SET thread-running-sleep-delay = $int	online set backend's max thread running sleep timeout
+SET shutdown-timeout = $int	online set the waiting seconds of idle connections during shutdown process
+SHUTDOWN [NORMAL] | IMMEDIATE	online shutdown the dbproxy Server, NORMAL: wait for the current transaction complete before shutdown-timeout expired, IMMEDIATE: shutdown immediately
+KILL [CONNECTION] $id	online kill the client connection, the $id can be found in command show processlist.
+SHOW percentile [$int m|h]	display the response time, m:minute h:hour
+SET percentile-switch = on|off	online set percentile
+SET percentile-value = $int (0,100]	set the percentile

@@ -1,0 +1,26 @@
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+alter admin user dbproxy_user1:dbproxy_pwd;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_user1	pCiiQ1jTxZnMIm8=			admin
+connect(127.0.0.1,dbproxy_test,123456,,6018,/opt/tmp/mysql.sock);
+ERROR 28000: unknown user
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_user1	pCiiQ1jTxZnMIm8=			admin
+alter admin user dbproxy_test:123456;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin

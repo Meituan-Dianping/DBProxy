@@ -1,0 +1,44 @@
+# This test requires that --log-output includes 'table', and the general
+# log is on
+
+# embedded server causes different stat
+-- source include/not_embedded.inc
+
+# thread pool causes different results
+-- source include/not_threadpool.inc
+
+# Save the initial number of concurrent sessions
+--source include/count_sessions.inc
+
+# Disable concurrent inserts to avoid sporadic test failures as it might
+# affect the the value of variables used throughout the test case.
+
+# Disable logging to table, since this will also cause table locking and unlocking, which will
+# show up in SHOW STATUS and may cause sporadic failures
+
+
+# PS causes different statistics
+--disable_ps_protocol
+
+flush status;
+
+#
+# Bug#17954 Threads_connected > Threads_created
+#
+
+--disable_warnings
+DROP VIEW IF EXISTS v1;
+--enable_warnings
+
+CREATE VIEW v1 AS SELECT VARIABLE_NAME AS NAME, CONVERT(VARIABLE_VALUE, UNSIGNED) AS VALUE FROM INFORMATION_SCHEMA.GLOBAL_STATUS;
+
+#SELECT * FROM INFORMATION_SCHEMA.GLOBAL_STATUS where variable_name like '%thread%';
+#SELECT * FROM INFORMATION_SCHEMA.GLOBAL_STATUS;
+#SELECT * FROM INFORMATION_SCHEMA.GLOBAL_VARIABLES;
+
+DROP VIEW v1;
+
+# Restore global concurrent_insert value. Keep in the end of the test file.
+
+# Wait till we reached the initial number of concurrent sessions
+

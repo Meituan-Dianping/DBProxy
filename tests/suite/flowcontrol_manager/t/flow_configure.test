@@ -1,0 +1,762 @@
+drop table if exists slave_tag_test;
+create table slave_tag_test(tc1 int primary key, tc2 int);
+
+#grant all privileges on *.* to slave_tag1@'%' identified by '123456';
+#grant all privileges on *.* to slave_tag2@'%' identified by '123456';
+#flush privileges;
+
+connect (conn0,localhost,dbproxy_test,'123456','*NO-ONE*',6018);
+connect (conn1,localhost,slave_tag1,'123456',test,6003);
+connect (conn2,localhost,slave_tag2,'123456',test,6003);
+
+#case1:不为user配置backends，也不为backend配置tag
+#测例目的:测试没有tag情况下，各个从库 轮转 连接
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+select * from pwds;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+#case2:不为user配置tag,为其中一个backend配置tag
+#测试目的: 1 非指定tag的连接从default-backends队列取backend,指定tag的backend被移入backends队列
+#          2 指定tag的连接发往对应的backend
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add slave tag tag_mt 2;
+select * from pwds;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+
+#case3:不为user配置tag,为所有backend(目前2个从库)配置不同tag
+#测试目的: 1 如果default-backends队列没有backends,则分配主库的backends
+#          2 指定tag的连接发往对应的backend
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add slave tag tag_mt 2;
+add slave tag tag_dp 3;
+select * from pwds;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+
+#case4:不为user配置tag, 为所有backend(目前2个从库)配置相同tag
+#测试目的: 1 tag 内轮转连接
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add slave tag tag_mt 2;
+add slave tag tag_mt 3;
+select * from pwds;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+
+#case5:为user配置单一tag,不为backend配置tag
+#测试目的: 1 测试tag没有backend对应时,是否会报错
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add user backends slave_tag1@tag_mt;
+select * from pwds;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+
+#case6:为user配置单一tag,为某一backend配置tag
+#测试目的: 1 指定tag的连接发往对应的backend
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add user backends slave_tag1@tag_mt;
+add slave tag tag_mt 2;
+select * from pwds;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+#case7:为user配置单一tag,为多个backend配置tag
+#测试目的: 1 tag内的backends是否 轮转 连接
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add user backends slave_tag1@tag_mt;
+add slave tag tag_mt 2,3;
+select * from pwds;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+#case8:为user配置多个(2个)tag,不为backend配置tag
+#测试目的: 1 测试一个user添加多个tag
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add user backends slave_tag1@tag_mt|tag_dp;
+select * from pwds;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+#case9:为user配置多个(2个)tag,为其中一个tag配置backend
+#测试目的: 1 一个user多tag情况下，测试 指定tag的连接发往对应的backend
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add user backends slave_tag1@tag_mt|tag_dp;
+add slave tag tag_mt 2;
+select * from pwds;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+
+#case10:为user配置多个(2个)tag,为每个tag配置backend
+#测试目的: 1 测试一个user多tag情况下，每个tag都起作用
+#          2 测试tag之间是否 轮转 连接
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add user backends slave_tag1@tag_mt|tag_dp;
+add slave tag tag_mt 2;
+add slave tag tag_dp 3;
+select * from pwds;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+
+#case11:不为user配置tag,不为backend配tag,修改backend_ndx=2 weight=4,修改backend_ndx=3 weight=1
+#测试目的: 1 backends间不同权重下的 连接策略
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+alter slave weight 2 4;
+alter slave weight 3 1;
+select * from pwds;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+#case12:为user配置一个tag,为tag配置多个(2个)backend,修改backend_ndx=2 weight=4,修改backend_ndx=3 weight=1
+#测试目的: 1 tag内backends间不同权重下的 连接策略
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add user backends slave_tag1@tag_mt;
+add slave tag tag_mt 2,3;
+alter slave weight 2 4;
+alter slave weight 3 1;
+select * from pwds;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+#case13:为user配置多个(2个)tag,为tag配置多个(2个)backend,修改backend_ndx=2 weight=4,修改backend_ndx=3 weight=1
+#测试目的: 1 tag间 不同权重下 连接策略
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add user backends slave_tag1@tag_mt|tag_dp;
+add slave tag tag_mt 2,3;
+alter slave weight 2 4;
+alter slave weight 3 1;
+select * from pwds;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+##关键分支覆盖测试
+#1 alter_slave_weight()函数
+#1.1 无效权重
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+select * from pwds;
+select * from backends;
+
+alter slave weight 2 0;
+select * from backends;
+
+#1.2 无效ndx
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+select * from pwds;
+select * from backends;
+
+alter slave weight 2048 2;
+select * from backends;
+
+#1.3 ndx为主库
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+select * from pwds;
+select * from backends;
+
+alter slave weight 1 2;
+select * from backends;
+
+#1.4 无tag
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+select * from pwds;
+select * from backends;
+
+alter slave weight 2 4;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+#1.5 有tag
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add slave tag tag_mt 2;
+add slave tag tag_mt 3;
+add user backends slave_tag1@tag_mt;
+select * from pwds;
+select * from backends;
+
+alter slave weight 2 4;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+#2 add_slave_tag()函数
+#2.1 ndx无效
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+select * from pwds;
+select * from backends;
+
+add slave tag tag_mt -1024;
+select * from backends;
+
+#2.2 无tag
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+select * from pwds;
+select * from backends;
+
+add slave tag tag_mt 2;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+#2.3 有tag
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add slave tag tag_dp 2;
+select * from pwds;
+select * from backends;
+
+add slave tag tag_mt 2;
+select * from backends;
+
+connection conn1;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+
+#2.4 ndx为主库
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+select * from pwds;
+select * from backends;
+
+add slave tag tag_mt 1;
+select * from backends;
+
+#2.5 添加多组ndx
+connection conn0;
+remove user backends slave_tag1;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add user backends slave_tag1@tag_mt;
+select * from pwds;
+select * from backends;
+
+add slave tag tag_mt 2,3;
+select * from backends;
+
+connection conn1;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+#2.6 多个(2个)backend配置了tag_mt ,修改其中一个backend的tag为tag_dp
+connection conn0;
+remove user backends slave_tag1;
+remove user backends slave_tag2;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add slave tag tag_dp 2,3;
+add user backends slave_tag1@tag_mt;
+add user backends slave_tag2@tag_dp;
+select * from pwds;
+select * from backends;
+
+add slave tag tag_mt 2;
+select * from backends;
+
+connection conn1;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+connection conn2;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+
+#2.7 一个backend配置了tag_mt,修改其为tag_dp
+connection conn0;
+remove user backends slave_tag1;
+remove user backends slave_tag2;
+remove slave tag tag_mt;
+remove slave tag tag_dp;
+add slave tag tag_mt 2;
+add user backends slave_tag1@tag_mt;
+add user backends slave_tag2@tag_dp;
+select * from pwds;
+select * from backends;
+
+add slave tag tag_dp 2;
+select * from backends;
+
+connection conn1;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+connection conn2;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+
+#3 remove_slave_tag()函数
+#3.1 remove无效tag
+connection conn0;
+remove user backends slave_tag1;
+remove user backends slave_tag2;
+select * from pwds;
+select * from backends;
+
+remove slave tag tag_mt;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+#3.2 remove 有效tag
+connection conn0;
+remove user backends slave_tag1;
+remove user backends slave_tag2;
+add user backends slave_tag1@tag_mt;
+add slave tag tag_mt 2;
+select * from pwds;
+select * from backends;
+
+remove slave tag tag_mt;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+#3.3 remove 多个无效
+connection conn0;
+remove user backends slave_tag1;
+remove user backends slave_tag2;
+select * from pwds;
+select * from backends;
+
+remove slave tag tag_mt 2,3;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+#3.4 remove 多个有效
+connection conn0;
+remove user backends slave_tag1;
+remove user backends slave_tag2;
+add slave tag tag_mt 2,3;
+add user backends slave_tag1@tag_mt;
+select * from pwds;
+select * from backends;
+
+remove slave tag tag_mt 2,3;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+#3.5 remove 其中一个backend上tag
+connection conn0;
+remove user backends slave_tag1;
+remove user backends slave_tag2;
+add slave tag tag_mt 2,3;
+add user backends slave_tag1@tag_mt;
+select * from pwds;
+select * from backends;
+
+remove slave tag tag_mt 2;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+#4 user_backends_handle()函数
+#4.1 添加重复user backend
+connection conn0;
+remove user backends slave_tag1;
+remove user backends slave_tag2;
+add slave tag tag_mt 2,3;
+add user backends slave_tag1@tag_mt;
+select * from pwds;
+select * from backends;
+
+add user backends slave_tag1@tag_mt|tag_mt;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+#4.2 添加不存在的user backend
+connection conn0;
+remove user backends slave_tag1;
+remove user backends slave_tag2;
+add slave tag tag_mt 2,3;
+add user backends slave_tag1@tag_mt;
+select * from pwds;
+select * from backends;
+
+add user backends slave_tag1@tag_dp;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+
+#4.3 删除不存在的user backend
+connection conn0;
+remove user backends slave_tag1;
+remove user backends slave_tag2;
+add slave tag tag_mt 2,3;
+add user backends slave_tag1@tag_mt;
+select * from pwds;
+select * from backends;
+
+remove user backends slave_tag1@tag_dp;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+#4.4 删除存在的user backend
+connection conn0;
+remove user backends slave_tag1;
+remove user backends slave_tag2;
+add slave tag tag_mt 2,3;
+add user backends slave_tag1@tag_mt;
+select * from pwds;
+select * from backends;
+
+remove user backends slave_tag1@tag_mt;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+#4.5 删除user 上所有tag
+connection conn0;
+remove user backends slave_tag1;
+remove user backends slave_tag2;
+add slave tag tag_mt 2,3;
+add user backends slave_tag1@tag_mt|tag_dp;
+select * from pwds;
+select * from backends;
+
+remove user backends slave_tag1;
+select * from backends;
+
+connection conn1;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+select count(*) from test.slave_tag_test;
+
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+/*slave@tag_mt*/select count(*) from test.slave_tag_test;
+
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+/*slave@tag_dp*/select count(*) from test.slave_tag_test;
+
+drop table if exists slave_tag_test;

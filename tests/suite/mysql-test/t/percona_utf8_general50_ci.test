@@ -1,0 +1,8 @@
+#
+# Test that utf8_general50_ci provides pre-5.1.24 utf8_general_ci behavior,
+# i.e. SHARP S is only equal to itself.
+#
+
+SET NAMES utf8;
+
+--source include/ctype_german.inc

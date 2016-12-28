@@ -1,0 +1,15 @@
+#
+# Test slow_query_log_timestamp_always variable.  It's missing tests for FALSE value that
+# the log entries with the same timestamp are indeed not timestamped, but this is
+# impossible to test in MTR without debug injections.
+#
+SET SESSION min_examined_row_limit=0;
+SET SESSION long_query_time=0;
+
+--let log_file=percona_slow_extended_query_log_1
+SELECT 1;
+SELECT 2;
+--let grep_pattern= ^# Time: \d{6} (\d| )\d:\d\d:\d\d\$
+
+SET SESSION long_query_time=default;
+SET SESSION min_examined_row_limit=default;

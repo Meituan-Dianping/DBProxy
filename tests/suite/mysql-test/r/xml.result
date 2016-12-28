@@ -1,0 +1,495 @@
+SELECT extractValue('<a>a</a>', '/a[false()]');
+extractValue('<a>a</a>', '/a[false()]')
+
+SELECT extractValue('<a>a</a>', '/a[true()]');
+extractValue('<a>a</a>', '/a[true()]')
+a
+SELECT extractValue('<a>a</a>', '/a[not(false())]');
+extractValue('<a>a</a>', '/a[not(false())]')
+a
+SELECT extractValue('<a>a</a>', '/a[not(true())]');
+extractValue('<a>a</a>', '/a[not(true())]')
+
+SELECT extractValue('<a>a</a>', '/a[true() and true()]');
+extractValue('<a>a</a>', '/a[true() and true()]')
+a
+SELECT extractValue('<a>a</a>', '/a[true() and false()]');
+extractValue('<a>a</a>', '/a[true() and false()]')
+
+SELECT extractValue('<a>a</a>', '/a[false()and false()]');
+extractValue('<a>a</a>', '/a[false()and false()]')
+
+SELECT extractValue('<a>a</a>', '/a[false()and true()]');
+extractValue('<a>a</a>', '/a[false()and true()]')
+
+SELECT extractValue('<a>a</a>', '/a[true() or true()]');
+extractValue('<a>a</a>', '/a[true() or true()]')
+a
+SELECT extractValue('<a>a</a>', '/a[true() or false()]');
+extractValue('<a>a</a>', '/a[true() or false()]')
+a
+SELECT extractValue('<a>a</a>', '/a[false()or false()]');
+extractValue('<a>a</a>', '/a[false()or false()]')
+
+SELECT extractValue('<a>a</a>', '/a[false()or true()]');
+extractValue('<a>a</a>', '/a[false()or true()]')
+a
+SELECT extractValue('<a>a</a>', '/a[ceiling(3.1)=4]');
+extractValue('<a>a</a>', '/a[ceiling(3.1)=4]')
+a
+SELECT extractValue('<a>a</a>', '/a[floor(3.1)=3]');
+extractValue('<a>a</a>', '/a[floor(3.1)=3]')
+a
+SELECT extractValue('<a>a</a>', '/a[round(3.1)=3]');
+extractValue('<a>a</a>', '/a[round(3.1)=3]')
+a
+SELECT extractValue('<a>a</a>', '/a[round(3.8)=4]');
+extractValue('<a>a</a>', '/a[round(3.8)=4]')
+a
+SELECT extractValue('<a><b>b</b><c>c</c></a>', '/a/b | /a/c');
+extractValue('<a><b>b</b><c>c</c></a>', '/a/b | /a/c')
+b c
+SELECT extractValue('<a>a<b>a1<c>c1</c></b><b>a2</b></a>','/a/b[count(c)=0]');
+extractValue('<a>a<b>a1<c>c1</c></b><b>a2</b></a>','/a/b[count(c)=0]')
+a2
+SELECT extractValue('<a>a<b>a1<c>c1</c></b><b>a2</b></a>','/a/b[count(c)=1]');
+extractValue('<a>a<b>a1<c>c1</c></b><b>a2</b></a>','/a/b[count(c)=1]')
+a1
+select extractValue('<a><b>b1</b><b>b2</b></a>','/a/b[1]');
+extractValue('<a><b>b1</b><b>b2</b></a>','/a/b[1]')
+b1
+select extractValue('<a><b>b1</b><b>b2</b></a>','/a/b[boolean(1)]');
+extractValue('<a><b>b1</b><b>b2</b></a>','/a/b[boolean(1)]')
+b1 b2
+select extractValue('<a><b>b1</b><b>b2</b></a>','/a/b[true()]');
+extractValue('<a><b>b1</b><b>b2</b></a>','/a/b[true()]')
+b1 b2
+select extractValue('<a><b>b1</b><b>b2</b></a>','/a/b[number(true())]');
+extractValue('<a><b>b1</b><b>b2</b></a>','/a/b[number(true())]')
+b1
+select extractValue('<a>ab</a>','/a[contains("abc","b")]');
+extractValue('<a>ab</a>','/a[contains("abc","b")]')
+ab
+select extractValue('<a>ab</a>','/a[contains(.,"a")]');
+extractValue('<a>ab</a>','/a[contains(.,"a")]')
+ab
+select extractValue('<a>ab</a>','/a[contains(.,"b")]');
+extractValue('<a>ab</a>','/a[contains(.,"b")]')
+ab
+select extractValue('<a>ab</a>','/a[contains(.,"c")]');
+extractValue('<a>ab</a>','/a[contains(.,"c")]')
+
+select UpdateXML('<a>a1<b>b1<c>c1</c>b2</b>a2</a>','/a/b/c','+++++++++');
+UpdateXML('<a>a1<b>b1<c>c1</c>b2</b>a2</a>','/a/b/c','+++++++++')
+<a>a1<b>b1+++++++++b2</b>a2</a>
+select UpdateXML('<a>a1<b>b1<c>c1</c>b2</b>a2</a>','/a/b/c','<c1>+++++++++</c1>');
+UpdateXML('<a>a1<b>b1<c>c1</c>b2</b>a2</a>','/a/b/c','<c1>+++++++++</c1>')
+<a>a1<b>b1<c1>+++++++++</c1>b2</b>a2</a>
+select UpdateXML('<a>a1<b>b1<c>c1</c>b2</b>a2</a>','/a/b/c','<c1/>');
+UpdateXML('<a>a1<b>b1<c>c1</c>b2</b>a2</a>','/a/b/c','<c1/>')
+<a>a1<b>b1<c1/>b2</b>a2</a>
+select updatexml('<div><div><span>1</span><span>2</span></div></div>',
+'/','<tr><td>1</td><td>2</td></tr>') as upd1;
+upd1
+<tr><td>1</td><td>2</td></tr>
+select updatexml('', '/', '') as upd2;
+upd2
+
+select extractvalue('<a><b>B</b></a>','/a|/b');
+extractvalue('<a><b>B</b></a>','/a|/b')
+
+select extractvalue('<a><b>B</b></a>','/a|b');
+extractvalue('<a><b>B</b></a>','/a|b')
+
+select extractvalue('<a>a<b>B</b></a>','/a|/b');
+extractvalue('<a>a<b>B</b></a>','/a|/b')
+a
+select extractvalue('<a>a<b>B</b></a>','/a|b');
+extractvalue('<a>a<b>B</b></a>','/a|b')
+a
+select extractvalue('<a>a<b>B</b></a>','a|/b');
+extractvalue('<a>a<b>B</b></a>','a|/b')
+a
+select extractvalue('<a>A</a>','/<a>');
+ERROR HY000: XPATH error: comparison of two nodesets is not supported: '<a>'
+select extractvalue('<a><b>b</b><b!>b!</b!></a>','//b!');
+ERROR HY000: XPATH syntax error: '!'
+select extractvalue('<a>A<b>B<c>C</c></b></a>','/a/descendant::*');
+extractvalue('<a>A<b>B<c>C</c></b></a>','/a/descendant::*')
+B C
+select extractvalue('<a>A<b>B<c>C</c></b></a>','/a/self::*');
+extractvalue('<a>A<b>B<c>C</c></b></a>','/a/self::*')
+A
+select extractvalue('<a>A<b>B<c>C</c></b></a>','/a/descendant-or-self::*');
+extractvalue('<a>A<b>B<c>C</c></b></a>','/a/descendant-or-self::*')
+A B C
+select extractvalue('<A_B>A</A_B>','/A_B');
+extractvalue('<A_B>A</A_B>','/A_B')
+A
+select extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[position()]');
+extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[position()]')
+B1 B2
+select extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[count(.)=last()]');
+extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[count(.)=last()]')
+B1 B2
+select extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[last()]');
+extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[last()]')
+B2
+select extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[last()-1]');
+extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[last()-1]')
+B1
+select extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[last()=1]');
+extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[last()=1]')
+
+select extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[last()=2]');
+extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[last()=2]')
+B1 B2
+select extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[last()=position()]');
+extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[last()=position()]')
+B2
+select extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[count(.)]');
+extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[count(.)]')
+B2
+select extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[count(.)-1]');
+extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[count(.)-1]')
+B1
+select extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[count(.)=1]');
+extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[count(.)=1]')
+
+select extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[count(.)=2]');
+extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[count(.)=2]')
+B1 B2
+select extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[count(.)=position()]');
+extractvalue('<a>A<b>B1</b><b>B2</b></a>','/a/b[count(.)=position()]')
+B2
+select extractvalue('<a>Jack</a>','/a[contains(../a,"J")]');
+extractvalue('<a>Jack</a>','/a[contains(../a,"J")]')
+Jack
+select extractvalue('<a>Jack</a>','/a[contains(../a,"j")]');
+extractvalue('<a>Jack</a>','/a[contains(../a,"j")]')
+Jack
+select ExtractValue('<tag1><![CDATA[test]]></tag1>','/tag1');
+ExtractValue('<tag1><![CDATA[test]]></tag1>','/tag1')
+test
+select extractValue('<a>a','/a');
+extractValue('<a>a','/a')
+NULL
+select extractValue('<a>a<','/a');
+extractValue('<a>a<','/a')
+NULL
+select extractValue('<a>a</','/a');
+extractValue('<a>a</','/a')
+NULL
+select extractValue('<a>a</a','/a');
+extractValue('<a>a</a','/a')
+NULL
+select extractValue('<a>a</a></b>','/a');
+extractValue('<a>a</a></b>','/a')
+NULL
+select extractValue('<a b=>a</a>','/a');
+extractValue('<a b=>a</a>','/a')
+NULL
+select extractValue('<e>1</e>','position()');
+ERROR HY000: XPATH syntax error: ''
+select extractValue('<e>1</e>','last()');
+ERROR HY000: XPATH syntax error: ''
+select extractValue('<e><a>1</a></e>','/e/');
+ERROR HY000: XPATH syntax error: ''
+set names utf8;
+select extractValue('<Ñ><r>r</r></Ñ>','/Ñ/r');
+extractValue('<Ñ><r>r</r></Ñ>','/Ñ/r')
+r
+select extractValue('<r><Ñ>Ñ</Ñ></r>','/r/Ñ');
+extractValue('<r><Ñ>Ñ</Ñ></r>','/r/Ñ')
+Ñ
+DROP PROCEDURE IF EXISTS p2;
+CREATE PROCEDURE p2 ()
+BEGIN
+DECLARE p LONGTEXT CHARACTER SET UTF8 DEFAULT '<Ñ><r>A</r></Ñ>';
+SELECT EXTRACTVALUE(p,'/Ñ/r');
+END//
+CALL p2();
+EXTRACTVALUE(p,'/Ñ/r')
+A
+DROP PROCEDURE p2;
+select extractValue('<ns:element xmlns:ns="myns"/>','count(ns:element)');
+extractValue('<ns:element xmlns:ns="myns"/>','count(ns:element)')
+1
+select extractValue('<ns:element xmlns:ns="myns">a</ns:element>','/ns:element');
+extractValue('<ns:element xmlns:ns="myns">a</ns:element>','/ns:element')
+a
+select extractValue('<foo><foo.bar>Data</foo.bar><something>Otherdata</something></foo>','/foo/foo.bar');
+extractValue('<foo><foo.bar>Data</foo.bar><something>Otherdata</something></foo>','/foo/foo.bar')
+Data
+select extractValue('<foo><foo.bar>Data</foo.bar><something>Otherdata</something></foo>','/foo/something');
+extractValue('<foo><foo.bar>Data</foo.bar><something>Otherdata</something></foo>','/foo/something')
+Otherdata
+select extractValue('<zot><tim0><01>10:39:15</01><02>140</02></tim0></zot>','/zot/tim0/02');
+ERROR HY000: XPATH syntax error: '02'
+select extractValue('<zot><tim0><01>10:39:15</01><02>140</02></tim0></zot>','//*');
+extractValue('<zot><tim0><01>10:39:15</01><02>140</02></tim0></zot>','//*')
+NULL
+select extractValue('<.>test</.>','//*');
+extractValue('<.>test</.>','//*')
+NULL
+select extractValue('<->test</->','//*');
+extractValue('<->test</->','//*')
+NULL
+select extractValue('<:>test</:>','//*');
+extractValue('<:>test</:>','//*')
+test
+select extractValue('<_>test</_>','//*');
+extractValue('<_>test</_>','//*')
+test
+select extractValue('<x.-_:>test</x.-_:>','//*');
+extractValue('<x.-_:>test</x.-_:>','//*')
+test
+select ExtractValue('<a><b><Text>test</Text></b></a>','/a/b/Text');
+ExtractValue('<a><b><Text>test</Text></b></a>','/a/b/Text')
+test
+select ExtractValue('<a><b><comment>test</comment></b></a>','/a/b/comment');
+ExtractValue('<a><b><comment>test</comment></b></a>','/a/b/comment')
+test
+select ExtractValue('<a><b><node>test</node></b></a>','/a/b/node');
+ExtractValue('<a><b><node>test</node></b></a>','/a/b/node')
+test
+select ExtractValue('<a><b><processing-instruction>test</processing-instruction></b></a>','/a/b/processing-instruction');
+ExtractValue('<a><b><processing-instruction>test</processing-instruction></b></a>','/a/b/processing-instruction')
+test
+select ExtractValue('<a><and>test</and></a>', '/a/and');
+ExtractValue('<a><and>test</and></a>', '/a/and')
+test
+select ExtractValue('<a><or>test</or></a>', '/a/or');
+ExtractValue('<a><or>test</or></a>', '/a/or')
+test
+select ExtractValue('<a><mod>test</mod></a>', '/a/mod');
+ExtractValue('<a><mod>test</mod></a>', '/a/mod')
+test
+select ExtractValue('<a><div>test</div></a>', '/a/div');
+ExtractValue('<a><div>test</div></a>', '/a/div')
+test
+select ExtractValue('<a><and:and>test</and:and></a>', '/a/and:and');
+ExtractValue('<a><and:and>test</and:and></a>', '/a/and:and')
+test
+select ExtractValue('<a><or:or>test</or:or></a>', '/a/or:or');
+ExtractValue('<a><or:or>test</or:or></a>', '/a/or:or')
+test
+select ExtractValue('<a><mod:mod>test</mod:mod></a>', '/a/mod:mod');
+ExtractValue('<a><mod:mod>test</mod:mod></a>', '/a/mod:mod')
+test
+select ExtractValue('<a><div:div>test</div:div></a>', '/a/div:div');
+ExtractValue('<a><div:div>test</div:div></a>', '/a/div:div')
+test
+select ExtractValue('<a><ancestor>test</ancestor></a>', '/a/ancestor');
+ExtractValue('<a><ancestor>test</ancestor></a>', '/a/ancestor')
+test
+select ExtractValue('<a><ancestor-or-self>test</ancestor-or-self></a>', '/a/ancestor-or-self');
+ExtractValue('<a><ancestor-or-self>test</ancestor-or-self></a>', '/a/ancestor-or-self')
+test
+select ExtractValue('<a><attribute>test</attribute></a>', '/a/attribute');
+ExtractValue('<a><attribute>test</attribute></a>', '/a/attribute')
+test
+select ExtractValue('<a><child>test</child></a>', '/a/child');
+ExtractValue('<a><child>test</child></a>', '/a/child')
+test
+select ExtractValue('<a><descendant>test</descendant></a>', '/a/descendant');
+ExtractValue('<a><descendant>test</descendant></a>', '/a/descendant')
+test
+select ExtractValue('<a><descendant-or-self>test</descendant-or-self></a>', '/a/descendant-or-self');
+ExtractValue('<a><descendant-or-self>test</descendant-or-self></a>', '/a/descendant-or-self')
+test
+select ExtractValue('<a><following>test</following></a>', '/a/following');
+ExtractValue('<a><following>test</following></a>', '/a/following')
+test
+select ExtractValue('<a><following-sibling>test</following-sibling></a>', '/a/following-sibling');
+ExtractValue('<a><following-sibling>test</following-sibling></a>', '/a/following-sibling')
+test
+select ExtractValue('<a><namespace>test</namespace></a>', '/a/namespace');
+ExtractValue('<a><namespace>test</namespace></a>', '/a/namespace')
+test
+select ExtractValue('<a><parent>test</parent></a>', '/a/parent');
+ExtractValue('<a><parent>test</parent></a>', '/a/parent')
+test
+select ExtractValue('<a><preceding>test</preceding></a>', '/a/preceding');
+ExtractValue('<a><preceding>test</preceding></a>', '/a/preceding')
+test
+select ExtractValue('<a><preceding-sibling>test</preceding-sibling></a>', '/a/preceding-sibling');
+ExtractValue('<a><preceding-sibling>test</preceding-sibling></a>', '/a/preceding-sibling')
+test
+select ExtractValue('<a><self>test</self></a>', '/a/self');
+ExtractValue('<a><self>test</self></a>', '/a/self')
+test
+CREATE PROCEDURE spxml(xml VARCHAR(128))
+BEGIN
+DECLARE c INT;
+DECLARE i INT DEFAULT 1;
+SET c= ExtractValue(xml,'count(/a/b)');
+WHILE i <= c DO
+BEGIN
+SET i= i + 1;
+END;
+END WHILE;
+END|
+call spxml('<a><b>b1</b><b>b2</b><b>b3</b></a>');
+drop procedure spxml;
+Multiple matches, but no index specification
+SELECT ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b');
+ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b')
+b1 b2
+No matches
+SELECT ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/c');
+ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/c')
+
+Index out of range
+SELECT ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b[-1]');
+ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b[-1]')
+
+SELECT ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b[10]');
+ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b[10]')
+
+With string-to-number conversion
+SELECT ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b["1"]');
+ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b["1"]')
+b1
+SELECT ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b["1 and string"]');
+ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b["1 and string"]')
+b1
+SELECT ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b["string and 1"]');
+ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b["string and 1"]')
+
+SELECT ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b["string"]');
+ExtractValue('<a><b>b1</b><b>b2</b></a>','/a/b["string"]')
+
+String-to-number conversion from a user variable
+String-to-number conversion with a CHAR SP variable
+CREATE PROCEDURE spxml(xml VARCHAR(128), i CHAR(16))
+BEGIN
+SELECT ExtractValue(xml,'/a/b[$i]');
+END|
+CALL spxml('<a><b>b1</b><b>b2</b></a>', '1');
+ExtractValue(xml,'/a/b[$i]')
+b1
+CALL spxml('<a><b>b1</b><b>b2</b></a>', '1 and string');
+ExtractValue(xml,'/a/b[$i]')
+b1
+CALL spxml('<a><b>b1</b><b>b2</b></a>', 'string and 1');
+ExtractValue(xml,'/a/b[$i]')
+
+CALL spxml('<a><b>b1</b><b>b2</b></a>', 'string');
+ExtractValue(xml,'/a/b[$i]')
+
+DROP PROCEDURE spxml;
+select UpdateXML('<a>a</a>',repeat('a b ',1000),'');
+ERROR HY000: XPATH syntax error: 'b a b a b a b a b a b a b a b a '
+select updatexml(NULL, 1, 1), updatexml(1, NULL, 1), updatexml(1, 1, NULL);
+updatexml(NULL, 1, 1)	updatexml(1, NULL, 1)	updatexml(1, 1, NULL)
+NULL	NULL	NULL
+select updatexml(NULL, NULL, 1), updatexml(1, NULL, NULL), 
+updatexml(NULL, 1, NULL);
+updatexml(NULL, NULL, 1)	updatexml(1, NULL, NULL)	updatexml(NULL, 1, NULL)
+NULL	NULL	NULL
+select updatexml(NULL, NULL, NULL);
+updatexml(NULL, NULL, NULL)
+NULL
+CREATE TABLE t1(a INT NOT NULL);
+INSERT INTO t1 VALUES (0), (0);
+SELECT 1 FROM t1 ORDER BY(UPDATEXML(a, '1', '1'));
+1
+1
+1
+DROP TABLE t1;
+select extractvalue('<a></a>','round(123.4)/a');
+ERROR HY000: XPATH syntax error: '/a'
+select extractvalue('<a></a>','1/a');
+ERROR HY000: XPATH syntax error: '/a'
+select extractvalue('<a></a>','"b"/a');
+ERROR HY000: XPATH syntax error: '/a'
+select extractvalue('<a></a>','(1)/a');
+ERROR HY000: XPATH syntax error: '/a'
+CREATE TABLE IF NOT EXISTS t1 (
+id int(10) unsigned NOT NULL AUTO_INCREMENT,
+xml text,
+PRIMARY KEY (id)
+) ENGINE=MyISAM;
+INSERT INTO t1 (id, xml) VALUES
+(15, '<?xml version="1.0"?><bla name="blubb"></bla>'),
+(14, '<xml version="kaputt">');
+SELECT
+extractvalue( xml, '/bla/@name' ),
+extractvalue( xml, '/bla/@name' )
+FROM t1 ORDER BY t1.id;
+extractvalue( xml, '/bla/@name' )	extractvalue( xml, '/bla/@name' )
+NULL	NULL
+blubb	blubb
+SELECT
+UpdateXML(xml, '/bla/@name', 'test'),
+UpdateXML(xml, '/bla/@name', 'test')
+FROM t1 ORDER BY t1.id;
+UpdateXML(xml, '/bla/@name', 'test')	UpdateXML(xml, '/bla/@name', 'test')
+NULL	NULL
+<?xml version="1.0"?><bla test></bla>	<?xml version="1.0"?><bla test></bla>
+DROP TABLE t1;
+#
+# Bug#57257 Replace(ExtractValue(...)) causes MySQL crash
+#
+SET NAMES utf8;
+SELECT REPLACE(EXTRACTVALUE('1', '/a'),'ds','');
+REPLACE(EXTRACTVALUE('1', '/a'),'ds','')
+
+#
+# Bug #57820 extractvalue crashes
+#
+#
+# Bug#57279 updatexml dies with: Assertion failed: str_arg[length] == 0
+#
+SELECT UPDATEXML(NULL, (LPAD(0.1111E-15, '2011', 1)), 1);
+ERROR 22007: Illegal double '111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111' value found during parsing
+SELECT EXTRACTVALUE('', LPAD(0.1111E-15, '2011', 1));
+ERROR 22007: Illegal double '111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111' value found during parsing
+#
+# Bug #44332 	my_xml_scan reads behind the end of buffer
+#
+SELECT UPDATEXML(CONVERT(_latin1'<' USING utf8),'1','1');
+UPDATEXML(CONVERT(_latin1'<' USING utf8),'1','1')
+NULL
+SELECT UPDATEXML(CONVERT(_latin1'<!--' USING utf8),'1','1');
+UPDATEXML(CONVERT(_latin1'<!--' USING utf8),'1','1')
+NULL
+#
+# Bug#11766725 (bug#59901): EXTRACTVALUE STILL BROKEN AFTER FIX FOR BUG #44332
+#
+SELECT ExtractValue(CONVERT('<\"', BINARY(10)), 1);
+ExtractValue(CONVERT('<\"', BINARY(10)), 1)
+NULL
+End of 5.1 tests
+#
+# Start of 5.5 tests
+#
+#
+# Bug#58175 xml functions read initialized bytes when conversions happen
+#
+SET NAMES latin1;
+SELECT UPDATEXML(CONVERT('' USING swe7), TRUNCATE('',1), 0);
+UPDATEXML(CONVERT('' USING swe7), TRUNCATE('',1), 0)
+NULL
+#
+# Bug#12375190: UPDATEXML CRASHES ON SIMPLE INPUTS
+#
+SELECT UPDATEXML('','(a)/a','');
+UPDATEXML('','(a)/a','')
+
+SELECT UPDATEXML('<a><a>x</a></a>','(a)/a','<b />');
+UPDATEXML('<a><a>x</a></a>','(a)/a','<b />')
+<a><b /></a>
+SELECT UPDATEXML('<a><c><a>x</a></c></a>','(a)/a','<b />');
+UPDATEXML('<a><c><a>x</a></c></a>','(a)/a','<b />')
+<a><c><a>x</a></c></a>
+SELECT UPDATEXML('<a><c><a>x</a></c></a>','(a)//a','<b />');
+UPDATEXML('<a><c><a>x</a></c></a>','(a)//a','<b />')
+<a><c><b /></c></a>
+SELECT ExtractValue('<a><a>aa</a><b>bb</b></a>','(a)/a|(a)/b');
+ExtractValue('<a><a>aa</a><b>bb</b></a>','(a)/a|(a)/b')
+aa bb
+#
+# End of 5.5 tests
+#

@@ -1,0 +1,35 @@
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+add admin user hosts 127.0.0.1;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd	127.0.0.1		admin
+remove admin user hosts 127.0.0.1;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd			admin
+add admin user hosts 1.1.1.1;
+status
+select * from pwds;
+username	password	hosts	backends	type
+%				proxy
+dbproxy_test	8XjhBQKd			proxy
+dbproxy_test	8XjhBQKd	1.1.1.1		admin
+connect(127.0.0.1,dbproxy_test,123456,,6018,/opt/tmp/mysql.sock);
+ERROR 28000: unpermitted host
+remove admin user hosts 1.1.1.1;
+status

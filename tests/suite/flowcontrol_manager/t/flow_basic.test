@@ -1,0 +1,121 @@
+#flow-basic
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+
+#case1: filter-flag
+show variables like 'manual-filter-flag';
+set manual-filter-flag = ON;
+show variables like 'manual-filter-flag';
+
+set manual-filter-flag = on;
+show variables like 'manual-filter-flag';
+
+set manual-filter-flag = OFF;
+show variables like 'manual-filter-flag';
+
+set manual-filter-flag = off;
+show variables like 'manual-filter-flag';
+
+show variables like 'auto-filter-flag';
+set auto-filter-flag = ON;
+show variables like 'auto-filter-flag';
+
+set auto-filter-flag = on;
+show variables like 'auto-filter-flag';
+
+set auto-filter-flag = OFF;
+show variables like 'auto-filter-flag';
+
+set auto-filter-flag = off;
+show variables like 'auto-filter-flag';
+
+#case2: lastest-query-num 
+show variables like 'lastest-query-num';
+set lastest-query-num = 1024;
+show variables like 'lastest-query-num';
+
+set lastest-query-num = 0;
+show variables like 'lastest-query-num';
+
+--error 1105
+set lastest-query-num = -1;
+
+#case3: lastest_queries
+show lastest_queries;
+
+#case4: select-where-limit
+show variables like 'select-where-limit';
+set select-where-limit = ON;
+show variables like 'select-where-limit';
+
+set select-where-limit = on;
+show variables like 'select-where-limit';
+
+set select-where-limit = OFF;
+show variables like 'select-where-limit';
+
+set select-where-limit = off;
+show variables like 'select-where-limit';
+
+#case5: access-num-per-time-window
+show variables like 'access-num-per-time-window';
+set access-num-per-time-window = 1024;
+show variables like 'access-num-per-time-window';
+
+set access-num-per-time-window = 1;
+show variables like 'access-num-per-time-window';
+
+--error 1105
+set access-num-per-time-window = 0;
+
+#case6: query-filter-frequent-threshold
+show variables like 'query-filter-frequent-threshold';
+set query-filter-frequent-threshold = 1024;
+show variables like 'query-filter-frequent-threshold';
+
+set query-filter-frequent-threshold = 3.1415;
+show variables like 'query-filter-frequent-threshold';
+
+set query-filter-frequent-threshold = 1;
+show variables like 'query-filter-frequent-threshold';
+
+--error 1105
+set query-filter-frequent-threshold = 0;
+
+#case7: query-filter-time-threshold
+show variables like 'query-filter-time-threshold';
+set query-filter-time-threshold = 1024;
+show variables like 'query-filter-time-threshold';
+
+set query-filter-time-threshold = 1;
+show variables like 'query-filter-time-threshold';
+
+set query-filter-time-threshold = 0;
+show variables like 'query-filter-time-threshold';
+
+set query-filter-time-threshold = -1;
+show variables like 'query-filter-time-threshold';
+
+--error 1105
+set query-filter-time-threshold = -2;
+
+#case8: blacklist
+show blacklists;
+add blacklist 'select * from abc';
+add blacklist 'select * from def join ghi';
+add blacklist 'select * from jkl where id>5';
+show blacklists;
+
+remove blacklist '1234567890';
+
+set blacklist '1234567890' 1;
+
+set blacklist '1234567890' 0;
+
+--error 1105
+set blacklist '1234567890' 7;
+
+clear blacklists;
+
+save blacklists;
+
+load blacklists;

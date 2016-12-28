@@ -1,0 +1,40 @@
+USE_POPEN           = 0
+USE_VALGRIND 	    = false
+VALGRIND_OUTPUT_FILE  = "./valgrind.log"
+VERBOSE             = 4
+FORCE_ON_ERROR 	    = true
+--TESTS_REGEX 	    = test
+--设置运行模式
+-- 'check'模式是将直连mysql的结果保存为reuslt并将dbproxy的执行结果与result文件进行对比
+-- 'setup'模式是将dbproxy的执行结果保存为result文件
+-- 'normal'是将dbproxy的执行结果与result文件进行对比
+-- 'admin'模式是将dbproxy admin的执行结果保存为result文件
+RUN_MODE	    = 'check'
+
+PROXY_INSTALL_PATH = "/usr/local/mysql-proxy"
+MYSQL_CLIENT_PATH = "/usr/local/mysql"
+
+MYSQL_USER="dbproxy_test"
+MYSQL_PASSWORD="123456"
+MYSQL_DB	   	    = "test"
+MYSQL_TEST_BIN="../mysqltest"
+MYSQL_CLIENT_BIN 	= "mysql"
+
+PROXY_BACKEND_ADDRESS=
+PROXY_READONLY_BACKEND_ADDRESSES=
+
+PROXY_DEFAULT_FILE         = "default.cnf"
+PROXY_MASTER_DEFAULT_FILE  = "default.cnf"
+PROXY_SLAVE_DEFAULT_FILE   = "default.cnf"
+
+PROXY_HOST	       = "0.0.0.0"
+PROXY_PORT_BASE=6003
+PROXY_PWDS="dbproxy_test:7O7YJJEK"
+ADMIN_PWDS	       = "root:"
+
+SELECT_WHERE_LIMIT = "true"
+KEEP_ALIVE = "false"
+SQL_LOG = 'REALTIME'
+
+PROXY_TRACE	= ""	-- use it to inject strace or valgrind
+PROXY_PARAMS = ""	-- extra params

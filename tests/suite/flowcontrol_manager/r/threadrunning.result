@@ -1,0 +1,18 @@
+set backend-max-thread-running = ;
+ERROR 07000: use 'SELECT * FROM help' to see the supported commands
+set backend-max-thread-running = -3;
+ERROR 07000: invalid operation value: -3
+set backend-max-thread-running = 2.4;
+ERROR 07000: invalid operation value: 2.4
+set backend-max-thread-running = abc;
+ERROR 07000: invalid operation value: abc
+show variables like 'backend-max-thread-running';
+Variable_name	Group	Value	Set mode
+backend-max-thread-running	main	0	Dynamic
+set backend-max-thread-running = 0;
+status
+show variables like 'backend-max-thread-running';
+Variable_name	Group	Value	Set mode
+backend-max-thread-running	main	0	Dynamic
+set backend-max-thread-running = 1024;
+status

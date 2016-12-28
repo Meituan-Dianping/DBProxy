@@ -1,0 +1,14 @@
+#admin-user-login
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+
+#case1:登录修改用户名和密码,使用旧账号密码登录,使用新账号密码登录
+connection conn0;
+select * from pwds;
+alter admin user dbproxy_user1:dbproxy_pwd;
+select * from pwds;
+--error 1045
+connect (conn1, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+connect (conn2, 127.0.0.1, dbproxy_user1, 'dbproxy_pwd', '*NO-ONE*', 6018);
+select * from pwds;
+alter admin user dbproxy_test:123456;
+select * from pwds;

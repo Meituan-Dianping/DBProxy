@@ -1,0 +1,6 @@
+SET SESSION min_examined_row_limit=0;
+SET long_query_time=2;
+SET long_query_time=4;
+SET long_query_time=2;
+SET long_query_time=default;
+SET SESSION min_examined_row_limit=default;

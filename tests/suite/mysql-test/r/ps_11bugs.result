@@ -1,0 +1,42 @@
+drop table if exists t1, t2;
+CREATE TABLE t1(session_id  char(9) NOT NULL);
+INSERT INTO t1 VALUES ("abc");
+SELECT * FROM t1;
+session_id
+abc
+drop table t1;
+create table t1 (
+c_01 char(6), c_02 integer, c_03 real, c_04 int(3), c_05 varchar(20),
+c_06 date,    c_07 char(1), c_08 real, c_09 int(11), c_10 time,
+c_11 char(6), c_12 integer, c_13 real, c_14 int(3), c_15 varchar(20),
+c_16 date,    c_17 char(1), c_18 real, c_19 int(11), c_20 text);
+select * from t1;
+c_01	c_02	c_03	c_04	c_05	c_06	c_07	c_08	c_09	c_10	c_11	c_12	c_13	c_14	c_15	c_16	c_17	c_18	c_19	c_20
+drop table t1;
+create table t1(
+cola varchar(50) not null,
+colb varchar(8) not null,
+colc varchar(12) not null,
+cold varchar(2) not null,
+primary key (cola, colb, cold));
+create table t2(
+cola varchar(50) not null,
+colb varchar(8) not null,
+colc varchar(2) not null,
+cold float,
+primary key (cold));
+insert into t1 values ('aaaa', 'yyyy', 'yyyy-dd-mm', 'R');
+insert into t2 values ('aaaa', 'yyyy', 'R', 203), ('bbbb', 'zzzz', 'C', 201);
+drop table t1, t2;
+create table t1 (a int primary key);
+insert into t1 values (1);
+explain select * from t1 where 3 in (select (1+1) union select 1);
+id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	PRIMARY	NULL	NULL	NULL	NULL	NULL	NULL	NULL	Impossible WHERE noticed after reading const tables
+2	DEPENDENT SUBQUERY	NULL	NULL	NULL	NULL	NULL	NULL	NULL	No tables used
+3	DEPENDENT UNION	NULL	NULL	NULL	NULL	NULL	NULL	NULL	No tables used
+NULL	UNION RESULT	<union2,3>	ALL	NULL	NULL	NULL	NULL	NULL	
+select * from t1 where 3 in (select (1+1) union select 1);
+a
+drop table t1;
+End of 5.0 tests.

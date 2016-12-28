@@ -1,0 +1,23 @@
+#basic-manager
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+
+#case1: shutdown-timeout
+connection conn0;
+show variables like 'shutdown-timeout';
+set shutdown-timeout = 1234;
+show variables like 'shutdown-timeout';
+set shutdown-timeout = 1;
+show variables like 'shutdown-timeout';
+--error 1105
+set shutdown-timeout = 0;
+--error 1105
+set shutdown-timeout = a;
+
+#case2: save config
+connection conn0;
+#show variables;
+save config;
+
+#case3: select 
+connection conn0;
+select * from help;

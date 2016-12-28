@@ -1,0 +1,12 @@
+drop table if exists roll_test;
+create table roll_test(tc1 int primary key, tc2 int);
+set autocommit=0;
+insert into roll_test values(1,2);
+insert into roll_test values(1,3);
+ERROR 23000: Duplicate entry '1' for key 'PRIMARY'
+set autocommit=0;
+insert into roll_test values(2,3);
+commit;
+rollback;
+select * from roll_test where tc1 = 1;
+tc1	tc2

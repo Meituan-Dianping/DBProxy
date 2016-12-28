@@ -1,0 +1,17 @@
+
+SET SESSION min_examined_row_limit=0;
+SET long_query_time=2;
+--let log_file=percona.slow_extended.long_query_time
+
+
+SET long_query_time=4;
+
+
+
+SET long_query_time=2;
+
+SET long_query_time=default;
+SET SESSION min_examined_row_limit=default;
+
+--let grep_pattern = Query_time
+

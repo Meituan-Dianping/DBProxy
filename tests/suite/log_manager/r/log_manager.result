@@ -1,0 +1,180 @@
+set log-level = message;
+status
+show variables like 'log-level';
+Variable_name	Group	Value	Set mode
+log-level	main	message	Dynamic
+set log-level = Message;
+status
+show variables like 'log-level';
+Variable_name	Group	Value	Set mode
+log-level	main	message	Dynamic
+set log-level = warning;
+status
+show variables like 'log-level';
+Variable_name	Group	Value	Set mode
+log-level	main	warning	Dynamic
+set log-level = wArning;
+status
+show variables like 'log-level';
+Variable_name	Group	Value	Set mode
+log-level	main	warning	Dynamic
+set log-level = critical;
+status
+show variables like 'log-level';
+Variable_name	Group	Value	Set mode
+log-level	main	critical	Dynamic
+set log-level = crItical;
+status
+show variables like 'log-level';
+Variable_name	Group	Value	Set mode
+log-level	main	critical	Dynamic
+set log-level = error;
+status
+show variables like 'log-level';
+Variable_name	Group	Value	Set mode
+log-level	main	error	Dynamic
+set log-level = errOr;
+status
+show variables like 'log-level';
+Variable_name	Group	Value	Set mode
+log-level	main	error	Dynamic
+set log-level = info;
+status
+show variables like 'log-level';
+Variable_name	Group	Value	Set mode
+log-level	main	info	Dynamic
+set log-level = infO;
+status
+show variables like 'log-level';
+Variable_name	Group	Value	Set mode
+log-level	main	info	Dynamic
+set log-level = debug;
+status
+show variables like 'log-level';
+Variable_name	Group	Value	Set mode
+log-level	main	debug	Dynamic
+set log-level = debuG;
+status
+show variables like 'log-level';
+Variable_name	Group	Value	Set mode
+log-level	main	debug	Dynamic
+set log-level = abc;
+ERROR 07000: invalid operation value: abc
+set log-trace-modules = 1;
+status
+show variables like 'log-trace-modules';
+Variable_name	Group	Value	Set mode
+log-trace-modules	main	1	Dynamic
+set log-trace-modules = 32;
+status
+set log-trace-modules = -1;
+ERROR 07000: invalid operation value: -1
+set log-trace-modules = abc;
+ERROR 07000: invalid operation value: abc
+set log-trace-modules = 0;
+status
+set sql-log = on;
+status
+show variables like 'sql-log';
+Variable_name	Group	Value	Set mode
+sql-log	proxy	ON	Dynamic
+set sql-log = off;
+status
+show variables like 'sql-log';
+Variable_name	Group	Value	Set mode
+sql-log	proxy	OFF	Dynamic
+set sql-log = realtime;
+status
+show variables like 'sql-log';
+Variable_name	Group	Value	Set mode
+sql-log	proxy	REALTIME	Dynamic
+set sql-log = On;
+status
+show variables like 'sql-log';
+Variable_name	Group	Value	Set mode
+sql-log	proxy	ON	Dynamic
+set sql-log = OFF;
+status
+show variables like 'sql-log';
+Variable_name	Group	Value	Set mode
+sql-log	proxy	OFF	Dynamic
+set sql-log = reALTIme;
+status
+show variables like 'sql-log';
+Variable_name	Group	Value	Set mode
+sql-log	proxy	REALTIME	Dynamic
+set sql-log = abc;
+ERROR 07000: invalid operation value: abc
+set sql-log-file-num = 10001;
+status
+show variables like 'sql-log-buffer-size';
+Variable_name	Group	Value	Set mode
+sql-log-buffer-size	proxy	10000	Dynamic
+set sql-log-file-num = 0;
+status
+show variables like 'sql-log-buffer-size';
+Variable_name	Group	Value	Set mode
+sql-log-buffer-size	proxy	10000	Dynamic
+set sql-log-file-num = -1;
+ERROR 07000: invalid operation value: -1
+set sql-log-file-num = 10000;
+status
+show variables like 'sql-log-file-num';
+Variable_name	Group	Value	Set mode
+sql-log-file-num	proxy	10000	Dynamic
+set sql-log-file-num = 0;
+status
+show variables like 'sql-log-file-num';
+Variable_name	Group	Value	Set mode
+sql-log-file-num	proxy	0	Dynamic
+set sql-log-file-num = -1;
+ERROR 07000: invalid operation value: -1
+set sql-log-file-size = 1000;
+status
+show variables like 'sql-log-file-size';
+Variable_name	Group	Value	Set mode
+sql-log-file-size	proxy	1000	Dynamic
+set sql-log-file-size = 0;
+status
+show variables like 'sql-log-file-size';
+Variable_name	Group	Value	Set mode
+sql-log-file-size	proxy	0	Dynamic
+set sql-log-file-size = -1;
+ERROR 07000: invalid operation value: -1
+set sql-log-mode = ALL;
+status
+show variables like 'sql-log-mode';
+Variable_name	Group	Value	Set mode
+sql-log-mode	proxy	ALL	Dynamic
+set sql-log-mode = CLIENT;
+status
+show variables like 'sql-log-mode';
+Variable_name	Group	Value	Set mode
+sql-log-mode	proxy	CLIENT	Dynamic
+set sql-log-mode = BACKEND;
+status
+show variables like 'sql-log-mode';
+Variable_name	Group	Value	Set mode
+sql-log-mode	proxy	BACKEND	Dynamic
+set sql-log-mode = aLl;
+status
+show variables like 'sql-log-mode';
+Variable_name	Group	Value	Set mode
+sql-log-mode	proxy	ALL	Dynamic
+set sql-log-mode = abc;
+ERROR 07000: invalid operation value: abc
+set sql-log-slow-ms = 100;
+status
+show variables like 'sql-log-buffer-size';
+Variable_name	Group	Value	Set mode
+sql-log-buffer-size	proxy	10000	Dynamic
+set sql-log-slow-ms = 0;
+status
+show variables like 'sql-log-buffer-size';
+Variable_name	Group	Value	Set mode
+sql-log-buffer-size	proxy	10000	Dynamic
+set sql-log-slow-ms = -1;
+ERROR 07000: invalid operation value: -1
+show variables like 'sql-log-buffer-size';
+Variable_name	Group	Value	Set mode
+sql-log-buffer-size	proxy	10000	Dynamic

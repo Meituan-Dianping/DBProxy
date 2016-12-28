@@ -1,0 +1,9 @@
+SHOW VARIABLES like 'character_sets_dir';
+Variable_name	Value
+character_sets_dir	/usr/share/mysql/charsets/
+SHOW VARIABLES like 'character_set_filesystem';
+Variable_name	Value
+character_set_filesystem	binary
+SHOW VARIABLES like 'character_set_client';
+Variable_name	Value
+character_set_client	latin1

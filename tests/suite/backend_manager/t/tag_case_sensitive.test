@@ -1,0 +1,66 @@
+#tag-case-sensitive
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+
+#case1: slave tag
+connection conn0;
+add slave tag tag_MT 2;
+select * from backends;
+
+remove slave tag tag_mt 2;
+select * from backends;
+remove slave tag tag_MT 2;
+select * from backends;
+
+add slave tag tag_DP 2;
+select * from backends;
+
+remove slave tag tag_dp;
+select * from backends;
+remove slave tag tag_DP;
+select * from backends;
+
+#case2: user backends
+connection conn0;
+add user backends dbproxy_test@tag_MT;
+select * from pwds;
+
+remove user backends dbproxy_test@tag_mt;
+select * from pwds;
+remove user backends dbproxy_test@tag_MT;
+select * from pwds;
+
+add user backends dbproxy_test@tag_DP;
+select * from pwds;
+
+remove user backends dbproxy_test;
+select * from pwds;
+
+#case3: 同时增加多个
+add user backends dbproxy_test@tag_MT|tag_mt;
+select * from pwds;
+
+remove user backends dbproxy_test;
+select * from pwds;
+
+add user backends dbproxy_test@tag_DP|tag_dp;
+select * from pwds;
+
+remove user backends dbproxy_test@;
+select * from pwds;
+
+#case4: 先后增加多个
+add user backends dbproxy_test@tag_mt;
+select * from pwds;
+add user backends dbproxy_test@tag_MT;
+select * from pwds;
+
+remove user backends dbproxy_test@tag_mt;
+select * from pwds;
+
+remove user backends dbproxy_test@tag_MT;
+select * from pwds;
+
+#case5: 同时删除多个user backends
+add user backends dbproxy_test@tag_mt|tag_dp;
+select * from pwds;
+remove user backends dbproxy_test@tag_mt|tag_dp;

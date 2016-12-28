@@ -1,0 +1,88 @@
+#monitor_manager
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+
+#case1: show variables;
+#show variables;
+
+show variables like 'access-num-per-time-window'; 
+show variables like 'admin-address';
+show variables like 'admin-password';
+show variables like 'admin-username';
+show variables like 'auto-filter-flag';
+show variables like 'backend-max-thread-running';
+show variables like 'backend-monitor-pwds';
+show variables like 'basedir';
+show variables like 'blacklist-file';
+show variables like 'check-state-conn-timeout';
+show variables like 'check-state-interval';
+show variables like 'daemon';
+show variables like 'db-connection-idle-timeout';
+show variables like 'db-connection-max-age';
+show variables like 'event-threads';
+show variables like 'instance';
+show variables like 'keepalive';
+show variables like 'lastest-query-num';
+show variables like 'log-level';
+show variables like 'log-path';
+show variables like 'log-trace-modules';
+show variables like 'long-query-time';
+show variables like 'long-wait-time';
+show variables like 'manual-filter-flag';
+show variables like 'max-connections';
+show variables like 'max-open-files';
+#show variables like 'mysql-version';
+show variables like 'percentile';
+show variables like 'percentile-switch';
+show variables like 'percentile-value';
+show variables like 'plugins';
+show variables like 'proxy-address';
+show variables like 'query-filter-frequent-threshold';
+show variables like 'query-filter-time-threshold';
+show variables like 'query-response-time-range-base';
+show variables like 'query-response-time-stats';
+show variables like 'remove-backend-timeout';
+show variables like 'select-where-limit';
+show variables like 'shutdown-timeout';
+show variables like 'sql-log';
+show variables like 'sql-log-buffer-size';
+show variables like 'sql-log-file-num';
+show variables like 'sql-log-file-size';
+show variables like 'sql-log-mode';
+show variables like 'sql-log-slow-ms';
+show variables like 'thread-running-sleep-delay';
+show variables like 'user';
+#show variables like 'version';
+show variables like 'wait-timeout';
+
+#case2: show proxy status
+show proxy status;
+
+#case3: show processlist
+#show processlist;
+
+#case4: show events waits status
+show events waits status;
+
+#case5: show query_response_time
+show query_response_time;
+
+#case6: show lastest_queries
+show lastest_queries;
+
+#case7: show blacklists
+show blacklists;
+
+#case8: show percentile
+set percentile-switch = ON;
+show variables like 'percentile-switch';
+set percentile-value = 95;
+show variables like 'percentile-value';
+show percentile;
+show percentile 1m;
+show percentile 5h;
+--error 1105
+show percentile 1;
+set percentile-switch = OFF;
+show variables like 'percentile-switch';
+--error 1105
+show percentile;

@@ -1,0 +1,44 @@
+local backend_address = "";
+local user_backends;
+local backend;
+local pwds = PROXY_PWDS;
+local head = 1;
+local sep;
+
+if PROXY_READONLY_BACKEND_ADDRESSES then
+    while true do
+	sep = string.find(PROXY_READONLY_BACKEND_ADDRESSES, ",", head)
+        if sep == nil then
+	    backend = string.sub(PROXY_READONLY_BACKEND_ADDRESSES, head, #PROXY_READONLY_BACKEND_ADDRESSES)
+        else
+            if (sep-1 >= head) then
+       		backend = string.sub(PROXY_READONLY_BACKEND_ADDRESSES,head,sep-1);   
+            end
+	end
+	if backend ~= PROXY_BACKEND_ADDRESS then
+	    backend_address = backend_address .. "," .. backend
+	end
+	if sep == nil then
+	    break
+	end
+	head=sep+1
+    end
+
+    backend_address = PROXY_BACKEND_ADDRESS .. backend_address
+   
+    local pos = string.find(PROXY_PWDS, ":")
+    local password = string.sub(PROXY_PWDS, pos+1, #PROXY_PWDS)
+ 
+    pwds = pwds .. ",slave_tag1:" .. password
+    pwds = pwds .. ",slave_tag2:" .. password
+    pwds = pwds .. ",slave_tag3:" .. password
+end
+
+slave_tag_options = {
+	["proxy-read-only-backend-addresses"] = backend_address or "",
+	["user-backends"] = user_backends or "",
+	["pwds"] = pwds or "",
+	["log-trace-modules"] = "4",
+}
+
+start_proxy("slave_tag", slave_tag_options) 

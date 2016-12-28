@@ -1,0 +1,11 @@
+show variables like 'ignore_builtin_innodb';
+Variable_name	Value
+ignore_builtin_innodb	OFF
+select PLUGIN_NAME from information_schema.plugins
+where PLUGIN_NAME = "InnoDb";
+PLUGIN_NAME
+InnoDB
+select ENGINE from information_schema.engines
+where ENGINE = "InnoDB";
+ENGINE
+InnoDB

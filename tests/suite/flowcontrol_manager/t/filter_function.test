@@ -1,0 +1,71 @@
+#filter-function
+drop table if exists filter_function_test;
+create table filter_function_test(a int, b int not null primary key);
+
+#grant all privileges on test.filter_function_test to dbproxy_test@'%' identified by '123456';
+#flush privileges;
+
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+connect (conn1, 127.0.0.1, dbproxy_test, '123456', 'test', 6003);
+
+#case1: 测试where
+connection conn0;
+set select-where-limit = OFF;
+show variables like 'select-where-limit';
+
+connection conn1;
+select * from filter_function_test limit 1;
+
+connection conn0;
+set select-where-limit = ON;
+show variables like 'select-where-limit';
+
+connection conn1;
+--error 1105
+select * from filter_function_test limit 1;
+#case 2: 测试手动黑名单
+connection conn0;
+set manual-filter-flag = ON;
+show variables like 'manual-filter-flag';
+
+connection conn1;
+select * from filter_function_test where a > 1 limit 1;
+
+connection conn0;
+show blacklists;
+add blacklist 'select * from filter_function_test where a > 1 limit 1' 1;
+show blacklists;
+
+connection conn1;
+--error 1105
+select * from filter_function_test where a > 1 limit 1;
+
+#case3: set blacklist
+connection conn0;
+set manual-filter-flag = OFF;
+add blacklist 'select * from filter_function_test where a=1' 1;
+show blacklists;
+
+add blacklist 'select * from filter_function_test where a=<1023' 0;
+show blacklists;
+
+#case4: save blacklist  && clear blacklists
+connection conn0;
+add blacklist 'select * from filter_function_test where b=1' 1;
+add blacklist 'select * from filter_function_test where b=<1023' 0;
+show blacklists;
+save blacklists;
+
+show blacklists;
+clear blacklists;
+
+#case5: 黑名单拦截
+connection conn0;
+clear blacklists;
+show blacklists;
+add blacklist 'select * from filter_function_test where b=1' 1;
+show blacklists;
+
+connection conn1;
+--error 1105
+select * from filter_function_test where b=1024;

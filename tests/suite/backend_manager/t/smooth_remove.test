@@ -1,0 +1,54 @@
+#backend_manager
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+connect (conn1, 127.0.0.1, dbproxy_test, '123456', 'test', 6003);
+
+#case1: 没有进行中的事务时，下线backend，该backend会立即下线
+connection conn0;
+select * from backends;
+remove backend 2;
+select * from backends;
+
+add slave 10.32.45.150:5002;
+#case2: 没有进行中的事务时，设置backend状态为offline，该backend状态立即更改
+connection conn0;
+select * from backends;
+set offline 2;
+select * from backends;
+
+set online 2;
+#case3: 存在进行中的事务时，下线backend，会等待一段时间
+connection conn0;
+set remove-backend-timeout = 3600;
+show variables like 'remove-backend-timeout';
+connection conn1;
+begin;
+connection conn0;
+select * from backends;
+remove backend 2;
+select * from backends;
+
+add slave 10.32.45.150:5002;
+#case4: 存在进行中的事务时，设置backend状态为offline，会等待一段时间
+connection conn0;
+set remove-backend-timeout = 3600;
+show variables like 'remove-backend-timeout';
+connection conn1;
+begin;
+connection conn0;
+select * from backends;
+set offline 2;
+select * from backends;
+
+set online 2;
+#case5:测试参数 timeout
+connection conn0;
+set remove-backend-timeout = 3600;
+show variables like 'remove-backend-timeout';
+connection conn1;
+begin;
+connection conn0;
+select * from backends;
+remove backend 2 timeout 0;
+select * from backends;
+
+add slave 10.32.45.150:5002;

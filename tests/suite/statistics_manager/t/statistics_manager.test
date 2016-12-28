@@ -1,0 +1,121 @@
+#statistics-manager
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
+
+#case1: percentile
+show variables like 'percentile-value';
+--error 1105
+set percentile-value = ;
+set percentile-value = 33;
+show variables like 'percentile-value';
+--error 1105
+set percentile-value = 3.14;
+--error 1105
+set percentile-value = 0;
+set percentile-value = 100;
+show variables like 'percentile-value';
+--error 1105
+set percentile-value = 120;
+--error 1105
+set percentile-value = abc;
+
+--error 1105
+set percentile-switch = ;
+--error 1105
+set percentile-switch = abc;
+
+show variables like 'percentile-switch';
+set percentile-switch = off;
+show variables like 'percentile-switch';
+set percentile-switch = oN;
+show variables like 'percentile-switch';
+set percentile-switch = oFf;
+show variables like 'percentile-switch';
+set percentile-switch = On;
+show variables like 'percentile-switch';
+set percentile-switch = ofF;
+show variables like 'percentile-switch';
+set percentile-switch = ON;
+show variables like 'percentile-switch';
+set percentile-switch = Off;
+show variables like 'percentile-switch';
+set percentile-switch = on;
+show variables like 'percentile-switch';
+set percentile-switch = OFf;
+show variables like 'percentile-switch';
+set percentile-switch = on;
+show variables like 'percentile-switch';
+set percentile-switch = oFF;
+show variables like 'percentile-switch';
+set percentile-switch = on;
+show variables like 'percentile-switch';
+set percentile-switch = OfF;
+show variables like 'percentile-switch';
+set percentile-switch = on;
+show variables like 'percentile-switch';
+set percentile-switch = OFF;
+show variables like 'percentile-switch';
+
+set percentile-switch = off;
+show variables like 'percentile-switch';
+--error 1105
+show percentile;
+
+set percentile-switch = on;
+show variables like 'percentile-switch';
+show percentile;
+show percentile 5m;
+show percentile 5h;
+--error 1105
+show percentile 24h;
+--error 1105
+show percentile 60m;
+--error 1105
+show percentile 0h;
+--error 1105
+show percentile 0m;
+--error 1105
+show percentile 3mh;
+--error 1105
+show percentile 4;
+
+#case2: query-response-time-stats
+show variables like 'query-response-time-stats';
+set query-response-time-stats = 1024;
+show variables like 'query-response-time-stats';
+
+set query-response-time-stats = 0;
+show variables like 'query-response-time-stats';
+
+--error 1105
+set query-response-time-stats = -1;
+
+#case3: long-query-time
+show variables like 'long-query-time';
+set long-query-time = 1024;
+show variables like 'long-query-time';
+
+set long-query-time = 0;
+show variables like 'long-query-time';
+
+--error 1105
+set long-query-time = -1;
+
+#case4: query-response-time-range-base
+show variables like 'query-response-time-range-base';
+set query-response-time-range-base = 4;
+show variables like 'query-response-time-range-base';
+
+set query-response-time-range-base = 3;
+show variables like 'query-response-time-range-base';
+
+--error 1105
+set query-response-time-range-base = 0;
+
+--error 1105
+set query-response-time-range-base = -1;
+
+--error 1105
+set query-response-time-range-base = 1.4;
+
+#case5: query_response_time
+show query_response_time;
