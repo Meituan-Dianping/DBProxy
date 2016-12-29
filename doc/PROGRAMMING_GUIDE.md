@@ -22,7 +22,7 @@ CentOS 6.5
 ### 参数配置
 1. 默认安装在/usr/local/mysql-proxy目录下 
 2. mkdir /usr/local/mysql-proxy/conf 
-3. cp source.cnf /usr/local/mysql-proxy/conf/ 
+3. cp script/source.cnf.samples /usr/local/mysql-proxy/conf/source.cnf
 4. 设置daemon和keepalive为false 
 5. 确保log-path目录存在
 6. 修改proxy-backend-addresses、proxy-read-only-backend-addresses、pwds
