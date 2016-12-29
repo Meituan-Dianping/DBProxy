@@ -5,7 +5,10 @@
 yum install -y Percona-Server-devel-55.x86_64 Percona-Server-client-55.x86_64 Percona-Server-shared-55 jemalloc jemalloc-devel libevent openssl lua lua-devel glib2 glib2-devel bison flex libtool.x86_64
 ```
 
-注意目前确认有效的glib2版本是2.42.0-1.el6，centos默认源中的版本是2.28.8-4.el6，会导致make报错。
+**注意**
+
+1. 操作系统版本：CentOS 6.5
+2. 目前确认有效的glib2版本是2.42.0-1.el6，centos默认源中的版本是2.28.8-4.el6，会导致make报错。
 
 ## 1.2 源码安装
 
@@ -16,10 +19,23 @@ git clone git@github.com:Meituan-Dianping/DBProxy.git
 ```
 
 - 编译源码并安装（添加新文件和修改版本的时候需要运行autogen.sh，注意docker centos:6.6 image下运行autogen.sh会失败）
+
+
 ```
 sh autogen.sh
 sh bootstrap.sh
 make && make install
+```
+
+**注意**
+
+目前DBProxy默认安装路径为：/usr/local/mysql-proxy。修改DBProxy默认安装路径，需要修改bootstrap.sh文件。例如将默认安装路径修改为： /usr/dbproxy，则需修改bootstrap.sh中--prefix后的参数，修改如下：
+
+```
+#!/bin/sh
+base=$(cd "$(dirname "$0")"; pwd)
+cd $base
+./configure --prefix=/usr/dbproxy CFLAGS="-g -O0"  ##仅仅修改修改该行
 ```
 
 ## 1.3 RPM包安装

@@ -1,38 +1,7 @@
-# 编译安装
-## 操作系统
-CentOS 6.5
-## 源码依赖包
-* Percona-Server-devel-55.x86_64 Percona-Server-client-55.x86_64 Percona-Server-shared-55  
-* libevent
-* openssl  
-* glib2 glib2-devel 
-* jemalloc jemalloc-devel 
-* lua lua-devel
-* flex bison
+# 编译/安装/运行
 
-注意目前确认有效的glib2版本是2.42.0-1.el6，centos默认源中的版本是2.28.8-4.el6，会导致make报错。
+详见[快速入门手册](./QUICK_START.md) 对应章节
 
-## 编译，安装
-* 三部曲: configure && make && make install
-* ./bootstrap.sh   
-   指定默认的安装目录/usr/local/mysql-proxy，这个目录可以根据自己的需求去指定，程序需要安装到/opt/dbproxy 目录下，则修改bootstrap.sh命令中configure参数--prefix=/opt/dbproxy 即可
-* make && make install
-
-## 启动
-### 参数配置
-1. 默认安装在/usr/local/mysql-proxy目录下 
-2. mkdir /usr/local/mysql-proxy/conf 
-3. cp script/source.cnf.samples /usr/local/mysql-proxy/conf/source.cnf
-4. 设置daemon和keepalive为false 
-5. 确保log-path目录存在
-6. 修改proxy-backend-addresses、proxy-read-only-backend-addresses、pwds
-
-### 启动进程
-在安装目录下的bin/mysql-proxy进行启动，启动时需传入配置文件的路径。例如:默认安装的路径为：/usr/local/mysql-proxy，配置文件路径为：/usr/local/mysql-proxy/conf/source.cnf，且配置文件中配置了必须配置的参数，启动命令如下: 
-
-```
-/usr/local/mysql-proxy/bin/mysql-proxy --defaults-file=/usr/local/mysql-proxy/conf/source.cnf
-```
 ## 源码简介
 
 ### 调试
