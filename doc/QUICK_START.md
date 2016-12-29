@@ -35,7 +35,7 @@ make && make install
 #!/bin/sh
 base=$(cd "$(dirname "$0")"; pwd)
 cd $base
-./configure --prefix=/usr/dbproxy CFLAGS="-g -O0"  ##仅仅修改修改该行
+./configure --prefix=/usr/dbproxy CFLAGS="-g -O0"  ##仅仅修改该行
 ```
 
 ## 1.3 RPM包安装
