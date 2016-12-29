@@ -55,7 +55,7 @@ DBProxy 可以配置一主多从结构，即必须配置一个主库，0个或�
 
 ```
 mkdir /usr/local/mysql-proxy/conf   # 创建配置文件所在文件夹
-cp source.cnf.sample /usr/local/mysql-proxy/conf/source.cnf #拷贝示例配置文件
+cp script/source.cnf.samples /usr/local/mysql-proxy/conf/source.cnf #拷贝示例配置文件
 ```
 
 下面列出了配置文件的一个子集，详细配置信息请参考[用户手册](USER_GUIDE.md)。以部署一主一从为例，主库：1.1.1.1:3306 从库：1.1.1.2:3306；DBProxy的admin和后端MySQL的用户名和密码均为guest，uqmOY9A=是guest加密之后的结果。 
