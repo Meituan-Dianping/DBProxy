@@ -1,5 +1,6 @@
 # 1. DBProxy安装
 ## 1.1 安装依赖项
+<h1 id="1.1"></h1>
 
 ```
 yum install -y Percona-Server-devel-55.x86_64 Percona-Server-client-55.x86_64 Percona-Server-shared-55 jemalloc jemalloc-devel libevent openssl lua lua-devel glib2 glib2-devel bison flex libtool.x86_64
@@ -37,20 +38,7 @@ base=$(cd "$(dirname "$0")"; pwd)
 cd $base
 ./configure --prefix=/usr/dbproxy CFLAGS="-g -O0"  ##仅仅修改修改该行
 ```
-
-## 1.3 RPM包安装
-
-- 获取RPM包
-
-```
-wget [下载路径]
-```
-
-- 安装 DBProxy
-
-```
-rpm -ivh dbproxy-xxxxx.rpm
-``` 
+ 
 
 # 2. 部署
 ## 2.1 部署结构介绍  
@@ -183,8 +171,26 @@ DBProxy开发相关描述，详见：[DBProxy 开发手册](./PROGRAMMING_GUIDE.
 
 # 5 RPM包的发布与安装   
 
+## 5.1 打RPM包
 
 ```
 sh dbproxy/script/build_dbproxy_rpm.sh -v [版本号] -r [release号]
 ```
+
+## 5.2 RPM包安装
+
+- 获取RPM包
+
+```
+wget [下载路径]
+```
+
+- 依赖安装
+
+参考 [1.1 安装依赖项](#1.1) 
+
+- 安装 DBProxy
+
+```
+rpm -ivh dbproxy-xxxxx.rpm
 
