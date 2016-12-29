@@ -12,14 +12,13 @@ yum install -y Percona-Server-devel-55.x86_64 Percona-Server-client-55.x86_64 Pe
 - 源码从代码仓库下载到本地  
  
 ```
-git clone XXX
+git clone git@github.com:Meituan-Dianping/DBProxy.git
 ```
 
-- 编译源码并安装     
-
+- 编译源码并安装（添加新文件和修改版本的时候需要运行autogen.sh，注意docker centos:6.6 image下运行autogen.sh会失败）
 ```
-sh dbproxy/autogen.sh
-sh dbproxy/bootstrap.sh
+sh autogen.sh
+sh bootstrap.sh
 make && make install
 ```
 
