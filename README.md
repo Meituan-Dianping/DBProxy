@@ -35,7 +35,11 @@ DBProxy is a MySQL protocol-based database middleware project developed and main
 If You have new functional requirements about DBProxy in the production environment, or find a bug in the process of using DBProxy. Welcome to leave message to us or pull request on github. We will set up DBProxy disscussion group and long-museum later.
 
 
-###7.Other language version
+###6.Other language version
 
 [简体中文](README_ZH.md)
  
+
+###7.Communication group(QQ)
+
+![QQ](./doc/img/DBProxy用户交流群群二维码.png)
