@@ -2,7 +2,7 @@
 ## 1.1 安装依赖项
 
 ```
-yum install -y Percona-Server-devel-55.x86_64 Percona-Server-client-55.x86_64 Percona-Server-shared-55 jemalloc jemalloc-devel libevent openssl lua lua-devel glib2 glib2-devel bison flex
+yum install -y Percona-Server-devel-55.x86_64 Percona-Server-client-55.x86_64 Percona-Server-shared-55 jemalloc jemalloc-devel libevent openssl lua lua-devel glib2 glib2-devel bison flex libtool.x86_64
 ```
 
 注意目前确认有效的glib2版本是2.42.0-1.el6，centos默认源中的版本是2.28.8-4.el6，会导致make报错。
