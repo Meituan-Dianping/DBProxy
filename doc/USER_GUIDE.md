@@ -272,7 +272,7 @@ percentile=95
 #配置监控backends的用户信息
 backend-monitor-pwds
 #日志缓冲大小（日志条数），默认500
-sql-log-buffer-size=
+sql-log-buffer-size=500
   
 #设置check state线程查询backend的信息的时间间隔，默认为4s
 check-state-interval=4
