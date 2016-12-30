@@ -1,6 +1,6 @@
 ###1.Brief introduction
 
-DBProxy is a MySQL protocol-based database middleware project developed and maintained by DBA (Beijing) team of the Engineering Department in meituandianping. It fixed some bugs and added lot of new functions on the basis of Atlas which is a open source of QIHU360. Currently the project has been widely applied in meituandianping.
+DBProxy is a MySQL protocol-based database middleware project developed and maintained by DBA (Beijing) team of the Technical Infrastructure in meituandianping. It fixed some bugs and added lot of new functions on the basis of Atlas which is a open source of QIHU360. Currently the project has been widely applied in meituandianping.
 
 ###2.Major functions
 
