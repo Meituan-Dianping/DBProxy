@@ -1064,7 +1064,7 @@ alter_slave_weight(network_backends_t *bs, gint idx, gint weight)
             g_assert(tag_backends != NULL);
 		}
 
-        g_wrr_poll_update(bs, bs->def_backend_tag);
+        g_wrr_poll_update(bs, tag_backends);
 		ret = 0;
 	} else {
 		g_debug("%s(%s): backend_ndx %d is BACKEND_TYPE_RW, set weight failed",
