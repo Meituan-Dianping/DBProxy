@@ -26,39 +26,39 @@
 #define S(x) x->str, x->len
 
 network_mysqld_masterinfo_t * network_mysqld_masterinfo_new(void) {
-	network_mysqld_masterinfo_t *info;
+    network_mysqld_masterinfo_t *info;
 
-	info = g_new0(network_mysqld_masterinfo_t, 1);
+    info = g_new0(network_mysqld_masterinfo_t, 1);
 
-	info->master_log_file   = g_string_new(NULL);
-	info->master_host       = g_string_new(NULL);
-	info->master_user       = g_string_new(NULL);
-	info->master_password   = g_string_new(NULL);
-	
-	info->master_ssl_ca     = g_string_new(NULL);
-	info->master_ssl_capath = g_string_new(NULL);
-	info->master_ssl_cert   = g_string_new(NULL);
-	info->master_ssl_cipher = g_string_new(NULL);
-	info->master_ssl_key    = g_string_new(NULL);
+    info->master_log_file   = g_string_new(NULL);
+    info->master_host       = g_string_new(NULL);
+    info->master_user       = g_string_new(NULL);
+    info->master_password   = g_string_new(NULL);
+    
+    info->master_ssl_ca     = g_string_new(NULL);
+    info->master_ssl_capath = g_string_new(NULL);
+    info->master_ssl_cert   = g_string_new(NULL);
+    info->master_ssl_cipher = g_string_new(NULL);
+    info->master_ssl_key    = g_string_new(NULL);
 
-	return info;
+    return info;
 }
 
 void network_mysqld_masterinfo_free(network_mysqld_masterinfo_t *info) {
-	if (!info) return;
+    if (!info) return;
 
-	g_string_free(info->master_log_file, TRUE);
-	g_string_free(info->master_host, TRUE);
-	g_string_free(info->master_user, TRUE);
-	g_string_free(info->master_password, TRUE);
-	
-	g_string_free(info->master_ssl_ca, TRUE);
-	g_string_free(info->master_ssl_capath, TRUE);
-	g_string_free(info->master_ssl_cert, TRUE);
-	g_string_free(info->master_ssl_cipher, TRUE);
-	g_string_free(info->master_ssl_key, TRUE);
+    g_string_free(info->master_log_file, TRUE);
+    g_string_free(info->master_host, TRUE);
+    g_string_free(info->master_user, TRUE);
+    g_string_free(info->master_password, TRUE);
+    
+    g_string_free(info->master_ssl_ca, TRUE);
+    g_string_free(info->master_ssl_capath, TRUE);
+    g_string_free(info->master_ssl_cert, TRUE);
+    g_string_free(info->master_ssl_cipher, TRUE);
+    g_string_free(info->master_ssl_key, TRUE);
 
-	g_free(info);
+    g_free(info);
 }
 
 /**
@@ -66,119 +66,119 @@ void network_mysqld_masterinfo_free(network_mysqld_masterinfo_t *info) {
  */
 
 static int network_mysqld_masterinfo_get_string(network_packet *packet, GString *str) {
-	guint i;
+    guint i;
 
-	g_return_val_if_fail(packet, -1);
-	g_return_val_if_fail(str, -1);
+    g_return_val_if_fail(packet, -1);
+    g_return_val_if_fail(str, -1);
 
-	for (i = packet->offset; i < packet->data->len; i++) {
-		const char c = packet->data->str[i];
+    for (i = packet->offset; i < packet->data->len; i++) {
+        const char c = packet->data->str[i];
 
-		if (c == '\n') break;
-	}
+        if (c == '\n') break;
+    }
 
-	if (packet->data->str[i] == '\n') {
-		g_string_assign_len(str, packet->data->str + packet->offset, i - packet->offset);
+    if (packet->data->str[i] == '\n') {
+        g_string_assign_len(str, packet->data->str + packet->offset, i - packet->offset);
 
-		packet->offset = i + 1; /* start the next string after our \n */
+        packet->offset = i + 1; /* start the next string after our \n */
 
-		return 0;
-	} 
+        return 0;
+    } 
 
-	return -1;
+    return -1;
 }
 
 static int network_mysqld_masterinfo_get_int32(network_packet *packet, guint32 *_i) {
-	GString *s;
-	int err = 0;
+    GString *s;
+    int err = 0;
 
-	s = g_string_new(NULL);
-	err = err || network_mysqld_masterinfo_get_string(packet, s);
-	if (!err) {
-		char *errptr;
-		guint32 i;
+    s = g_string_new(NULL);
+    err = err || network_mysqld_masterinfo_get_string(packet, s);
+    if (!err) {
+        char *errptr;
+        guint32 i;
 
-		i = strtoul(s->str, &errptr, 0);
+        i = strtoul(s->str, &errptr, 0);
 
-		err = err || (*errptr != '\0');
+        err = err || (*errptr != '\0');
 
-		if (!err) *_i = i;
-	}
+        if (!err) *_i = i;
+    }
 
-	g_string_free(s, TRUE);
+    g_string_free(s, TRUE);
 
-	return err ? -1 : 0;
+    return err ? -1 : 0;
 }
 
 /**
  * get the master-info structure from the internal representation 
  */
 int network_mysqld_masterinfo_get(network_packet *packet, network_mysqld_masterinfo_t *info) {
-	int err = 0;
+    int err = 0;
 
-	g_return_val_if_fail(info, -1);
-	g_return_val_if_fail(packet, -1);
+    g_return_val_if_fail(info, -1);
+    g_return_val_if_fail(packet, -1);
 
-	/*err = err || network_mysqld_masterinfo_get_int32(packet, &lines);*/
-	/*info->master_lines = lines;*/
+    /*err = err || network_mysqld_masterinfo_get_int32(packet, &lines);*/
+    /*info->master_lines = lines;*/
         err = err || network_mysqld_masterinfo_get_int32(packet, &(info->master_lines));
         err = err || network_mysqld_masterinfo_get_string(packet, info->master_log_file);
-	err = err || network_mysqld_masterinfo_get_int32(packet, &(info->master_log_pos));
-	err = err || network_mysqld_masterinfo_get_string(packet, info->master_host);
-	err = err || network_mysqld_masterinfo_get_string(packet, info->master_user);
-	err = err || network_mysqld_masterinfo_get_string(packet, info->master_password);
-	err = err || network_mysqld_masterinfo_get_int32(packet, &(info->master_port));
-	err = err || network_mysqld_masterinfo_get_int32(packet, &(info->master_connect_retry));
-	err = err || network_mysqld_masterinfo_get_int32(packet, &(info->master_ssl));
-	err = err || network_mysqld_masterinfo_get_string(packet, info->master_ssl_ca);
-	err = err || network_mysqld_masterinfo_get_string(packet, info->master_ssl_capath);
-	err = err || network_mysqld_masterinfo_get_string(packet, info->master_ssl_cert);
-	err = err || network_mysqld_masterinfo_get_string(packet, info->master_ssl_cipher);
-	err = err || network_mysqld_masterinfo_get_string(packet, info->master_ssl_key);
-	if (info->master_lines >= 15) {
-		err = err || network_mysqld_masterinfo_get_int32(packet, &(info->master_ssl_verify_server_cert));
-	}
-	return err ? -1 : 0;
+    err = err || network_mysqld_masterinfo_get_int32(packet, &(info->master_log_pos));
+    err = err || network_mysqld_masterinfo_get_string(packet, info->master_host);
+    err = err || network_mysqld_masterinfo_get_string(packet, info->master_user);
+    err = err || network_mysqld_masterinfo_get_string(packet, info->master_password);
+    err = err || network_mysqld_masterinfo_get_int32(packet, &(info->master_port));
+    err = err || network_mysqld_masterinfo_get_int32(packet, &(info->master_connect_retry));
+    err = err || network_mysqld_masterinfo_get_int32(packet, &(info->master_ssl));
+    err = err || network_mysqld_masterinfo_get_string(packet, info->master_ssl_ca);
+    err = err || network_mysqld_masterinfo_get_string(packet, info->master_ssl_capath);
+    err = err || network_mysqld_masterinfo_get_string(packet, info->master_ssl_cert);
+    err = err || network_mysqld_masterinfo_get_string(packet, info->master_ssl_cipher);
+    err = err || network_mysqld_masterinfo_get_string(packet, info->master_ssl_key);
+    if (info->master_lines >= 15) {
+        err = err || network_mysqld_masterinfo_get_int32(packet, &(info->master_ssl_verify_server_cert));
+    }
+    return err ? -1 : 0;
 }
 
 static int network_mysqld_masterinfo_append_string(GString *packet, GString *s) {
-	g_string_append_len(packet, S(s));
-	g_string_append_c(packet, '\n');
+    g_string_append_len(packet, S(s));
+    g_string_append_c(packet, '\n');
 
-	return 0;
+    return 0;
 }
 
 static int network_mysqld_masterinfo_append_int32(GString *packet, guint32 i) {
-	g_string_append_printf(packet, "%"G_GUINT32_FORMAT"\n", i);
+    g_string_append_printf(packet, "%"G_GUINT32_FORMAT"\n", i);
 
-	return 0;
+    return 0;
 }
 
 
 int network_mysqld_masterinfo_append(GString *packet, network_mysqld_masterinfo_t *info) {
-	int err = 0;
+    int err = 0;
 
-	g_return_val_if_fail(info, -1);
-	g_return_val_if_fail(packet, -1);
+    g_return_val_if_fail(info, -1);
+    g_return_val_if_fail(packet, -1);
 
-	err = err || network_mysqld_masterinfo_append_int32(packet, info->master_lines);
+    err = err || network_mysqld_masterinfo_append_int32(packet, info->master_lines);
         err = err || network_mysqld_masterinfo_append_string(packet, info->master_log_file);
-	err = err || network_mysqld_masterinfo_append_int32(packet, info->master_log_pos);
-	err = err || network_mysqld_masterinfo_append_string(packet, info->master_host);
-	err = err || network_mysqld_masterinfo_append_string(packet, info->master_user);
-	err = err || network_mysqld_masterinfo_append_string(packet, info->master_password);
-	err = err || network_mysqld_masterinfo_append_int32(packet, info->master_port);
-	err = err || network_mysqld_masterinfo_append_int32(packet, info->master_connect_retry);
-	err = err || network_mysqld_masterinfo_append_int32(packet, info->master_ssl);
-	err = err || network_mysqld_masterinfo_append_string(packet, info->master_ssl_ca);
-	err = err || network_mysqld_masterinfo_append_string(packet, info->master_ssl_capath);
-	err = err || network_mysqld_masterinfo_append_string(packet, info->master_ssl_cert);
-	err = err || network_mysqld_masterinfo_append_string(packet, info->master_ssl_cipher);
-	err = err || network_mysqld_masterinfo_append_string(packet, info->master_ssl_key);
-	if (info->master_lines >= 15) {
+    err = err || network_mysqld_masterinfo_append_int32(packet, info->master_log_pos);
+    err = err || network_mysqld_masterinfo_append_string(packet, info->master_host);
+    err = err || network_mysqld_masterinfo_append_string(packet, info->master_user);
+    err = err || network_mysqld_masterinfo_append_string(packet, info->master_password);
+    err = err || network_mysqld_masterinfo_append_int32(packet, info->master_port);
+    err = err || network_mysqld_masterinfo_append_int32(packet, info->master_connect_retry);
+    err = err || network_mysqld_masterinfo_append_int32(packet, info->master_ssl);
+    err = err || network_mysqld_masterinfo_append_string(packet, info->master_ssl_ca);
+    err = err || network_mysqld_masterinfo_append_string(packet, info->master_ssl_capath);
+    err = err || network_mysqld_masterinfo_append_string(packet, info->master_ssl_cert);
+    err = err || network_mysqld_masterinfo_append_string(packet, info->master_ssl_cipher);
+    err = err || network_mysqld_masterinfo_append_string(packet, info->master_ssl_key);
+    if (info->master_lines >= 15) {
                 err = err || network_mysqld_masterinfo_append_int32(packet, info->master_ssl_verify_server_cert);
         }
 
-	return err ? -1 : 0;
+    return err ? -1 : 0;
 }
 

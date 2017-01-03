@@ -38,34 +38,34 @@
  */
 
 typedef enum {
-	NETWORK_MYSQLD_PROTOCOL_VERSION_PRE41,
-	NETWORK_MYSQLD_PROTOCOL_VERSION_41
+    NETWORK_MYSQLD_PROTOCOL_VERSION_PRE41,
+    NETWORK_MYSQLD_PROTOCOL_VERSION_41
 } network_mysqld_protocol_t;
 
 /**
  * tracking the state of the response of a COM_QUERY packet
  */
 typedef struct {
-	enum {
-		PARSE_COM_QUERY_INIT,
-		PARSE_COM_QUERY_FIELD,
-		PARSE_COM_QUERY_RESULT,
-		PARSE_COM_QUERY_LOCAL_INFILE_DATA,
-		PARSE_COM_QUERY_LOCAL_INFILE_RESULT
-	} state;
+    enum {
+        PARSE_COM_QUERY_INIT,
+        PARSE_COM_QUERY_FIELD,
+        PARSE_COM_QUERY_RESULT,
+        PARSE_COM_QUERY_LOCAL_INFILE_DATA,
+        PARSE_COM_QUERY_LOCAL_INFILE_RESULT
+    } state;
 
-	guint16 server_status;
-	guint16 warning_count;
-	guint64 affected_rows;
-	guint64 insert_id;
+    guint16 server_status;
+    guint16 warning_count;
+    guint64 affected_rows;
+    guint64 insert_id;
 
-	gboolean was_resultset;
-	gboolean binary_encoded;
+    gboolean was_resultset;
+    gboolean binary_encoded;
 
-	guint64 rows;
-	guint64 bytes;
+    guint64 rows;
+    guint64 bytes;
 
-	guint8  query_status;
+    guint8  query_status;
 } network_mysqld_com_query_result_t;
 
 typedef struct com_string {
@@ -93,8 +93,8 @@ NETWORK_API int network_mysqld_proto_get_com_query_result(network_packet *packet
  * depending on the kind of statement that was prepare we will receive 0-2 EOF packets
  */
 typedef struct {
-	gboolean first_packet;
-	gint     want_eofs;
+    gboolean first_packet;
+    gint     want_eofs;
 } network_mysqld_com_stmt_prepare_result_t;
 
 NETWORK_API network_mysqld_com_stmt_prepare_result_t *network_mysqld_com_stmt_prepare_result_new(void);
@@ -108,7 +108,7 @@ NETWORK_API int network_mysqld_proto_get_com_stmt_prepare_result(network_packet 
  * if the server side OK'ed it
  */
 typedef struct {
-	GString *db_name;
+    GString *db_name;
 } network_mysqld_com_init_db_result_t;
 
 NETWORK_API int network_mysqld_proto_get_query_result(network_packet *packet, network_mysqld_con *con);
@@ -117,12 +117,12 @@ NETWORK_API int network_mysqld_con_command_states_init(network_mysqld_con *con, 
 NETWORK_API GList *network_mysqld_proto_get_fielddefs(GList *chunk, GPtrArray *fields);
 
 typedef struct {
-	guint64 affected_rows;
-	guint64 insert_id;
-	guint16 server_status;
-	guint16 warnings;
+    guint64 affected_rows;
+    guint64 insert_id;
+    guint16 server_status;
+    guint16 warnings;
 
-	gchar *msg;
+    gchar *msg;
 } network_mysqld_ok_packet_t;
 
 NETWORK_API network_mysqld_ok_packet_t *network_mysqld_ok_packet_new(void);
@@ -132,11 +132,11 @@ NETWORK_API int network_mysqld_proto_get_ok_packet(network_packet *packet, netwo
 NETWORK_API int network_mysqld_proto_append_ok_packet(GString *packet, network_mysqld_ok_packet_t *ok_packet);
 
 typedef struct {
-	GString *errmsg;
-	GString *sqlstate;
+    GString *errmsg;
+    GString *sqlstate;
 
-	guint16 errcode;
-	network_mysqld_protocol_t version;
+    guint16 errcode;
+    network_mysqld_protocol_t version;
 } network_mysqld_err_packet_t;
 
 NETWORK_API network_mysqld_err_packet_t *network_mysqld_err_packet_new(void);
@@ -147,8 +147,8 @@ NETWORK_API int network_mysqld_proto_get_err_packet(network_packet *packet, netw
 NETWORK_API int network_mysqld_proto_append_err_packet(GString *packet, network_mysqld_err_packet_t *err_packet);
 
 typedef struct {
-	guint16 server_status;
-	guint16 warnings;
+    guint16 server_status;
+    guint16 warnings;
 } network_mysqld_eof_packet_t;
 
 NETWORK_API network_mysqld_eof_packet_t *network_mysqld_eof_packet_new(void);
@@ -158,14 +158,14 @@ NETWORK_API int network_mysqld_proto_get_eof_packet(network_packet *packet, netw
 NETWORK_API int network_mysqld_proto_append_eof_packet(GString *packet, network_mysqld_eof_packet_t *eof_packet);
 
 struct network_mysqld_auth_challenge {
-	guint8    protocol_version;
-	gchar    *server_version_str;
-	guint32   server_version;
-	guint32   thread_id;
-	GString  *challenge;
-	guint16   capabilities;
-	guint8    charset;
-	guint16   server_status;
+    guint8    protocol_version;
+    gchar    *server_version_str;
+    guint32   server_version;
+    guint32   thread_id;
+    GString  *challenge;
+    guint16   capabilities;
+    guint8    charset;
+    guint16   server_status;
 };
 
 NETWORK_API network_mysqld_auth_challenge *network_mysqld_auth_challenge_new(void);
@@ -175,12 +175,12 @@ NETWORK_API int network_mysqld_proto_append_auth_challenge(GString *packet, netw
 NETWORK_API void network_mysqld_auth_challenge_set_challenge(network_mysqld_auth_challenge *shake);
 
 struct network_mysqld_auth_response {
-	guint32  capabilities;
-	guint32  max_packet_size;
-	guint8   charset;
-	GString *username;
-	GString *response;
-	GString *database;
+    guint32  capabilities;
+    guint32  max_packet_size;
+    guint8   charset;
+    GString *username;
+    GString *response;
+    GString *database;
 };
 
 NETWORK_API network_mysqld_auth_response *network_mysqld_auth_response_new(void);
@@ -192,7 +192,7 @@ NETWORK_API network_mysqld_auth_response *network_mysqld_auth_response_copy(netw
 /* COM_STMT_* */
 
 typedef struct {
-	GString *stmt_text;
+    GString *stmt_text;
 } network_mysqld_stmt_prepare_packet_t;
 
 NETWORK_API network_mysqld_stmt_prepare_packet_t *network_mysqld_stmt_prepare_packet_new();
@@ -201,10 +201,10 @@ NETWORK_API int network_mysqld_proto_get_stmt_prepare_packet(network_packet *pac
 NETWORK_API int network_mysqld_proto_append_stmt_prepare_packet(GString *packet, network_mysqld_stmt_prepare_packet_t *stmt_prepare_packet);
 
 typedef struct {
-	guint32 stmt_id;
-	guint16 num_columns;
-	guint16 num_params;
-	guint16 warnings;
+    guint32 stmt_id;
+    guint16 num_columns;
+    guint16 num_params;
+    guint16 warnings;
 } network_mysqld_stmt_prepare_ok_packet_t;
 
 NETWORK_API network_mysqld_stmt_prepare_ok_packet_t *network_mysqld_stmt_prepare_ok_packet_new(void);
@@ -213,11 +213,11 @@ NETWORK_API int network_mysqld_proto_get_stmt_prepare_ok_packet(network_packet *
 NETWORK_API int network_mysqld_proto_append_stmt_prepare_ok_packet(GString *packet, network_mysqld_stmt_prepare_ok_packet_t *stmt_prepare_ok_packet);
 
 typedef struct {
-	guint32 stmt_id;
-	guint8  flags;
-	guint32 iteration_count;
-	guint8 new_params_bound;
-	GPtrArray *params; /**< array<network_mysqld_type *> */
+    guint32 stmt_id;
+    guint8  flags;
+    guint32 iteration_count;
+    guint8 new_params_bound;
+    GPtrArray *params; /**< array<network_mysqld_type *> */
 } network_mysqld_stmt_execute_packet_t;
 
 NETWORK_API network_mysqld_stmt_execute_packet_t *network_mysqld_stmt_execute_packet_new(void);
@@ -235,7 +235,7 @@ NETWORK_API int network_mysqld_proto_get_binary_row(network_packet *packet, netw
 NETWORK_API GList *network_mysqld_proto_get_next_binary_row(GList *chunk, network_mysqld_proto_fielddefs_t *fields, network_mysqld_resultset_row_t *row);
 
 typedef struct {
-	guint32 stmt_id;
+    guint32 stmt_id;
 } network_mysqld_stmt_close_packet_t;
 
 NETWORK_API network_mysqld_stmt_close_packet_t *network_mysqld_stmt_close_packet_new(void);

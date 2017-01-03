@@ -24,7 +24,7 @@
 
 #if defined(mysql_chassis_proxy_EXPORTS)
 #define NETWORK_API __declspec(dllexport)
-#elif defined(mysql_chassis_proxy_STATIC)	/* In test cases, define this to prevent linker warnings on Win32 */
+#elif defined(mysql_chassis_proxy_STATIC)   /* In test cases, define this to prevent linker warnings on Win32 */
 #define NETWORK_API 
 #else
 #define NETWORK_API extern __declspec(dllimport)
@@ -32,7 +32,7 @@
 
 #else
 
-#define NETWORK_API		extern
+#define NETWORK_API     extern
 
 #endif
 

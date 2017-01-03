@@ -70,62 +70,62 @@ typedef enum {
 
 
 struct chassis {
-	struct event_base *event_base;
-	gchar *event_hdr_version;
+    struct event_base *event_base;
+    gchar *event_hdr_version;
 
-	GPtrArray *modules;                       /**< array(chassis_plugin) */
+    GPtrArray *modules;                       /**< array(chassis_plugin) */
 
-	gchar *base_dir;				/**< base directory for all relative paths referenced */
-	gchar *log_path;				/**< log directory */
-	gchar *user;					/**< user to run as */
-	gchar *instance_name;					/**< instance name*/
+    gchar *base_dir;                /**< base directory for all relative paths referenced */
+    gchar *log_path;                /**< log directory */
+    gchar *user;                    /**< user to run as */
+    gchar *instance_name;                   /**< instance name*/
 
-	chassis_log *log;
-	
-	chassis_stats_t *stats;			/**< the overall chassis stats, includes lua and glib allocation stats */
+    chassis_log *log;
+    
+    chassis_stats_t *stats;         /**< the overall chassis stats, includes lua and glib allocation stats */
 
-	/* network-io threads */
-	guint event_thread_count;
+    /* network-io threads */
+    guint event_thread_count;
 
-	gint proxy_max_connections;
-	volatile gint proxy_connections;
-	volatile gint proxy_max_used_connections;
-	volatile gint proxy_attempted_connects;
-	volatile gint proxy_aborted_connects;
-	volatile gint proxy_closed_clients;
-	volatile gint proxy_aborted_clients;
+    gint proxy_max_connections;
+    volatile gint proxy_connections;
+    volatile gint proxy_max_used_connections;
+    volatile gint proxy_attempted_connects;
+    volatile gint proxy_aborted_connects;
+    volatile gint proxy_closed_clients;
+    volatile gint proxy_aborted_clients;
 
-	gint long_wait_time;   // ms
-	gint long_query_time;   // ms
-	gint query_response_time_range_base;
-	gint query_response_time_stats;
+    gint long_wait_time;   // ms
+    gint long_query_time;   // ms
+    gint query_response_time_range_base;
+    gint query_response_time_stats;
 
-	gint db_connection_idle_timeout; //s
-	gint db_connection_max_age; //s
+    gint db_connection_idle_timeout; //s
+    gint db_connection_max_age; //s
 
-	MYSQL_VERSION my_version;
+    MYSQL_VERSION my_version;
 
-	GPtrArray *threads;
+    GPtrArray *threads;
 
-	chassis_shutdown_hooks_t *shutdown_hooks;
+    chassis_shutdown_hooks_t *shutdown_hooks;
 
-	lua_scope *sc;
+    lua_scope *sc;
 
-	network_backends_t *backends;
+    network_backends_t *backends;
 
-	volatile gint wait_timeout;
-	volatile gint shutdown_timeout;
+    volatile gint wait_timeout;
+    volatile gint shutdown_timeout;
 
-	gint max_backend_tr;
-	gint thread_running_sleep_delay;
+    gint max_backend_tr;
+    gint thread_running_sleep_delay;
 
-	sql_filter *proxy_filter;
-	sql_reserved_query *proxy_reserved;
+    sql_filter *proxy_filter;
+    sql_reserved_query *proxy_reserved;
 
-	gint daemon_mode;
-	gint64 max_files_number;
-	guint auto_restart;
-	chassis_options_t *opts;
+    gint daemon_mode;
+    gint64 max_files_number;
+    guint auto_restart;
+    chassis_options_t *opts;
 };
 
 

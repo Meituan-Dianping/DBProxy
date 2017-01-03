@@ -31,10 +31,10 @@
  *
  */
 typedef struct {
-	gpointer udata;
-	GDestroyNotify udata_free;
+    gpointer udata;
+    GDestroyNotify udata_free;
 
-	gint ref_count;
+    gint ref_count;
 } GRef;
 
 CHASSIS_API GRef *g_ref_new(void);

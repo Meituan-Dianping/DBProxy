@@ -28,10 +28,10 @@
 
 /* a input or output stream */
 typedef struct {
-	GQueue *chunks;
+    GQueue *chunks;
 
-	size_t len;    /* len in all chunks (w/o the offset) */
-	size_t offset; /* offset in the first chunk */
+    size_t len;    /* len in all chunks (w/o the offset) */
+    size_t offset; /* offset in the first chunk */
 } network_queue;
 
 NETWORK_API network_queue *network_queue_init(void) G_GNUC_DEPRECATED;

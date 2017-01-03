@@ -101,67 +101,67 @@ typedef struct network_mysqld_con network_mysqld_con; /* forward declaration */
  * #NETWORK_MYSQLD_PLUGIN_FUNC can be used to create a function pointer declaration.
  */
 typedef struct {
-	/**
-	 * Called when a new client connection to MySQL Proxy was created.
-	 */
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_init);
-	/**
-	 * Called when MySQL Proxy needs to establish a connection to a backend server
-	 *
-	 * Returning a handshake response packet from this callback will cause the con_read_handshake step to be skipped.
-	 * The next state then is con_send_handshake.
-	 */
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_connect_server);
-	/**
-	 * Called when MySQL Proxy has read the handshake packet from the server.
-	 */
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_read_handshake);
-	/**
-	 * Called when MySQL Proxy wants to send the handshake packet to the client.
-	 * 
-	 * @note No known plugins actually implement this step right now, but rather return a handshake challenge from con_init instead.
-	 */
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_send_handshake);
-	/**
-	 * Called when MySQL Proxy has read the authentication packet from the client.
-	 */
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_read_auth);
-	/**
-	 * Called when MySQL Proxy wants to send the authentication packet to the server.
-	 * 
-	 * @note No known plugins actually implement this step.
-	 */
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_send_auth);
-	/**
-	 * Called when MySQL Proxy has read the authentication result from the backend server, in response to con_send_auth.
-	 */
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_read_auth_result);
-	/**
-	 * Called when MySQL Proxy wants to send the authentication response packet to the client.
-	 * 
-	 * @note No known plugins implement this callback, but the default implementation deals with the important case that
-	 * the authentication response used the pre-4.1 password hash method, but the client didn't.
-	 * @see network_mysqld_con::auth_result_state
-	 */
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_send_auth_result);
-	/**
-	 * Called when MySQL Proxy receives a COM_QUERY packet from a client.
-	 */
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_read_query);
-	/**
-	 * Called when MySQL Proxy receives a result set from the server.
-	 */
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_read_query_result);
-	/**
-	 * Called when MySQL Proxy sends a result set to the client.
-	 * 
-	 * The proxy plugin, for example, uses this state to inject more queries into the connection, possibly in response to a
-	 * result set received from a server.
-	 * 
-	 * This callback should not cause multiple result sets to be sent to the client.
-	 * @see network_mysqld_con_lua_injection::sent_resultset
-	 */
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_send_query_result);
+    /**
+     * Called when a new client connection to MySQL Proxy was created.
+     */
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_init);
+    /**
+     * Called when MySQL Proxy needs to establish a connection to a backend server
+     *
+     * Returning a handshake response packet from this callback will cause the con_read_handshake step to be skipped.
+     * The next state then is con_send_handshake.
+     */
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_connect_server);
+    /**
+     * Called when MySQL Proxy has read the handshake packet from the server.
+     */
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_read_handshake);
+    /**
+     * Called when MySQL Proxy wants to send the handshake packet to the client.
+     * 
+     * @note No known plugins actually implement this step right now, but rather return a handshake challenge from con_init instead.
+     */
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_send_handshake);
+    /**
+     * Called when MySQL Proxy has read the authentication packet from the client.
+     */
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_read_auth);
+    /**
+     * Called when MySQL Proxy wants to send the authentication packet to the server.
+     * 
+     * @note No known plugins actually implement this step.
+     */
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_send_auth);
+    /**
+     * Called when MySQL Proxy has read the authentication result from the backend server, in response to con_send_auth.
+     */
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_read_auth_result);
+    /**
+     * Called when MySQL Proxy wants to send the authentication response packet to the client.
+     * 
+     * @note No known plugins implement this callback, but the default implementation deals with the important case that
+     * the authentication response used the pre-4.1 password hash method, but the client didn't.
+     * @see network_mysqld_con::auth_result_state
+     */
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_send_auth_result);
+    /**
+     * Called when MySQL Proxy receives a COM_QUERY packet from a client.
+     */
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_read_query);
+    /**
+     * Called when MySQL Proxy receives a result set from the server.
+     */
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_read_query_result);
+    /**
+     * Called when MySQL Proxy sends a result set to the client.
+     * 
+     * The proxy plugin, for example, uses this state to inject more queries into the connection, possibly in response to a
+     * result set received from a server.
+     * 
+     * This callback should not cause multiple result sets to be sent to the client.
+     * @see network_mysqld_con_lua_injection::sent_resultset
+     */
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_send_query_result);
     /**
      * Called when an internal timer has elapsed.
      * 
@@ -181,12 +181,12 @@ typedef struct {
      * 
      * @note There are no two separate callback functions for the two possibilities, which probably is a deficiency.
      */
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_cleanup);
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_cleanup);
 
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_read_local_infile_data);
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_send_local_infile_data);
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_read_local_infile_result);
-	NETWORK_MYSQLD_PLUGIN_FUNC(con_send_local_infile_result);
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_read_local_infile_data);
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_send_local_infile_data);
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_read_local_infile_result);
+    NETWORK_MYSQLD_PLUGIN_FUNC(con_send_local_infile_result);
 
 } network_mysqld_hooks;
 
@@ -200,10 +200,10 @@ typedef struct {
  * how we can refactor this into a more generic way.
  */
 struct network_mysqld_con_parse {
-	enum enum_server_command command;	/**< The command indicator from the MySQL Protocol */
+    enum enum_server_command command;   /**< The command indicator from the MySQL Protocol */
 
-	gpointer data;						/**< An opaque pointer to a parsed command structure */
-	void (*data_free)(gpointer);		/**< A function pointer to the appropriate "free" function of data */
+    gpointer data;                      /**< An opaque pointer to a parsed command structure */
+    void (*data_free)(gpointer);        /**< A function pointer to the appropriate "free" function of data */
 };
 
 /**
@@ -213,32 +213,32 @@ struct network_mysqld_con_parse {
  * <em>internal state</em>.
  */
 typedef enum { 
-	CON_STATE_INIT = 0,                  /**< A new client connection was established */
-	CON_STATE_CONNECT_SERVER = 1,        /**< A connection to a backend is about to be made */
-	CON_STATE_READ_HANDSHAKE = 2,        /**< A handshake packet is to be read from a server */
-	CON_STATE_SEND_HANDSHAKE = 3,        /**< A handshake packet is to be sent to a client */
-	CON_STATE_READ_AUTH = 4,             /**< An authentication packet is to be read from a client */
-	CON_STATE_SEND_AUTH = 5,             /**< An authentication packet is to be sent to a server */
-	CON_STATE_READ_AUTH_RESULT = 6,      /**< The result of an authentication attempt is to be read from a server */
-	CON_STATE_SEND_AUTH_RESULT = 7,      /**< The result of an authentication attempt is to be sent to a client */
-	CON_STATE_READ_AUTH_OLD_PASSWORD = 8,/**< The authentication method used is for pre-4.1 MySQL servers, internal state */
-	CON_STATE_SEND_AUTH_OLD_PASSWORD = 9,/**< The authentication method used is for pre-4.1 MySQL servers, internal state */
-	CON_STATE_READ_QUERY = 10,           /**< COM_QUERY packets are to be read from a client */
-	CON_STATE_SEND_QUERY = 11,           /**< COM_QUERY packets are to be sent to a server */
-	CON_STATE_READ_QUERY_RESULT = 12,    /**< Result set packets are to be read from a server */
-	CON_STATE_SEND_QUERY_RESULT = 13,    /**< Result set packets are to be sent to a client */
-	
-	CON_STATE_CLOSE_CLIENT = 14,         /**< The client connection should be closed */
-	CON_STATE_SEND_ERROR = 15,           /**< An unrecoverable error occurred, leads to sending a MySQL ERR packet to the client and closing the client connection */
-	CON_STATE_ERROR = 16,                /**< An error occurred (malformed/unexpected packet, unrecoverable network error), internal state */
+    CON_STATE_INIT = 0,                  /**< A new client connection was established */
+    CON_STATE_CONNECT_SERVER = 1,        /**< A connection to a backend is about to be made */
+    CON_STATE_READ_HANDSHAKE = 2,        /**< A handshake packet is to be read from a server */
+    CON_STATE_SEND_HANDSHAKE = 3,        /**< A handshake packet is to be sent to a client */
+    CON_STATE_READ_AUTH = 4,             /**< An authentication packet is to be read from a client */
+    CON_STATE_SEND_AUTH = 5,             /**< An authentication packet is to be sent to a server */
+    CON_STATE_READ_AUTH_RESULT = 6,      /**< The result of an authentication attempt is to be read from a server */
+    CON_STATE_SEND_AUTH_RESULT = 7,      /**< The result of an authentication attempt is to be sent to a client */
+    CON_STATE_READ_AUTH_OLD_PASSWORD = 8,/**< The authentication method used is for pre-4.1 MySQL servers, internal state */
+    CON_STATE_SEND_AUTH_OLD_PASSWORD = 9,/**< The authentication method used is for pre-4.1 MySQL servers, internal state */
+    CON_STATE_READ_QUERY = 10,           /**< COM_QUERY packets are to be read from a client */
+    CON_STATE_SEND_QUERY = 11,           /**< COM_QUERY packets are to be sent to a server */
+    CON_STATE_READ_QUERY_RESULT = 12,    /**< Result set packets are to be read from a server */
+    CON_STATE_SEND_QUERY_RESULT = 13,    /**< Result set packets are to be sent to a client */
+    
+    CON_STATE_CLOSE_CLIENT = 14,         /**< The client connection should be closed */
+    CON_STATE_SEND_ERROR = 15,           /**< An unrecoverable error occurred, leads to sending a MySQL ERR packet to the client and closing the client connection */
+    CON_STATE_ERROR = 16,                /**< An error occurred (malformed/unexpected packet, unrecoverable network error), internal state */
 
-	CON_STATE_CLOSE_SERVER = 17,         /**< The server connection should be closed */
+    CON_STATE_CLOSE_SERVER = 17,         /**< The server connection should be closed */
 
-	/* handling the LOAD DATA LOCAL INFILE protocol extensions */
-	CON_STATE_READ_LOCAL_INFILE_DATA = 18,
-	CON_STATE_SEND_LOCAL_INFILE_DATA = 19,
-	CON_STATE_READ_LOCAL_INFILE_RESULT = 20,
-	CON_STATE_SEND_LOCAL_INFILE_RESULT = 21
+    /* handling the LOAD DATA LOCAL INFILE protocol extensions */
+    CON_STATE_READ_LOCAL_INFILE_DATA = 18,
+    CON_STATE_SEND_LOCAL_INFILE_DATA = 19,
+    CON_STATE_READ_LOCAL_INFILE_RESULT = 20,
+    CON_STATE_SEND_LOCAL_INFILE_RESULT = 21
 } network_mysqld_con_state_t;
 
 /**
@@ -247,15 +247,15 @@ typedef enum {
 NETWORK_API const char *network_mysqld_con_state_get_name(network_mysqld_con_state_t state);
 
 typedef struct {
-	guint sub_sql_num;
-	guint sub_sql_exed;
-	GPtrArray* rows;
-	int limit;
-	guint64 affected_rows;
-	guint16 warnings;
+    guint sub_sql_num;
+    guint sub_sql_exed;
+    GPtrArray* rows;
+    int limit;
+    guint64 affected_rows;
+    guint16 warnings;
 } merge_res_t;
 
-#define	VALUE_IS_STRING 1
+#define VALUE_IS_STRING 1
 #define VALUE_IS_MINUS 2
 
 typedef struct {
@@ -302,7 +302,7 @@ typedef struct info_func {
 typedef struct{
     gboolean is_in_transaction;                     // 当前是否在事务中
     gboolean is_set_autocommit;                     // 当前是否是set autocommit语句
-    guint lock_stmt_type;                     		// 当前是否是get_lock或者release_lock语句
+    guint lock_stmt_type;                           // 当前是否是get_lock或者release_lock语句
     volatile gint  exit_phase;                       // 当前connnection的退出状态，使用在kill或者dbproxy shutdown过程
     volatile guint exit_begin_time;
 
@@ -312,8 +312,8 @@ typedef struct{
     gboolean is_row_count;
     info_func   *info_funcs;
 
-    GString* use_db;								// 当前use_db
-    GString* lock_key;								// 当前get_lock或者release_lock语句的lock key
+    GString* use_db;                                // 当前use_db
+    GString* lock_key;                              // 当前get_lock或者release_lock语句的lock key
     GString* set_charset_client;                    // 当前是否是set charset_client语句
     GString* set_charset_results;                   // 当前是否是set charset_results语句
     GString* set_charset_connection;                // 当前是否是set charset_connection语句
@@ -341,124 +341,124 @@ typedef struct {
  * are not set, will cause the MySQL Proxy core to simply forward the received data.
  */
 struct network_mysqld_con {
-	/**
-	 * The current/next state of this connection.
-	 */
-	guint64    con_id;
+    /**
+     * The current/next state of this connection.
+     */
+    guint64    con_id;
 
-	/* 
-	 * When the protocol state machine performs a transition, this variable will contain the next state,
-	 * otherwise, while performing the action at state, it will be set to the connection's current state
-	 * in the MySQL protocol.
-	 * 
-	 * Plugins may update it in a callback to cause an arbitrary state transition, however, this may result
-	 * reaching an invalid state leading to connection errors.
-	 * 
-	 * @see network_mysqld_con_handle
-	 */
-	network_mysqld_con_state_t state;
+    /* 
+     * When the protocol state machine performs a transition, this variable will contain the next state,
+     * otherwise, while performing the action at state, it will be set to the connection's current state
+     * in the MySQL protocol.
+     * 
+     * Plugins may update it in a callback to cause an arbitrary state transition, however, this may result
+     * reaching an invalid state leading to connection errors.
+     * 
+     * @see network_mysqld_con_handle
+     */
+    network_mysqld_con_state_t state;
 
-	/* The current wait event of this connection. */
-	network_mysqld_con_wait_t wait_status;
+    /* The current wait event of this connection. */
+    network_mysqld_con_wait_t wait_status;
 
-	/**
-	 * The server side of the connection as it pertains to the low-level network implementation.
-	 */
-	network_socket *server;
-	/**
-	 * The client side of the connection as it pertains to the low-level network implementation.
-	 */
-	network_socket *client;
+    /**
+     * The server side of the connection as it pertains to the low-level network implementation.
+     */
+    network_socket *server;
+    /**
+     * The client side of the connection as it pertains to the low-level network implementation.
+     */
+    network_socket *client;
 
-	/**
-	 * Function pointers to the plugin's callbacks.
-	 * 
-	 * Plugins don't need set any of these, but if unset, the plugin will not have the opportunity to
-	 * alter the behavior of the corresponding protocol state.
-	 * 
-	 * @note In theory you could use functions from different plugins to handle the various states, but there is no guarantee that
-	 * this will work. Generally the plugins will assume that config is their own chassis_plugin_config (a plugin-private struct)
-	 * and violating this constraint may lead to a crash.
-	 * @see chassis_plugin_config
-	 */
-	network_mysqld_hooks plugins;
-	
-	/**
-	 * A pointer to a plugin-private struct describing configuration parameters.
-	 * 
-	 * @note The actual struct definition used is private to each plugin.
-	 */
-	chassis_plugin_config *config;
+    /**
+     * Function pointers to the plugin's callbacks.
+     * 
+     * Plugins don't need set any of these, but if unset, the plugin will not have the opportunity to
+     * alter the behavior of the corresponding protocol state.
+     * 
+     * @note In theory you could use functions from different plugins to handle the various states, but there is no guarantee that
+     * this will work. Generally the plugins will assume that config is their own chassis_plugin_config (a plugin-private struct)
+     * and violating this constraint may lead to a crash.
+     * @see chassis_plugin_config
+     */
+    network_mysqld_hooks plugins;
+    
+    /**
+     * A pointer to a plugin-private struct describing configuration parameters.
+     * 
+     * @note The actual struct definition used is private to each plugin.
+     */
+    chassis_plugin_config *config;
 
-	/**
-	 * A pointer back to the global, singleton chassis structure.
-	 */
-	chassis *srv; /* our srv object */
+    /**
+     * A pointer back to the global, singleton chassis structure.
+     */
+    chassis *srv; /* our srv object */
 
-	/**
-	 * A boolean flag indicating that this connection should only be used to accept incoming connections.
-	 * 
-	 * It does not follow the MySQL protocol by itself and its client network_socket will always be NULL.
-	 */
-	int is_listen_socket;
+    /**
+     * A boolean flag indicating that this connection should only be used to accept incoming connections.
+     * 
+     * It does not follow the MySQL protocol by itself and its client network_socket will always be NULL.
+     */
+    int is_listen_socket;
 
-	/**
-	 * An integer indicating the result received from a server after sending an authentication request.
-	 * 
-	 * This is used to differentiate between the old, pre-4.1 authentication and the new, 4.1+ one based on the response.
-	 */
-	guint8 auth_result_state;
+    /**
+     * An integer indicating the result received from a server after sending an authentication request.
+     * 
+     * This is used to differentiate between the old, pre-4.1 authentication and the new, 4.1+ one based on the response.
+     */
+    guint8 auth_result_state;
 
-	/** Flag indicating if we the plugin doesn't need the resultset itself.
-	 * 
-	 * If set to TRUE, the plugin needs to see the entire resultset and we will buffer it.
-	 * If set to FALSE, the plugin is not interested in the content of the resultset and we'll
-	 * try to forward the packets to the client directly, even before the full resultset is parsed.
-	 */
-	gboolean resultset_is_needed;
-	/**
-	 * Flag indicating whether we have seen all parts belonging to one resultset.
-	 */
-	gboolean resultset_is_finished;
+    /** Flag indicating if we the plugin doesn't need the resultset itself.
+     * 
+     * If set to TRUE, the plugin needs to see the entire resultset and we will buffer it.
+     * If set to FALSE, the plugin is not interested in the content of the resultset and we'll
+     * try to forward the packets to the client directly, even before the full resultset is parsed.
+     */
+    gboolean resultset_is_needed;
+    /**
+     * Flag indicating whether we have seen all parts belonging to one resultset.
+     */
+    gboolean resultset_is_finished;
 
-	/**
-	 * Flag indicating that we have received a COM_QUIT command.
-	 * 
-	 * This is mainly used to differentiate between the case where the server closed the connection because of some error
-	 * or if the client asked it to close its side of the connection.
-	 * MySQL Proxy would report spurious errors for the latter case, if we failed to track this command.
-	 */
-	gboolean com_quit_seen;
+    /**
+     * Flag indicating that we have received a COM_QUIT command.
+     * 
+     * This is mainly used to differentiate between the case where the server closed the connection because of some error
+     * or if the client asked it to close its side of the connection.
+     * MySQL Proxy would report spurious errors for the latter case, if we failed to track this command.
+     */
+    gboolean com_quit_seen;
 
-	/**
-	 * Contains the parsed packet.
-	 */
-	struct network_mysqld_con_parse parse;
+    /**
+     * Contains the parsed packet.
+     */
+    struct network_mysqld_con_parse parse;
 
-	/**
-	 * An opaque pointer to a structure describing extra connection state needed by the plugin.
-	 * 
-	 * The content and meaning is completely up to each plugin and the chassis will not access this in any way.
-	 * 
-	 * @note In practice, all current plugins and the chassis assume this to be network_mysqld_con_lua_t.
-	 */
-	void *plugin_con_state;
+    /**
+     * An opaque pointer to a structure describing extra connection state needed by the plugin.
+     * 
+     * The content and meaning is completely up to each plugin and the chassis will not access this in any way.
+     * 
+     * @note In practice, all current plugins and the chassis assume this to be network_mysqld_con_lua_t.
+     */
+    void *plugin_con_state;
 
-	connection_status_var_t conn_status_var;
+    connection_status_var_t conn_status_var;
 
-	connection_status_t conn_status;
+    connection_status_t conn_status;
 
-	GHashTable* locks;
+    GHashTable* locks;
 
-	merge_res_t* merge_res;
+    merge_res_t* merge_res;
 
-	GString* challenge;
+    GString* challenge;
 
-	conn_filter_t con_filter_var;
-	gboolean is_in_wait;
-	gint    try_send_query_times;
-	GRWLock server_lock;
-	guint16 server_error_code;
+    conn_filter_t con_filter_var;
+    gboolean is_in_wait;
+    gint    try_send_query_times;
+    GRWLock server_lock;
+    guint16 server_error_code;
 };
 
 
@@ -525,7 +525,7 @@ NETWORK_API void reset_funcs_info(info_func *info_funcs);
 
 #define SEND_INTERNAL_ERR(msg)                                          \
 do {                                                                    \
-	gboolean valid = ISVALID(con->server_error_code);                                                           \
+    gboolean valid = ISVALID(con->server_error_code);                                                           \
     gchar *errmsg = g_strdup_printf("Internal Error: %s", valid ? ERRMSG(con->server_error_code) : msg);        \
     network_mysqld_con_send_error_full_nolog(con->client,               \
                                             errmsg, strlen(errmsg),     \

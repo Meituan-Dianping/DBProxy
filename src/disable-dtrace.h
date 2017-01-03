@@ -34,7 +34,7 @@
 
 /* when adding new DTrace USDT probes, also add the stubs below */
 
-#define	MYSQLPROXY_STATE_CHANGE_ENABLED() FALSE
-#define	MYSQLPROXY_STATE_CHANGE(arg0, arg1, arg2)
+#define MYSQLPROXY_STATE_CHANGE_ENABLED() FALSE
+#define MYSQLPROXY_STATE_CHANGE(arg0, arg1, arg2)
 
 #endif

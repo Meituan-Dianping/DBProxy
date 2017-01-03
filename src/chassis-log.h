@@ -29,11 +29,11 @@
 
 #include "chassis-exports.h"
 
-#define CHASSIS_RESOLUTION_SEC	0x0
-#define CHASSIS_RESOLUTION_MS	0x1
-#define CHASSIS_RESOLUTION_US	0x2
+#define CHASSIS_RESOLUTION_SEC  0x0
+#define CHASSIS_RESOLUTION_MS   0x1
+#define CHASSIS_RESOLUTION_US   0x2
 
-#define CHASSIS_RESOLUTION_DEFAULT	CHASSIS_RESOLUTION_SEC
+#define CHASSIS_RESOLUTION_DEFAULT  CHASSIS_RESOLUTION_SEC
 
 
 #define DEBUG_TRACE_DISABLE         0x00
@@ -51,7 +51,7 @@
 
 #define TRACE_CONNECTION_POOL(mode) ((mode) & DEBUG_TRACE_CONNECTION_POOL)
 #define TRACE_WAIT_EVENT(mode)      ((mode) & DEBUG_TRACE_WAIT_EVENT)
-#define TRACE_SQL(mode)      		((mode) & DEBUG_TRACE_SQL)
+#define TRACE_SQL(mode)             ((mode) & DEBUG_TRACE_SQL)
 #define TRACE_CON_STATUS(mode)      ((mode) & DEBUG_TRACE_CON_STATUS)
 #define TRACE_SHARD(mode)           ((mode) & DEBUG_TRACE_SHARD)
 
@@ -60,27 +60,27 @@
 /** @addtogroup chassis */
 /*@{*/
 typedef struct {
-	GLogLevelFlags min_lvl;
+    GLogLevelFlags min_lvl;
 
-	gchar *log_filename;
-	gint log_file_fd;
+    gchar *log_filename;
+    gint log_file_fd;
 
-	gboolean use_syslog;
+    gboolean use_syslog;
 
 #ifdef _WIN32
-	HANDLE event_source_handle;
-	gboolean use_windows_applog;
+    HANDLE event_source_handle;
+    gboolean use_windows_applog;
 #endif
-	gboolean rotate_logs;
+    gboolean rotate_logs;
 
-	GString *log_ts_str;
-	gint	 log_ts_resolution;	/*<< timestamp resolution (sec, ms) */
+    GString *log_ts_str;
+    gint     log_ts_resolution; /*<< timestamp resolution (sec, ms) */
 
-	GString *last_msg;
-	time_t   last_msg_ts;
-	guint    last_msg_count;
+    GString *last_msg;
+    time_t   last_msg_ts;
+    guint    last_msg_count;
 
-	gint   log_trace_modules;
+    gint   log_trace_modules;
 
     GMutex log_mutex;
 } chassis_log;
@@ -92,7 +92,7 @@ typedef struct {
     int win_evtype;
 } log_lvl;
 
-#define LOG_LVL_MAP_SIZE	6
+#define LOG_LVL_MAP_SIZE    6
 extern const log_lvl log_lvl_map[];
 
 CHASSIS_API chassis_log *chassis_log_init(void) G_GNUC_DEPRECATED;

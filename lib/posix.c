@@ -20,56 +20,56 @@
 #include <lualib.h>
 
 static int lua_getpid (lua_State *L) {
-	lua_pushinteger (L, getpid());
+    lua_pushinteger (L, getpid());
 
-	return 1;
+    return 1;
 }
 
 static int lua_getuid (lua_State *L) {
-	lua_pushinteger (L, getuid());
+    lua_pushinteger (L, getuid());
 
-	return 1;
+    return 1;
 }
 
 #ifdef HAVE_SIGNAL_H
 static int lua_kill (lua_State *L) {
-	pid_t pid = luaL_checkinteger (L, 1);
-	int sig = luaL_checkinteger (L, 2);
+    pid_t pid = luaL_checkinteger (L, 1);
+    int sig = luaL_checkinteger (L, 2);
 
-	lua_pushinteger(L, kill(pid, sig));
+    lua_pushinteger(L, kill(pid, sig));
 
-	return 1;
+    return 1;
 }
 #endif
 
 #ifdef HAVE_PWD_H
 static int lua_getpwuid(lua_State *L) {
-	struct passwd *p;
-	int uid = luaL_checkinteger (L, 1);
+    struct passwd *p;
+    int uid = luaL_checkinteger (L, 1);
 
-	if (NULL == (p = getpwuid( (uid_t)uid )) ) {
-		lua_pushnil(L);
-		return 1;
-	}
+    if (NULL == (p = getpwuid( (uid_t)uid )) ) {
+        lua_pushnil(L);
+        return 1;
+    }
 
-	lua_newtable (L);
-	lua_pushstring (L, "name");
-	lua_pushstring (L, p->pw_name);
-	lua_settable (L, -3);
-	lua_pushstring (L, "uid");
-	lua_pushinteger (L, p->pw_uid);
-	lua_settable (L, -3);
-	lua_pushstring (L, "gid");
-	lua_pushinteger (L, p->pw_gid);
-	lua_settable (L, -3);
-	lua_pushstring (L, "dir");
-	lua_pushstring (L, p->pw_dir);
-	lua_settable (L, -3);
-	lua_pushstring (L, "shell");
-	lua_pushstring (L, p->pw_shell);
-	lua_settable (L, -3);
+    lua_newtable (L);
+    lua_pushstring (L, "name");
+    lua_pushstring (L, p->pw_name);
+    lua_settable (L, -3);
+    lua_pushstring (L, "uid");
+    lua_pushinteger (L, p->pw_uid);
+    lua_settable (L, -3);
+    lua_pushstring (L, "gid");
+    lua_pushinteger (L, p->pw_gid);
+    lua_settable (L, -3);
+    lua_pushstring (L, "dir");
+    lua_pushstring (L, p->pw_dir);
+    lua_settable (L, -3);
+    lua_pushstring (L, "shell");
+    lua_pushstring (L, p->pw_shell);
+    lua_settable (L, -3);
 
-	return 1;
+    return 1;
 }
 #endif
 
@@ -77,28 +77,28 @@ static int lua_getpwuid(lua_State *L) {
 ** Assumes the table is on top of the stack.
 */
 static void set_info (lua_State *L) {
-	lua_pushliteral (L, "_COPYRIGHT");
-	lua_pushliteral (L, "Copyright (C) 2008-2010 Oracle Inc");
-	lua_settable (L, -3);
-	lua_pushliteral (L, "_DESCRIPTION");
-	lua_pushliteral (L, "export posix-functions as posix.*");
-	lua_settable (L, -3);
-	lua_pushliteral (L, "_VERSION");
-	lua_pushliteral (L, "LuaPosix 0.1");
-	lua_settable (L, -3);
+    lua_pushliteral (L, "_COPYRIGHT");
+    lua_pushliteral (L, "Copyright (C) 2008-2010 Oracle Inc");
+    lua_settable (L, -3);
+    lua_pushliteral (L, "_DESCRIPTION");
+    lua_pushliteral (L, "export posix-functions as posix.*");
+    lua_settable (L, -3);
+    lua_pushliteral (L, "_VERSION");
+    lua_pushliteral (L, "LuaPosix 0.1");
+    lua_settable (L, -3);
 }
 
 
 static const struct luaL_reg posixlib[] = {
-	{"getpid", lua_getpid},
-	{"getuid", lua_getuid},
+    {"getpid", lua_getpid},
+    {"getuid", lua_getuid},
 #ifdef HAVE_PWD_H
-	{"getpwuid", lua_getpwuid},
+    {"getpwuid", lua_getpwuid},
 #endif
 #ifdef HAVE_SIGNAL_H
-	{"kill", lua_kill},
+    {"kill", lua_kill},
 #endif
-	{NULL, NULL},
+    {NULL, NULL},
 };
 
 #if defined(_WIN32)
@@ -108,8 +108,8 @@ static const struct luaL_reg posixlib[] = {
 #endif
 
 LUAEXT_API int luaopen_posix (lua_State *L) {
-	luaL_register (L, "posix", posixlib);
-	set_info (L);
-	return 1;
+    luaL_register (L, "posix", posixlib);
+    set_info (L);
+    return 1;
 }
 

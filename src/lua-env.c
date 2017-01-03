@@ -34,20 +34,20 @@
  */
 /* convert a stack index to positive */
 #define abs_index(L, i)         ((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : \
-		                                        lua_gettop(L) + (i) + 1)
+                                                lua_gettop(L) + (i) + 1)
 void lua_getfield_literal (lua_State *L, int idx, const char *k, size_t k_len) {
-	idx = abs_index(L, idx);
+    idx = abs_index(L, idx);
 
-	lua_pushlstring(L, k, k_len);
+    lua_pushlstring(L, k, k_len);
 
-	lua_gettable(L, idx);
+    lua_gettable(L, idx);
 }
 
 /**
  * check pass through the userdata as is 
  */
 void *luaL_checkself (lua_State *L) {
-	return lua_touserdata(L, 1);
+    return lua_touserdata(L, 1);
 }
 
 /**
@@ -60,25 +60,25 @@ void *luaL_checkself (lua_State *L) {
  * keep its location
  */
 int proxy_getmetatable(lua_State *L, const luaL_reg *methods) {
-	/* check if the */
+    /* check if the */
 
-	lua_pushlightuserdata(L, (luaL_reg *)methods);
-	lua_gettable(L, LUA_REGISTRYINDEX);
+    lua_pushlightuserdata(L, (luaL_reg *)methods);
+    lua_gettable(L, LUA_REGISTRYINDEX);
 
-	if (lua_isnil(L, -1)) {
-		/* not found */
-		lua_pop(L, 1);
+    if (lua_isnil(L, -1)) {
+        /* not found */
+        lua_pop(L, 1);
 
-		lua_newtable(L);
-		luaL_register(L, NULL, methods);
+        lua_newtable(L);
+        luaL_register(L, NULL, methods);
 
-		lua_pushlightuserdata(L, (luaL_reg *)methods);
-		lua_pushvalue(L, -2);
-		lua_settable(L, LUA_REGISTRYINDEX);
-	}
-	g_assert(lua_istable(L, -1));
+        lua_pushlightuserdata(L, (luaL_reg *)methods);
+        lua_pushvalue(L, -2);
+        lua_settable(L, LUA_REGISTRYINDEX);
+    }
+    g_assert(lua_istable(L, -1));
 
-	return 1;
+    return 1;
 }
 
 

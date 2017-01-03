@@ -102,12 +102,12 @@ enum Log_event_type
  */
 
 typedef struct {
-	guint64 table_id;
+    guint64 table_id;
 
-	GString *db_name;
-	GString *table_name;
+    GString *db_name;
+    GString *table_name;
 
-	GPtrArray *fields;
+    GPtrArray *fields;
 } network_mysqld_table;
 
 NETWORK_API network_mysqld_table *network_mysqld_table_new();
@@ -115,138 +115,138 @@ NETWORK_API void network_mysqld_table_free(network_mysqld_table *tbl);
 NETWORK_API guint64 *guint64_new(guint64 i);
 
 typedef enum {
-	NETWORK_MYSQLD_BINLOG_CHECKSUM_OFF   = 0,
-	NETWORK_MYSQLD_BINLOG_CHECKSUM_CRC32 = 1,
-	NETWORK_MYSQLD_BINLOG_CHECKSUM_UNDEF = 255
+    NETWORK_MYSQLD_BINLOG_CHECKSUM_OFF   = 0,
+    NETWORK_MYSQLD_BINLOG_CHECKSUM_CRC32 = 1,
+    NETWORK_MYSQLD_BINLOG_CHECKSUM_UNDEF = 255
 } network_mysqld_binlog_checksum;
 
 typedef struct {
-	gchar *filename;
+    gchar *filename;
 
-	/* we have to store some information from the format description event 
-	 */
-	guint header_len;
+    /* we have to store some information from the format description event 
+     */
+    guint header_len;
 
-	/* ... and the table-ids */
-	GHashTable *rbr_tables; /* hashed by table-id -> network_mysqld_table */
+    /* ... and the table-ids */
+    GHashTable *rbr_tables; /* hashed by table-id -> network_mysqld_table */
 
-	network_mysqld_binlog_checksum checksum;
+    network_mysqld_binlog_checksum checksum;
 } network_mysqld_binlog;
 
 NETWORK_API network_mysqld_binlog *network_mysqld_binlog_new();
 NETWORK_API void network_mysqld_binlog_free(network_mysqld_binlog *binlog);
 
 typedef struct {
-	guint32 timestamp;
-	enum Log_event_type event_type;
-	guint32 server_id;
-	guint32 event_size;
-	guint32 log_pos;
-	guint16 flags;
+    guint32 timestamp;
+    enum Log_event_type event_type;
+    guint32 server_id;
+    guint32 event_size;
+    guint32 log_pos;
+    guint16 flags;
 
-	union {
-		struct {
-			guint32 thread_id;
-			guint32 exec_time;
-			guint8  db_name_len;
-			guint16 error_code;
+    union {
+        struct {
+            guint32 thread_id;
+            guint32 exec_time;
+            guint8  db_name_len;
+            guint16 error_code;
 
-			gchar *db_name;
-			gchar *query;
-		} query_event;
-		struct {
-			gchar *binlog_file;
-			guint32 binlog_pos;
-		} rotate_event;
-		struct {
-			guint16 binlog_version;
-			gchar *master_version;
-			guint32 created_ts;
-			guint8  log_header_len;
-			gchar *perm_events;
-			gsize  perm_events_len;
-		} format_event;
-		struct {
-			guint32 name_len;
-			gchar *name;
+            gchar *db_name;
+            gchar *query;
+        } query_event;
+        struct {
+            gchar *binlog_file;
+            guint32 binlog_pos;
+        } rotate_event;
+        struct {
+            guint16 binlog_version;
+            gchar *master_version;
+            guint32 created_ts;
+            guint8  log_header_len;
+            gchar *perm_events;
+            gsize  perm_events_len;
+        } format_event;
+        struct {
+            guint32 name_len;
+            gchar *name;
 
-			guint8 is_null;
-			guint8 type;
-			guint32 charset; /* charset of the string */
+            guint8 is_null;
+            guint8 type;
+            guint32 charset; /* charset of the string */
 
-			guint32 value_len; 
-			gchar *value; /* encoded in binary speak, depends on .type */
-		} user_var_event;
-		struct {
-			guint64 table_id;
-			guint16 flags;
+            guint32 value_len; 
+            gchar *value; /* encoded in binary speak, depends on .type */
+        } user_var_event;
+        struct {
+            guint64 table_id;
+            guint16 flags;
 
-			guint8 db_name_len;
-			gchar *db_name;
-			guint8 table_name_len;
-			gchar *table_name;
+            guint8 db_name_len;
+            gchar *db_name;
+            guint8 table_name_len;
+            gchar *table_name;
 
-			guint64 columns_len;
-			gchar *columns;
+            guint64 columns_len;
+            gchar *columns;
 
-			guint64 metadata_len;
-			gchar *metadata;
+            guint64 metadata_len;
+            gchar *metadata;
 
-			guint32 null_bits_len;
-			gchar *null_bits;
-		} table_map_event;
+            guint32 null_bits_len;
+            gchar *null_bits;
+        } table_map_event;
 
-		struct {
-			guint64 table_id;
-			guint16 flags;
-			
-			guint64 columns_len;
+        struct {
+            guint64 table_id;
+            guint16 flags;
+            
+            guint64 columns_len;
 
-			/* before image */
-			guint32 used_columns_before_len; /* bytes of the used columns bit-mask */
-			gchar *used_columns_before;   /* bit-mask of the columns stored the row */
-			guint32 null_bits_before_len; /* bytes used to store the NULL-bits in the row */
+            /* before image */
+            guint32 used_columns_before_len; /* bytes of the used columns bit-mask */
+            gchar *used_columns_before;   /* bit-mask of the columns stored the row */
+            guint32 null_bits_before_len; /* bytes used to store the NULL-bits in the row */
 
-			/* after image */
-			guint32 used_columns_after_len;
-			gchar *used_columns_after;    /* bit-mask of the columns stored the row */
-			guint32 null_bits_after_len;  /* bytes used to store the NULL-bits in the row */
-			
-			guint32 row_len;
-			gchar *row;      /* raw row-buffer in the format:
-					    [null-bits] [field_0, ...]
-					    [null-bits] [field_0, ...]
-					    */
-		} row_event;
+            /* after image */
+            guint32 used_columns_after_len;
+            gchar *used_columns_after;    /* bit-mask of the columns stored the row */
+            guint32 null_bits_after_len;  /* bytes used to store the NULL-bits in the row */
+            
+            guint32 row_len;
+            gchar *row;      /* raw row-buffer in the format:
+                        [null-bits] [field_0, ...]
+                        [null-bits] [field_0, ...]
+                        */
+        } row_event;
 
-		struct {
-			guint8  type;
-			guint64 value;
-		} intvar;
+        struct {
+            guint8  type;
+            guint64 value;
+        } intvar;
 
-		struct {
-			guint64 xid_id;
-		} xid;
-		struct {
-			guint8 query_len; /* don't use */
-			gchar *query;
-		} rows_query;
-	} event;
+        struct {
+            guint64 xid_id;
+        } xid;
+        struct {
+            guint8 query_len; /* don't use */
+            gchar *query;
+        } rows_query;
+    } event;
 } network_mysqld_binlog_event;
 
 NETWORK_API network_mysqld_binlog_event *network_mysqld_binlog_event_new(void);
 NETWORK_API void network_mysqld_binlog_event_free(network_mysqld_binlog_event *event);
 NETWORK_API int network_mysqld_proto_get_binlog_event_header(network_packet *packet, network_mysqld_binlog_event *event);
 NETWORK_API int network_mysqld_proto_get_binlog_event(network_packet *packet, 
-		network_mysqld_binlog *binlog,
-		network_mysqld_binlog_event *event);
+        network_mysqld_binlog *binlog,
+        network_mysqld_binlog_event *event);
 NETWORK_API int network_mysqld_proto_get_binlog_status(network_packet *packet);
 
 typedef struct {
-	gchar *binlog_file;
-	guint32 binlog_pos;
-	guint16 flags;
-	guint32 server_id;
+    gchar *binlog_file;
+    guint32 binlog_pos;
+    guint16 flags;
+    guint32 server_id;
 } network_mysqld_binlog_dump;
 
 NETWORK_API network_mysqld_binlog_dump *network_mysqld_binlog_dump_new();
@@ -255,7 +255,7 @@ NETWORK_API int network_mysqld_proto_append_binlog_dump(GString *packet, network
 
 
 NETWORK_API int network_mysqld_binlog_event_tablemap_get(
-		network_mysqld_binlog_event *event,
-		network_mysqld_table *tbl);
+        network_mysqld_binlog_event *event,
+        network_mysqld_table *tbl);
 
 #endif

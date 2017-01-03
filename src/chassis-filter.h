@@ -62,10 +62,10 @@ typedef struct reserved_query_item
      gint     item_status;
      gint     item_access_num;
      gint     item_gap_access_num;
-	 GString  *item_rewrite;
-	 GString  *item_rewrite_md5;
-	 GList    *list_pos;
-	 GMutex   rq_item_lock;
+     GString  *item_rewrite;
+     GString  *item_rewrite_md5;
+     GList    *list_pos;
+     GMutex   rq_item_lock;
 } reserved_query_item;
 
 typedef struct sql_reserved_query

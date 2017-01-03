@@ -32,7 +32,7 @@
 
 #else
 
-#define CHASSIS_API		extern
+#define CHASSIS_API     extern
 
 #endif
 

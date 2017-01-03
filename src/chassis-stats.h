@@ -26,10 +26,10 @@
 #include "chassis-exports.h"
 
 typedef struct chassis_stats {
-	volatile gint lua_mem_alloc;
-	volatile gint lua_mem_free;
-	volatile gint lua_mem_bytes;
-	volatile gint lua_mem_bytes_max;
+    volatile gint lua_mem_alloc;
+    volatile gint lua_mem_free;
+    volatile gint lua_mem_bytes;
+    volatile gint lua_mem_bytes_max;
 } chassis_stats_t;
 
 CHASSIS_API chassis_stats_t *chassis_global_stats;

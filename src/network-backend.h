@@ -26,11 +26,11 @@
 #include "config.h"
 #endif
 
-#define PWD_SUCCESS		0
-#define ERR_USER_EXIST		1
-#define ERR_USER_NOT_EXIST	1
-#define ERR_PWD_ENCRYPT		2
-#define ERR_PWD_DECRYPT		2
+#define PWD_SUCCESS     0
+#define ERR_USER_EXIST      1
+#define ERR_USER_NOT_EXIST  1
+#define ERR_PWD_ENCRYPT     2
+#define ERR_PWD_DECRYPT     2
 
 #define ADD_PWD             1
 #define ADD_ENPWD           2
@@ -48,7 +48,7 @@
 #define USER_IDENT      "@"
 #define IPS_SEP         "|"
 #define IP_END          "%"
-#define BACKENDS_SEP	IPS_SEP
+#define BACKENDS_SEP    IPS_SEP
 #define COMMA_SEP       ","
 #define ITEM_SPLIT COMMA_SEP
 
@@ -56,42 +56,42 @@
 #include "network-exports.h"
 
 typedef enum { 
-	BACKEND_STATE_UNKNOWN, 
-	BACKEND_STATE_UP, 
+    BACKEND_STATE_UNKNOWN, 
+    BACKEND_STATE_UP, 
     BACKEND_STATE_PENDING,
-	BACKEND_STATE_DOWN,
-	BACKEND_STATE_OFFLINING,
-	BACKEND_STATE_OFFLINE,
-	BACKEND_STATE_REMOVING
+    BACKEND_STATE_DOWN,
+    BACKEND_STATE_OFFLINING,
+    BACKEND_STATE_OFFLINE,
+    BACKEND_STATE_REMOVING
 } backend_state_t;
 
 typedef enum { 
-	BACKEND_TYPE_UNKNOWN, 
-	BACKEND_TYPE_RW, 
-	BACKEND_TYPE_RO
+    BACKEND_TYPE_UNKNOWN, 
+    BACKEND_TYPE_RW, 
+    BACKEND_TYPE_RO
 } backend_type_t;
 
 
 typedef struct {
-	network_address *addr;
+    network_address *addr;
    
-	volatile backend_state_t state;   /**< UP or DOWN */
-	backend_type_t type;     /**< ReadWrite or ReadOnly */
+    volatile backend_state_t state;   /**< UP or DOWN */
+    backend_type_t type;     /**< ReadWrite or ReadOnly */
 
-	guint64  state_since;    /**< timestamp of the last state-change */
-	guint    offline_timeout;    /* offline timeout */
+    guint64  state_since;    /**< timestamp of the last state-change */
+    guint    offline_timeout;    /* offline timeout */
     volatile guint connected_clients; /**< number of open connections to this backend for SQF */
 
-//	network_connection_pool *pool; /**< the pool of open connections */
-	GPtrArray *pools;
+//  network_connection_pool *pool; /**< the pool of open connections */
+    GPtrArray *pools;
 
-	GString *uuid;           /**< the UUID of the backend */
-	guint weight;
+    GString *uuid;           /**< the UUID of the backend */
+    guint weight;
 
-	GString *slave_tag;
+    GString *slave_tag;
 
-	gint        thread_running;
-	GRWLock     backend_lock;
+    gint        thread_running;
+    GRWLock     backend_lock;
 } network_backend_t;
 
 #define IS_BACKEND_OFFLINE(bk) (g_atomic_int_get(&bk->state) == BACKEND_STATE_OFFLINE)
@@ -123,21 +123,21 @@ typedef struct admin_user_info {
 } admin_user_info;
 
 typedef struct network_backends_tag{
-	g_wrr_poll *wrr_poll;
-	GPtrArray *backends;
+    g_wrr_poll *wrr_poll;
+    GPtrArray *backends;
 } network_backends_tag;
 
 typedef struct {
-	GPtrArray *backends;
-	GHashTable *tag_backends;
-	network_backends_tag *def_backend_tag;
-	GRWLock    backends_lock;	/*remove lock*/
-	g_wrr_poll *global_wrr;
-	guint event_thread_count;
-	gchar *default_file;
-	GHashTable **ip_table;
-	gint *ip_table_index;
-	GPtrArray *raw_ips;
+    GPtrArray *backends;
+    GHashTable *tag_backends;
+    network_backends_tag *def_backend_tag;
+    GRWLock    backends_lock;   /*remove lock*/
+    g_wrr_poll *global_wrr;
+    guint event_thread_count;
+    gchar *default_file;
+    GHashTable **ip_table;
+    gint *ip_table_index;
+    GPtrArray *raw_ips;
 
     gchar *monitor_user;
     gchar *monitor_pwd;

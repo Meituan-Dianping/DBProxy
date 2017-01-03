@@ -37,17 +37,17 @@
 #error You need at least MySQL 4.1 to compile this software. 
 #endif
 
-#define MYSQL_PROTOCOL_VERSION		10
+#define MYSQL_PROTOCOL_VERSION      10
 
-#define MYSQL_PROTOCOL_SERVER_VERSION_56	"5.6.22-71.0-log"
-#define MYSQL_PROTOCOL_VERSION_ID_56		50622
+#define MYSQL_PROTOCOL_SERVER_VERSION_56    "5.6.22-71.0-log"
+#define MYSQL_PROTOCOL_VERSION_ID_56        50622
 
-#define MYSQL_PROTOCOL_SERVER_VERSION_55	"5.5.35-33.0-log"
-#define MYSQL_PROTOCOL_VERSION_ID_55		50535
+#define MYSQL_PROTOCOL_SERVER_VERSION_55    "5.5.35-33.0-log"
+#define MYSQL_PROTOCOL_VERSION_ID_55        50535
 
 // 不支持CLIENT_CONNECT_ATTRS
 #define MYSQL_PROTOCOL_CAPABILITIES (CLIENT_LONG_FLAG | CLIENT_CONNECT_WITH_DB | \
-				CLIENT_PROTOCOL_41 | CLIENT_TRANSACTIONS | CLIENT_SECURE_CONNECTION)
+                CLIENT_PROTOCOL_41 | CLIENT_TRANSACTIONS | CLIENT_SECURE_CONNECTION)
 
 #define UTF8_CHARSET_INDEX 33
 
@@ -80,19 +80,19 @@
 #define PACKET_LEN_MAX     (0x00ffffff)
 
 typedef struct {
-	GString *data;
+    GString *data;
 
-	guint offset;
+    guint offset;
 } network_packet;
 
 NETWORK_API network_packet *network_packet_new(void);
 NETWORK_API void network_packet_free(network_packet *packet);
 
 typedef enum {
-	NETWORK_MYSQLD_LENENC_TYPE_INT,
-	NETWORK_MYSQLD_LENENC_TYPE_NULL,
-	NETWORK_MYSQLD_LENENC_TYPE_EOF,
-	NETWORK_MYSQLD_LENENC_TYPE_ERR
+    NETWORK_MYSQLD_LENENC_TYPE_INT,
+    NETWORK_MYSQLD_LENENC_TYPE_NULL,
+    NETWORK_MYSQLD_LENENC_TYPE_EOF,
+    NETWORK_MYSQLD_LENENC_TYPE_ERR
 } network_mysqld_lenenc_type;
 
 NETWORK_API int network_mysqld_proto_skip(network_packet *packet, gsize size);
@@ -153,18 +153,18 @@ NETWORK_API int network_mysqld_proto_append_lenenc_string_len(GString *packet, c
 NETWORK_API int network_mysqld_proto_append_lenenc_string(GString *packet, const char *s);
 
 NETWORK_API int network_mysqld_proto_password_hash(GString *response,
-		const char *password, gsize password_len);
+        const char *password, gsize password_len);
 NETWORK_API int network_mysqld_proto_password_scramble(GString *response,
-		const char *challenge, gsize challenge_len,
-		const char *hashed_password, gsize hashed_password_len);
+        const char *challenge, gsize challenge_len,
+        const char *hashed_password, gsize hashed_password_len);
 NETWORK_API gboolean network_mysqld_proto_password_check(
-		const char *challenge, gsize challenge_len,
-		const char *response, gsize response_len,
-		const char *double_hashed, gsize double_hashed_len);
+        const char *challenge, gsize challenge_len,
+        const char *response, gsize response_len,
+        const char *double_hashed, gsize double_hashed_len);
 NETWORK_API int network_mysqld_proto_password_unscramble(
-		GString *hashed_password,
-		const char *challenge, gsize challenge_len,
-		const char *response, gsize response_len,
-		const char *double_hashed, gsize double_hashed_len);
+        GString *hashed_password,
+        const char *challenge, gsize challenge_len,
+        const char *response, gsize response_len,
+        const char *double_hashed, gsize double_hashed_len);
 
 #endif

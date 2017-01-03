@@ -40,90 +40,90 @@
  * Initialize an injection struct.
  */
 injection *injection_new(int id, GString *query) {
-	injection *i;
+    injection *i;
     
-	i = g_new0(injection, 1);
-	i->id = id;
-	i->query = query;
-	i->resultset_is_needed = FALSE; /* don't buffer the resultset */
+    i = g_new0(injection, 1);
+    i->id = id;
+    i->query = query;
+    i->resultset_is_needed = FALSE; /* don't buffer the resultset */
     
-	/**
-	 * we have to assume that injection_new() is only used by the read_query call
-	 * which should be fine
-	 */
-	i->ts_read_query = chassis_get_rel_microseconds();
-	/* g_get_current_time(&(i->ts_read_query)); */
+    /**
+     * we have to assume that injection_new() is only used by the read_query call
+     * which should be fine
+     */
+    i->ts_read_query = chassis_get_rel_microseconds();
+    /* g_get_current_time(&(i->ts_read_query)); */
     
-	return i;
+    return i;
 }
 
 /**
  * Free an injection struct
  */
 void injection_free(injection *i) {
-	if (!i) return;
+    if (!i) return;
     
-	if (i->query) g_string_free(i->query, TRUE);
+    if (i->query) g_string_free(i->query, TRUE);
     
-	g_free(i);
+    g_free(i);
 }
 
 network_injection_queue *network_injection_queue_new() {
-	return g_queue_new();
+    return g_queue_new();
 }
 
 void network_injection_queue_free(network_injection_queue *q) {
-	if (!q) return;
+    if (!q) return;
 
-	network_injection_queue_reset(q);
+    network_injection_queue_reset(q);
 
-	g_queue_free(q);
+    g_queue_free(q);
 }
 
 void network_injection_queue_reset(network_injection_queue *q) {
-	injection *inj;
-	if (!q) return;
-	
-	while ((inj = g_queue_pop_head(q))) injection_free(inj);
+    injection *inj;
+    if (!q) return;
+    
+    while ((inj = g_queue_pop_head(q))) injection_free(inj);
 }
 
 void network_injection_queue_append(network_injection_queue *q, injection *inj) {
-	g_queue_push_tail(q, inj);
+    g_queue_push_tail(q, inj);
 }
 
 void network_injection_queue_prepend(network_injection_queue *q, injection *inj) {
-	g_queue_push_head(q, inj);
+    g_queue_push_head(q, inj);
 }
 
 guint network_injection_queue_len(network_injection_queue *q) {
-	return q->length;
+    return q->length;
 }
 /**
  * Initialize a resultset struct
  */
 proxy_resultset_t *proxy_resultset_init() {
-	return proxy_resultset_new();
+    return proxy_resultset_new();
 }
 
 proxy_resultset_t *proxy_resultset_new() {
-	proxy_resultset_t *res;
+    proxy_resultset_t *res;
     
-	res = g_new0(proxy_resultset_t, 1);
+    res = g_new0(proxy_resultset_t, 1);
     
-	return res;
+    return res;
 }
 
 /**
  * Free a resultset struct
  */
 void proxy_resultset_free(proxy_resultset_t *res) {
-	if (!res) return;
+    if (!res) return;
     
-	if (res->fields) {
-		network_mysqld_proto_fielddefs_free(res->fields);
-	}
+    if (res->fields) {
+        network_mysqld_proto_fielddefs_free(res->fields);
+    }
     
-	g_free(res);
+    g_free(res);
 }
 
 

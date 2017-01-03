@@ -40,25 +40,25 @@ typedef struct chassis_plugin_stats chassis_plugin_stats_t;
 typedef struct chassis_plugin_config chassis_plugin_config;
 
 typedef struct chassis_plugin {
-	long      magic;    /**< a magic token to verify that the plugin API matches */
+    long      magic;    /**< a magic token to verify that the plugin API matches */
 
-	gchar    *option_grp_name;     /**< name of the option group (used in --help-<option-grp> */
-	gchar    *name;     /**< user visible name of this plugin */
-	gchar    *version;  /**< the plugin's version number */
-	GModule  *module;   /**< the plugin handle when loaded */
-	
-	chassis_plugin_stats_t *stats;	/**< contains the plugin-specific statistics */
+    gchar    *option_grp_name;     /**< name of the option group (used in --help-<option-grp> */
+    gchar    *name;     /**< user visible name of this plugin */
+    gchar    *version;  /**< the plugin's version number */
+    GModule  *module;   /**< the plugin handle when loaded */
+    
+    chassis_plugin_stats_t *stats;  /**< contains the plugin-specific statistics */
 
-	chassis_plugin_stats_t *(*new_stats)(void);		/**< handler function to initialize the plugin-specific stats */
-	void (*free_stats)(chassis_plugin_stats_t *user_data);	/**< handler function to dealloc the plugin-specific stats */
-	GHashTable *(*get_stats)(chassis_plugin_stats_t *user_data);	/**< handler function to retrieve the plugin-specific stats */
+    chassis_plugin_stats_t *(*new_stats)(void);     /**< handler function to initialize the plugin-specific stats */
+    void (*free_stats)(chassis_plugin_stats_t *user_data);  /**< handler function to dealloc the plugin-specific stats */
+    GHashTable *(*get_stats)(chassis_plugin_stats_t *user_data);    /**< handler function to retrieve the plugin-specific stats */
 
-	chassis_plugin_config *config;  /**< contains the plugin-specific config data */
+    chassis_plugin_config *config;  /**< contains the plugin-specific config data */
 
-	chassis_plugin_config *(*init)(void);   /**< handler function to allocate/initialize a chassis_plugin_config struct */
-	void     (*destroy)(chassis_plugin_config *user_data);  /**< handler function used to deallocate the chassis_plugin_config */
-	chassis_options_t * (*get_options)(chassis_plugin_config *user_data); /**< handler function to obtain the command line argument information */
-	int      (*apply_config)(chassis *chas, chassis_plugin_config * user_data); /**< handler function to set the argument values in the plugin's config */
+    chassis_plugin_config *(*init)(void);   /**< handler function to allocate/initialize a chassis_plugin_config struct */
+    void     (*destroy)(chassis_plugin_config *user_data);  /**< handler function used to deallocate the chassis_plugin_config */
+    chassis_options_t * (*get_options)(chassis_plugin_config *user_data); /**< handler function to obtain the command line argument information */
+    int      (*apply_config)(chassis *chas, chassis_plugin_config * user_data); /**< handler function to set the argument values in the plugin's config */
     void*    (*get_global_state)(chassis_plugin_config *user_data, const char* member);     /**< handler function to retrieve the plugin's global state */
     
 } chassis_plugin;

@@ -53,19 +53,19 @@ typedef socklen_t network_socklen_t;
 #endif
 
 typedef struct {
-	union {
-		struct sockaddr_in ipv4;
-		struct sockaddr_in6 ipv6;
+    union {
+        struct sockaddr_in ipv4;
+        struct sockaddr_in6 ipv6;
 #ifdef HAVE_SYS_UN_H
-		struct sockaddr_un un;
+        struct sockaddr_un un;
 #endif
-		struct sockaddr common;
-	} addr;
+        struct sockaddr common;
+    } addr;
 
-	GString *name; 
-	GString *hostname;
-	network_socklen_t len;
-	gboolean can_unlink_socket; /* set TRUE *only* after successful bind */
+    GString *name; 
+    GString *hostname;
+    network_socklen_t len;
+    gboolean can_unlink_socket; /* set TRUE *only* after successful bind */
 } network_address;
 
 NETWORK_API network_address *network_address_new(void);

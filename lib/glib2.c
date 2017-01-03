@@ -26,64 +26,64 @@
 #include <lualib.h>
 
 static int lua_g_usleep (lua_State *L) {
-	int ms = luaL_checkinteger (L, 1);
+    int ms = luaL_checkinteger (L, 1);
 
-	g_usleep(ms);
+    g_usleep(ms);
 
-	return 0;
+    return 0;
 }
 
 static int lua_g_get_current_time (lua_State *L) {
-	GTimeVal t;
+    GTimeVal t;
 
-	g_get_current_time(&t);
+    g_get_current_time(&t);
 
-	lua_newtable(L);
-	lua_pushinteger(L, t.tv_sec);
-	lua_setfield(L, -2, "tv_sec");
-	lua_pushinteger(L, t.tv_usec);
-	lua_setfield(L, -2, "tv_usec");
+    lua_newtable(L);
+    lua_pushinteger(L, t.tv_sec);
+    lua_setfield(L, -2, "tv_sec");
+    lua_pushinteger(L, t.tv_usec);
+    lua_setfield(L, -2, "tv_usec");
 
-	return 1;
+    return 1;
 }
 
 static int lua_g_checksum_md5 (lua_State *L) {
-	size_t str_len;
-	const char *str = luaL_checklstring (L, 1, &str_len);
-	GChecksum *cs;
+    size_t str_len;
+    const char *str = luaL_checklstring (L, 1, &str_len);
+    GChecksum *cs;
 
-	cs = g_checksum_new(G_CHECKSUM_MD5);
+    cs = g_checksum_new(G_CHECKSUM_MD5);
 
-	g_checksum_update(cs, (guchar *)str, str_len);
+    g_checksum_update(cs, (guchar *)str, str_len);
 
-	lua_pushstring(L, g_checksum_get_string(cs));
+    lua_pushstring(L, g_checksum_get_string(cs));
 
-	g_checksum_free(cs);
+    g_checksum_free(cs);
 
-	return 1;
+    return 1;
 }
 
 /*
 ** Assumes the table is on top of the stack.
 */
 static void set_info (lua_State *L) {
-	lua_pushliteral (L, "_COPYRIGHT");
-	lua_pushliteral (L, "Copyright (c) 2010 Oracle");
-	lua_settable (L, -3);
-	lua_pushliteral (L, "_DESCRIPTION");
-	lua_pushliteral (L, "export glib2-functions as glib.*");
-	lua_settable (L, -3);
-	lua_pushliteral (L, "_VERSION");
-	lua_pushliteral (L, "LuaGlib2 0.1");
-	lua_settable (L, -3);
+    lua_pushliteral (L, "_COPYRIGHT");
+    lua_pushliteral (L, "Copyright (c) 2010 Oracle");
+    lua_settable (L, -3);
+    lua_pushliteral (L, "_DESCRIPTION");
+    lua_pushliteral (L, "export glib2-functions as glib.*");
+    lua_settable (L, -3);
+    lua_pushliteral (L, "_VERSION");
+    lua_pushliteral (L, "LuaGlib2 0.1");
+    lua_settable (L, -3);
 }
 
 
 static const struct luaL_reg gliblib[] = {
-	{"usleep", lua_g_usleep},
-	{"md5", lua_g_checksum_md5},
-	{"get_current_time", lua_g_get_current_time},
-	{NULL, NULL},
+    {"usleep", lua_g_usleep},
+    {"md5", lua_g_checksum_md5},
+    {"get_current_time", lua_g_get_current_time},
+    {NULL, NULL},
 };
 
 #if defined(_WIN32)
@@ -93,7 +93,7 @@ static const struct luaL_reg gliblib[] = {
 #endif
 
 LUAEXT_API int luaopen_glib2 (lua_State *L) {
-	luaL_register (L, "glib2", gliblib);
-	set_info (L);
-	return 1;
+    luaL_register (L, "glib2", gliblib);
+    set_info (L);
+    return 1;
 }

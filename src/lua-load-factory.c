@@ -39,106 +39,106 @@
 #include "lua-load-factory.h"
 
 typedef enum { 
-	LOAD_STATE_PREFIX,
-	LOAD_STATE_BUFFER,
-	LOAD_STATE_POSTFIX,
-	LOAD_STATE_END
+    LOAD_STATE_PREFIX,
+    LOAD_STATE_BUFFER,
+    LOAD_STATE_POSTFIX,
+    LOAD_STATE_END
 } load_factory_state_t;
 
 typedef enum { 
-	LOAD_TYPE_FILE,
-	LOAD_TYPE_BUFFER
+    LOAD_TYPE_FILE,
+    LOAD_TYPE_BUFFER
 } load_factory_type_t;
 
 typedef struct {
-	union {
-		struct {
-			const char *str;
-		} string;
-		struct {
-		       const char *filename;
-		       FILE *f;
-		       char content[1024];
-		} file;
-	} data;
+    union {
+        struct {
+            const char *str;
+        } string;
+        struct {
+               const char *filename;
+               FILE *f;
+               char content[1024];
+        } file;
+    } data;
 
-	const char *prefix;
-	const char *postfix;
+    const char *prefix;
+    const char *postfix;
 
-	load_factory_type_t  type;
-	load_factory_state_t state;
+    load_factory_type_t  type;
+    load_factory_state_t state;
 } load_factory_t;
 
 #ifdef HAVE_LUA_H
 const char *loadstring_factory_reader(lua_State G_GNUC_UNUSED *L, void *data, size_t *size) {
-	load_factory_t *factory = data;
+    load_factory_t *factory = data;
 
-	switch (factory->state) {
-	case LOAD_STATE_PREFIX:
-		*size = strlen(factory->prefix);
-		factory->state = LOAD_STATE_BUFFER;
-		return factory->prefix;
-	case LOAD_STATE_BUFFER:
-		switch (factory->type) {
-		case LOAD_TYPE_BUFFER:
-			*size = strlen(factory->data.string.str);
-			factory->state = LOAD_STATE_POSTFIX;
-			return factory->data.string.str;
-		case LOAD_TYPE_FILE:
-			g_assert(NULL != factory->data.file.f);
-			*size = fread(factory->data.file.content, 1, sizeof(factory->data.file.content), factory->data.file.f);
+    switch (factory->state) {
+    case LOAD_STATE_PREFIX:
+        *size = strlen(factory->prefix);
+        factory->state = LOAD_STATE_BUFFER;
+        return factory->prefix;
+    case LOAD_STATE_BUFFER:
+        switch (factory->type) {
+        case LOAD_TYPE_BUFFER:
+            *size = strlen(factory->data.string.str);
+            factory->state = LOAD_STATE_POSTFIX;
+            return factory->data.string.str;
+        case LOAD_TYPE_FILE:
+            g_assert(NULL != factory->data.file.f);
+            *size = fread(factory->data.file.content, 1, sizeof(factory->data.file.content), factory->data.file.f);
 
-			if (*size == 0) {
-				/* eof */
-				factory->data.file.content[0] = '\n';
-				factory->data.file.content[1] = '\0';
+            if (*size == 0) {
+                /* eof */
+                factory->data.file.content[0] = '\n';
+                factory->data.file.content[1] = '\0';
 
-				factory->state = LOAD_STATE_POSTFIX;
-				*size = 1;
-			}
-			
-			return factory->data.file.content;
-		}
-	case LOAD_STATE_POSTFIX:
-		*size = strlen(factory->postfix);
-		factory->state = LOAD_STATE_END;
-		return factory->postfix;
-	case LOAD_STATE_END:
-		return NULL;
-	}
+                factory->state = LOAD_STATE_POSTFIX;
+                *size = 1;
+            }
+            
+            return factory->data.file.content;
+        }
+    case LOAD_STATE_POSTFIX:
+        *size = strlen(factory->postfix);
+        factory->state = LOAD_STATE_END;
+        return factory->postfix;
+    case LOAD_STATE_END:
+        return NULL;
+    }
 
-	return NULL;
+    return NULL;
 }
 
 int luaL_loadstring_factory(lua_State *L, const char *s) {
-	load_factory_t factory;
+    load_factory_t factory;
 
-	factory.type = LOAD_TYPE_BUFFER;
-	factory.data.string.str = s;
-	factory.state = LOAD_STATE_PREFIX;
-	factory.prefix = "return function()";
-	factory.postfix = "end\n";
+    factory.type = LOAD_TYPE_BUFFER;
+    factory.data.string.str = s;
+    factory.state = LOAD_STATE_PREFIX;
+    factory.prefix = "return function()";
+    factory.postfix = "end\n";
 
-	return lua_load(L, loadstring_factory_reader, &factory, s);
+    return lua_load(L, loadstring_factory_reader, &factory, s);
 }
 
 int luaL_loadfile_factory(lua_State *L, const char *filename) {
-	int ret;
-	load_factory_t factory;
+    int ret;
+    load_factory_t factory;
 
-	factory.type = LOAD_TYPE_FILE;
-	factory.data.file.filename = filename;
-	factory.state = LOAD_STATE_PREFIX;
-	factory.prefix = "return function()";
-	factory.postfix = "end\n";
+    factory.type = LOAD_TYPE_FILE;
+    factory.data.file.filename = filename;
+    factory.state = LOAD_STATE_PREFIX;
+    factory.prefix = "return function()";
+    factory.postfix = "end\n";
 
-	factory.data.file.f = fopen(filename, "rb");
+    factory.data.file.f = fopen(filename, "rb");
 
-	ret = lua_load(L, loadstring_factory_reader, &factory, filename);
+    ret = lua_load(L, loadstring_factory_reader, &factory, filename);
 
-	fclose(factory.data.file.f);
+    fclose(factory.data.file.f);
 
-	return ret;
+    return ret;
 }
 #endif
 

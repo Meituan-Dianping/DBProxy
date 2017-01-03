@@ -44,29 +44,29 @@ extern __thread cur_thid;
  * a event-thread
  */
 typedef struct {
-	chassis *chas;
+    chassis *chas;
 
-	//int notify_fd;
-	int notify_receive_fd;
-	int notify_send_fd;
+    //int notify_fd;
+    int notify_receive_fd;
+    int notify_send_fd;
 
-	struct event notify_fd_event;
+    struct event notify_fd_event;
 
-	GThread *thr;
+    GThread *thr;
 
-	struct event_base *event_base;
+    struct event_base *event_base;
 
-	guint index;
+    guint index;
 
-	GRWLock	connection_lock;
-	GList *connection_list;
-	guint connection_nums;
+    GRWLock connection_lock;
+    GList *connection_list;
+    guint connection_nums;
 
-	GAsyncQueue *event_queue;
+    GAsyncQueue *event_queue;
 
-	thread_status_var_t thread_status_var;
-	volatile gint    exit_phase;        /* thread exit status: SHUTDOWN NORMAL or DON'T EXIT. */
-	guint64  cur_max_con_idx;   /* used for generating new connection id in thread. */
+    thread_status_var_t thread_status_var;
+    volatile gint    exit_phase;        /* thread exit status: SHUTDOWN NORMAL or DON'T EXIT. */
+    guint64  cur_max_con_idx;   /* used for generating new connection id in thread. */
 } chassis_event_thread_t;
 
 CHASSIS_API chassis_event_thread_t *chassis_event_thread_new();

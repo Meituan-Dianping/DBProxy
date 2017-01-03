@@ -107,10 +107,10 @@ CHASSIS_API int chassis_frontend_init_lua_cpath(const char *set_path, const char
  * @param gerr           a pointer to a clean GError * or NULL in case the possible error should be ignored
  */
 CHASSIS_API int chassis_frontend_init_base_options(GOptionContext *option_ctx,
-		int *argc_p, char ***argv_p,
-		int *print_version,
-		char **config_file,
-		GError **gerr);
+        int *argc_p, char ***argv_p,
+        int *print_version,
+        char **config_file,
+        GError **gerr);
 
 /**
  * load the plugins
@@ -127,8 +127,8 @@ CHASSIS_API int chassis_frontend_init_base_options(GOptionContext *option_ctx,
  * @see chassis_frontend_init_plugins
  */
 CHASSIS_API int chassis_frontend_load_plugins(GPtrArray *plugins,
-		const gchar *plugin_dir,
-		gchar **plugin_names);
+        const gchar *plugin_dir,
+        gchar **plugin_names);
 
 /**
  * init the loaded plugins and setup their config
@@ -144,12 +144,12 @@ CHASSIS_API int chassis_frontend_load_plugins(GPtrArray *plugins,
  * @see chassis_frontend_init_basedir, chassis_frontend_init_plugins
  */
 CHASSIS_API int chassis_frontend_init_plugins(GPtrArray *plugins,
-		GOptionContext *option_ctx,
-		int *argc_p, char ***argv_p,
-		GKeyFile *keyfile,
-		const char *keyfile_section_name,
-		const char *base_dir,
-		GError **gerr);
+        GOptionContext *option_ctx,
+        int *argc_p, char ***argv_p,
+        GKeyFile *keyfile,
+        const char *keyfile_section_name,
+        const char *base_dir,
+        GError **gerr);
 
 /**
  * print the versions of the initialized plugins
@@ -168,8 +168,8 @@ CHASSIS_API void chassis_frontend_print_lua_version();
 CHASSIS_API int chassis_frontend_write_pidfile(const char *pid_file, GError **gerr);
 
 CHASSIS_API int chassis_options_set_cmdline_only_options(chassis_options_t *opts,
-		int *print_version,
-		char **config_file);
+        int *print_version,
+        char **config_file);
 
 
 CHASSIS_API int chassis_frontend_options_free(GOptionEntry *entries);

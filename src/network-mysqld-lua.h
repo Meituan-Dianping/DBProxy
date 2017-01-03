@@ -28,17 +28,17 @@
 #include "network-exports.h"
 
 typedef enum {
-	PROXY_NO_DECISION,
-	PROXY_SEND_QUERY,
-	PROXY_SEND_RESULT,
-	PROXY_SEND_INJECTION,
-	PROXY_IGNORE_RESULT       /** for read_query_result */
+    PROXY_NO_DECISION,
+    PROXY_SEND_QUERY,
+    PROXY_SEND_RESULT,
+    PROXY_SEND_INJECTION,
+    PROXY_IGNORE_RESULT       /** for read_query_result */
 } network_mysqld_lua_stmt_ret;
 
 typedef enum {
-	REGISTER_CALLBACK_SUCCESS,
-	REGISTER_CALLBACK_LOAD_FAILED,
-	REGISTER_CALLBACK_EXECUTE_FAILED
+    REGISTER_CALLBACK_SUCCESS,
+    REGISTER_CALLBACK_LOAD_FAILED,
+    REGISTER_CALLBACK_EXECUTE_FAILED
 } network_mysqld_register_callback_ret;
 
 NETWORK_API int network_mysqld_con_getmetatable(lua_State *L);
@@ -52,27 +52,27 @@ NETWORK_API void network_mysqld_lua_setup_global(lua_State *L, chassis *chas);
  * @todo Simplify this structure, it should be folded into network_mysqld_con_lua_t.
  */
 struct network_mysqld_con_lua_injection {
-	network_injection_queue *queries;	/**< An ordered list of queries we want to have executed. */
-	int sent_resultset;					/**< Flag to make sure we send only one result back to the client. */
+    network_injection_queue *queries;   /**< An ordered list of queries we want to have executed. */
+    int sent_resultset;                 /**< Flag to make sure we send only one result back to the client. */
 };
 /**
  * Contains extra connection state used for Lua-based plugins.
  */
 typedef struct {
-	struct network_mysqld_con_lua_injection injected;	/**< A list of queries to send to the backend.*/
+    struct network_mysqld_con_lua_injection injected;   /**< A list of queries to send to the backend.*/
 
-	lua_State *L;                  /**< The Lua interpreter state of the current connection. */
-	int L_ref;                     /**< The reference into the lua_scope's registry (a global structure in the Lua interpreter) */
+    lua_State *L;                  /**< The Lua interpreter state of the current connection. */
+    int L_ref;                     /**< The reference into the lua_scope's registry (a global structure in the Lua interpreter) */
 
-	network_backend_t *backend;
-	int backend_ndx;               /**< [lua] index into the backend-array */
+    network_backend_t *backend;
+    int backend_ndx;               /**< [lua] index into the backend-array */
 
-	gboolean connection_close;     /**< [lua] set by the lua code to close a connection */
+    gboolean connection_close;     /**< [lua] set by the lua code to close a connection */
 
-	struct timeval interval;       /**< The interval to be used for evt_timer, currently unused. */
-	struct event evt_timer;        /**< The event structure used to implement the timer callback, currently unused. */
+    struct timeval interval;       /**< The interval to be used for evt_timer, currently unused. */
+    struct event evt_timer;        /**< The event structure used to implement the timer callback, currently unused. */
 
-	gboolean is_reconnecting;      /**< if true, critical messages concerning failed connect() calls are suppressed, as they are expected errors */
+    gboolean is_reconnecting;      /**< if true, critical messages concerning failed connect() calls are suppressed, as they are expected errors */
 } network_mysqld_con_lua_t;
 
 NETWORK_API network_mysqld_con_lua_t *network_mysqld_con_lua_new();

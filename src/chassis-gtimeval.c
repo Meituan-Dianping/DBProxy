@@ -24,25 +24,25 @@
 
 void chassis_gtime_testset_now(GTimeVal *gt, gint64 *delay)
 {
-	GTimeVal	now;
-	gint64		tdiff;
+    GTimeVal    now;
+    gint64      tdiff;
 
-	if (gt == NULL)
-		return;
+    if (gt == NULL)
+        return;
 
-	g_get_current_time(&now);
-	ge_gtimeval_diff(gt, &now, &tdiff);
+    g_get_current_time(&now);
+    ge_gtimeval_diff(gt, &now, &tdiff);
 
-	if (tdiff < 0) {
-		g_critical("%s: time went backwards (%"G_GINT64_FORMAT" usec)!",
-				G_STRLOC, tdiff);
-		gt->tv_usec = gt->tv_sec = 0;
-		goto out;
-	}
+    if (tdiff < 0) {
+        g_critical("%s: time went backwards (%"G_GINT64_FORMAT" usec)!",
+                G_STRLOC, tdiff);
+        gt->tv_usec = gt->tv_sec = 0;
+        goto out;
+    }
 
-	*gt = now;
+    *gt = now;
 out:
-	if (delay != NULL)
-		*delay = tdiff;
-	return;
+    if (delay != NULL)
+        *delay = tdiff;
+    return;
 }

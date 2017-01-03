@@ -33,7 +33,7 @@ typedef guint64 ulonglong;
 
 #ifndef HAVE_ULONG
 #ifdef HAVE_ULONG_T
-typedef ulong_t	ulong;
+typedef ulong_t ulong;
 #else /* HAVE_ULONG_T */
 typedef guint32 ulong;
 #endif /* HAVE_ULONG_T */

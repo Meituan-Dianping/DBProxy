@@ -26,23 +26,23 @@
 #include "network-mysqld-proto.h"
 
 typedef struct {
-	guint32   master_lines;
-	GString  *master_log_file;
-	guint32   master_log_pos;
-	GString  *master_host;
-	GString  *master_user;
-	GString  *master_password;
-	guint32   master_port;
-	guint32   master_connect_retry;
+    guint32   master_lines;
+    GString  *master_log_file;
+    guint32   master_log_pos;
+    GString  *master_host;
+    GString  *master_user;
+    GString  *master_password;
+    guint32   master_port;
+    guint32   master_connect_retry;
 
-	guint32   master_ssl;          /* if ssl is compiled in */
-	GString  *master_ssl_ca;
-	GString  *master_ssl_capath;
-	GString  *master_ssl_cert;
-	GString  *master_ssl_cipher;
-	GString  *master_ssl_key;
+    guint32   master_ssl;          /* if ssl is compiled in */
+    GString  *master_ssl_ca;
+    GString  *master_ssl_capath;
+    GString  *master_ssl_cert;
+    GString  *master_ssl_cipher;
+    GString  *master_ssl_key;
 
-	guint32   master_ssl_verify_server_cert; /* 5.1.16+ */
+    guint32   master_ssl_verify_server_cert; /* 5.1.16+ */
 } network_mysqld_masterinfo_t;
 
 NETWORK_API network_mysqld_masterinfo_t * network_mysqld_masterinfo_new(void);

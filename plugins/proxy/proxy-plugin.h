@@ -20,7 +20,7 @@
  
 
 #ifndef _PROXY_PLUGIN_H
-#define	_PROXY_PLUGIN_H
+#define _PROXY_PLUGIN_H
 
 #include <glib.h>
 #include "network-mysqld.h"
@@ -119,5 +119,5 @@ struct chassis_plugin_config {
 };
 
 extern chassis_plugin_config *config;
-#endif	/* _PROXY_PLUGIN_H */
+#endif  /* _PROXY_PLUGIN_H */
 

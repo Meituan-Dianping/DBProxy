@@ -15,37 +15,37 @@
 #include "lauxlib.h"
 
 
-#define VERSION		"0.8"
-#define PATTERN_T	"pattern"
+#define VERSION     "0.8"
+#define PATTERN_T   "pattern"
 
 /* maximum call/backtrack levels */
-#define MAXBACK		400
+#define MAXBACK     400
 
 /* initial size for capture's list */
-#define IMAXCAPTURES	600
+#define IMAXCAPTURES    600
 
 
 /* index, on Lua stack, for subject */
-#define SUBJIDX		2
+#define SUBJIDX     2
 
 /* number of fixed arguments to 'match' (before capture arguments) */
-#define FIXEDARGS	3
+#define FIXEDARGS   3
 
 /* index, on Lua stack, for substitution value cache */
-#define subscache(ptop)	((ptop) + 1)
+#define subscache(ptop) ((ptop) + 1)
 
 /* index, on Lua stack, for capture list */
-#define caplistidx(ptop)	((ptop) + 2)
+#define caplistidx(ptop)    ((ptop) + 2)
 
 /* index, on Lua stack, for pattern's fenv */
-#define penvidx(ptop)	((ptop) + 3)
+#define penvidx(ptop)   ((ptop) + 3)
 
 
 
 typedef unsigned char byte;
 
 
-#define CHARSETSIZE		((UCHAR_MAX/CHAR_BIT) + 1)
+#define CHARSETSIZE     ((UCHAR_MAX/CHAR_BIT) + 1)
 
 
 typedef byte Charset[CHARSETSIZE];
@@ -71,45 +71,45 @@ typedef enum Opcode {
 } Opcode;
 
 
-#define ISJMP		1
-#define ISCHECK		2
-#define ISTEST		4
-#define ISNOFAIL	8
-#define ISCAPTURE	16
-#define ISMOVABLE	32
-#define ISFENVOFF	64
-#define HASCHARSET	128
+#define ISJMP       1
+#define ISCHECK     2
+#define ISTEST      4
+#define ISNOFAIL    8
+#define ISCAPTURE   16
+#define ISMOVABLE   32
+#define ISFENVOFF   64
+#define HASCHARSET  128
 
 static const byte opproperties[] = {
-  /* IAny */		ISCHECK,
-  /* IChar */		ISCHECK,
-  /* ISet */		ISCHECK | HASCHARSET,
-  /* IZSet */		ISCHECK | HASCHARSET,
-  /* ITestAny */	ISJMP | ISTEST | ISNOFAIL,
-  /* ITestChar */	ISJMP | ISTEST | ISNOFAIL,
-  /* ITestSet */	ISJMP | ISTEST | ISNOFAIL | HASCHARSET,
-  /* ITestZSet */	ISJMP | ISTEST | ISNOFAIL | HASCHARSET,
-  /* ISpan */		ISNOFAIL | HASCHARSET,
-  /* ISpanZ */		ISNOFAIL | HASCHARSET,
-  /* IRet */		0,
-  /* IEnd */		0,
-  /* IChoice */		ISJMP,
-  /* IJmp */		ISJMP | ISNOFAIL,
-  /* ICall */		ISJMP,
-  /* IOpenCall */	ISFENVOFF,
-  /* ICommit */		ISJMP,
-  /* IPartialCommit */	ISJMP,
-  /* IBackCommit */	ISJMP,
-  /* IFailTwice */	0,
-  /* IFail */		0,
-  /* IGiveup */		0,
-  /* IFunc */		0,
-  /* IFullCapture */	ISCAPTURE | ISNOFAIL | ISFENVOFF,
-  /* IEmptyCapture */	ISCAPTURE | ISNOFAIL | ISMOVABLE,
+  /* IAny */        ISCHECK,
+  /* IChar */       ISCHECK,
+  /* ISet */        ISCHECK | HASCHARSET,
+  /* IZSet */       ISCHECK | HASCHARSET,
+  /* ITestAny */    ISJMP | ISTEST | ISNOFAIL,
+  /* ITestChar */   ISJMP | ISTEST | ISNOFAIL,
+  /* ITestSet */    ISJMP | ISTEST | ISNOFAIL | HASCHARSET,
+  /* ITestZSet */   ISJMP | ISTEST | ISNOFAIL | HASCHARSET,
+  /* ISpan */       ISNOFAIL | HASCHARSET,
+  /* ISpanZ */      ISNOFAIL | HASCHARSET,
+  /* IRet */        0,
+  /* IEnd */        0,
+  /* IChoice */     ISJMP,
+  /* IJmp */        ISJMP | ISNOFAIL,
+  /* ICall */       ISJMP,
+  /* IOpenCall */   ISFENVOFF,
+  /* ICommit */     ISJMP,
+  /* IPartialCommit */  ISJMP,
+  /* IBackCommit */ ISJMP,
+  /* IFailTwice */  0,
+  /* IFail */       0,
+  /* IGiveup */     0,
+  /* IFunc */       0,
+  /* IFullCapture */    ISCAPTURE | ISNOFAIL | ISFENVOFF,
+  /* IEmptyCapture */   ISCAPTURE | ISNOFAIL | ISMOVABLE,
   /* IEmptyCaptureIdx */ISCAPTURE | ISNOFAIL | ISMOVABLE | ISFENVOFF,
-  /* IOpenCapture */	ISCAPTURE | ISNOFAIL | ISMOVABLE | ISFENVOFF,
-  /* ICloseCapture */	ISCAPTURE | ISNOFAIL | ISMOVABLE | ISFENVOFF,
-  /* ICloseRunTime */	ISCAPTURE | ISFENVOFF
+  /* IOpenCapture */    ISCAPTURE | ISNOFAIL | ISMOVABLE | ISFENVOFF,
+  /* ICloseCapture */   ISCAPTURE | ISNOFAIL | ISMOVABLE | ISFENVOFF,
+  /* ICloseRunTime */   ISCAPTURE | ISFENVOFF
 };
 
 
@@ -125,22 +125,22 @@ typedef union Instruction {
 
 static const Instruction giveup = {{IGiveup, 0, 0}};
 
-#define getkind(op)	((op)->i.aux & 0xF)
-#define getoff(op)	(((op)->i.aux >> 4) & 0xF)
+#define getkind(op) ((op)->i.aux & 0xF)
+#define getoff(op)  (((op)->i.aux >> 4) & 0xF)
 
-#define dest(p,x)	((x) + ((p)+(x))->i.offset)
+#define dest(p,x)   ((x) + ((p)+(x))->i.offset)
 
-#define MAXOFF		0xF
+#define MAXOFF      0xF
 
-#define isprop(op,p)	(opproperties[(op)->i.code] & (p))
-#define isjmp(op)	isprop(op, ISJMP)
-#define iscapture(op) 	isprop(op, ISCAPTURE)
-#define ischeck(op)	isprop(op, ISCHECK)
-#define istest(op)	isprop(op, ISTEST)
-#define isnofail(op)	isprop(op, ISNOFAIL)
-#define ismovable(op)	isprop(op, ISMOVABLE)
-#define isfenvoff(op)	isprop(op, ISFENVOFF)
-#define hascharset(op)	isprop(op, HASCHARSET)
+#define isprop(op,p)    (opproperties[(op)->i.code] & (p))
+#define isjmp(op)   isprop(op, ISJMP)
+#define iscapture(op)   isprop(op, ISCAPTURE)
+#define ischeck(op) isprop(op, ISCHECK)
+#define istest(op)  isprop(op, ISTEST)
+#define isnofail(op)    isprop(op, ISNOFAIL)
+#define ismovable(op)   isprop(op, ISMOVABLE)
+#define isfenvoff(op)   isprop(op, ISFENVOFF)
+#define hascharset(op)  isprop(op, HASCHARSET)
 
 
 /* kinds of captures */
@@ -149,7 +149,7 @@ typedef enum CapKind {
   Cquery, Cstring, Csubst, Caccum, Cruntime
 } CapKind;
 
-#define iscapnosize(k)	((k) == Cposition || (k) == Cconst)
+#define iscapnosize(k)  ((k) == Cposition || (k) == Cconst)
 
 
 typedef struct Capture {
@@ -161,23 +161,23 @@ typedef struct Capture {
 
 
 /* maximum size (in elements) for a pattern */
-#define MAXPATTSIZE	(SHRT_MAX - 10)
+#define MAXPATTSIZE (SHRT_MAX - 10)
 
 
 /* size (in elements) for an instruction plus extra l bytes */
-#define instsize(l)	(((l) - 1)/sizeof(Instruction) + 2)
+#define instsize(l) (((l) - 1)/sizeof(Instruction) + 2)
 
 
 /* size (in elements) for a ISet instruction */
-#define CHARSETINSTSIZE		instsize(CHARSETSIZE)
+#define CHARSETINSTSIZE     instsize(CHARSETSIZE)
 
 
 
-#define loopset(v,b)	{ int v; for (v = 0; v < CHARSETSIZE; v++) b; }
+#define loopset(v,b)    { int v; for (v = 0; v < CHARSETSIZE; v++) b; }
 
 
-#define testchar(st,c)	(((int)(st)[((c) >> 3)] & (1 << ((c) & 7))))
-#define setchar(st,c)	((st)[(c) >> 3] |= (1 << ((c) & 7)))
+#define testchar(st,c)  (((int)(st)[((c) >> 3)] & (1 << ((c) & 7))))
+#define setchar(st,c)   ((st)[(c) >> 3] |= (1 << ((c) & 7)))
 
 
 
@@ -814,7 +814,7 @@ static void rotate (Instruction *p, int e, int n) {
 }
 
 
-#define op_step(p)	((p)->i.code == IAny ? (p)->i.aux : 1)
+#define op_step(p)  ((p)->i.code == IAny ? (p)->i.aux : 1)
 
 
 static int skipchecks (Instruction *p, int up, int *pn) {
@@ -829,7 +829,7 @@ static int skipchecks (Instruction *p, int up, int *pn) {
 }
 
 
-#define ismovablecap(op)	(ismovable(op) && getoff(op) < MAXOFF)
+#define ismovablecap(op)    (ismovable(op) && getoff(op) < MAXOFF)
 
 static void optimizecaptures (Instruction *p) {
   int i;
@@ -934,9 +934,9 @@ static int jointable (lua_State *L, int p1) {
 }
 
 
-#define copypatt(p1,p2,sz)	memcpy(p1, p2, (sz) * sizeof(Instruction));
+#define copypatt(p1,p2,sz)  memcpy(p1, p2, (sz) * sizeof(Instruction));
 
-#define pattsize(L,idx)		(lua_objlen(L, idx)/sizeof(Instruction) - 1)
+#define pattsize(L,idx)     (lua_objlen(L, idx)/sizeof(Instruction) - 1)
 
 
 static int addpatt (lua_State *L, Instruction *p, int p1idx) {
@@ -961,7 +961,7 @@ static void setinstaux (Instruction *i, Opcode op, int offset, int aux) {
   i->i.aux = aux;
 }
 
-#define setinst(i,op,off)	setinstaux(i,op,off,0)
+#define setinst(i,op,off)   setinstaux(i,op,off,0)
 
 #define setinstcap(i,op,idx,k,n)  setinstaux(i,op,idx,((k) | ((n) << 4)))
 
@@ -1042,7 +1042,7 @@ static int exclusive (CharsetTag *c1, CharsetTag *c2) {
 }
 
 
-#define correctset(p)	{ if (testchar(p[1].buff, '\0')) p->i.code++; }
+#define correctset(p)   { if (testchar(p[1].buff, '\0')) p->i.code++; }
 
 
 static Instruction *newcharset (lua_State *L) {
@@ -1268,7 +1268,7 @@ static int pattern_l (lua_State *L) {
 }
 
 
-#define isany(p)	((p)->i.code == IAny && ((p) + 1)->i.code == IEnd)
+#define isany(p)    ((p)->i.code == IAny && ((p) + 1)->i.code == IEnd)
 
 
 static int concat_l (lua_State *L) {
@@ -1726,13 +1726,13 @@ typedef struct CapState {
 } CapState;
 
 
-#define captype(cap)	((cap)->kind)
+#define captype(cap)    ((cap)->kind)
 
-#define isclosecap(cap)	(captype(cap) == Cclose)
+#define isclosecap(cap) (captype(cap) == Cclose)
 
-#define closeaddr(c)	((c)->s + (c)->siz - 1)
+#define closeaddr(c)    ((c)->s + (c)->siz - 1)
 
-#define isfullcap(cap)	((cap)->siz != 0)
+#define isfullcap(cap)  ((cap)->siz != 0)
 
 #define pushluaval(cs) lua_rawgeti((cs)->L, penvidx((cs)->ptop), (cs)->cap->idx)
 
@@ -1904,7 +1904,7 @@ typedef struct StrAux {
   const char *e;
 } StrAux;
 
-#define MAXSTRCAPS	10
+#define MAXSTRCAPS  10
 
 static int getstrcaps (CapState *cs, StrAux *cps, int n) {
   int k = n++;

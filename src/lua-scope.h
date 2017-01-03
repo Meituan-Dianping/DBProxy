@@ -36,12 +36,12 @@
 
 typedef struct {
 #ifdef HAVE_LUA_H
-	lua_State *L;
-	int L_ref;
+    lua_State *L;
+    int L_ref;
 #endif
-	GMutex mutex;	/*remove lock*/
+    GMutex mutex;   /*remove lock*/
 
-	int L_top;
+    int L_top;
 } lua_scope;
 
 CHASSIS_API lua_scope *lua_scope_init(void) G_GNUC_DEPRECATED;
@@ -52,10 +52,10 @@ CHASSIS_API void lua_scope_get(lua_scope *sc, const char* pos);
 CHASSIS_API void lua_scope_release(lua_scope *sc, const char* pos);
 
 #define LOCK_LUA(sc) \
-	lua_scope_get(sc, G_STRLOC); 
+    lua_scope_get(sc, G_STRLOC); 
 
 #define UNLOCK_LUA(sc) \
-	lua_scope_release(sc, G_STRLOC); 
+    lua_scope_release(sc, G_STRLOC); 
 
 #ifdef HAVE_LUA_H
 CHASSIS_API lua_State *lua_scope_load_script(lua_scope *sc, const gchar *name);

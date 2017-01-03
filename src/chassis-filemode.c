@@ -28,7 +28,7 @@
 #include "chassis-filemode.h"
 
 int chassis_filemode_check(const gchar *filename) {
-	return chassis_filemode_check_full(filename, CHASSIS_FILEMODE_SECURE_MASK, NULL);
+    return chassis_filemode_check_full(filename, CHASSIS_FILEMODE_SECURE_MASK, NULL);
 }
 
 /*
@@ -44,31 +44,31 @@ int chassis_filemode_check(const gchar *filename) {
  */
 int chassis_filemode_check_full(const gchar *filename, int required_filemask, GError **gerr) {
 #ifndef _WIN32
-	struct stat stbuf;
-	mode_t		fmode;
-	
-	if (stat(filename, &stbuf) == -1) {
-		g_set_error(gerr, G_FILE_ERROR, g_file_error_from_errno(errno),
-				"cannot stat(%s): %s", filename,
-				g_strerror(errno));
-		return -1;
-	}
+    struct stat stbuf;
+    mode_t      fmode;
+    
+    if (stat(filename, &stbuf) == -1) {
+        g_set_error(gerr, G_FILE_ERROR, g_file_error_from_errno(errno),
+                "cannot stat(%s): %s", filename,
+                g_strerror(errno));
+        return -1;
+    }
 
-	fmode = stbuf.st_mode;
-	if ((fmode & S_IFMT) != S_IFREG) {
-		g_set_error(gerr, G_FILE_ERROR, G_FILE_ERROR_INVAL,
-				"%s isn't a regular file", filename);
-		return -1;
-	}
+    fmode = stbuf.st_mode;
+    if ((fmode & S_IFMT) != S_IFREG) {
+        g_set_error(gerr, G_FILE_ERROR, G_FILE_ERROR_INVAL,
+                "%s isn't a regular file", filename);
+        return -1;
+    }
 
-	if ((fmode & required_filemask) != 0) {
-		g_set_error(gerr, G_FILE_ERROR, G_FILE_ERROR_PERM,
-				"permissions of %s aren't secure (0660 or stricter required)", filename);
-		return 1;
-	}
-	
+    if ((fmode & required_filemask) != 0) {
+        g_set_error(gerr, G_FILE_ERROR, G_FILE_ERROR_PERM,
+                "permissions of %s aren't secure (0660 or stricter required)", filename);
+        return 1;
+    }
+    
 #undef MASK
 
 #endif /* _WIN32 */
-	return 0;
+    return 0;
 }

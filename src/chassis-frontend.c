@@ -58,35 +58,35 @@
  * initialize the basic components of the chassis
  */
 int chassis_frontend_init_glib() {
-	const gchar *check_str = NULL;
+    const gchar *check_str = NULL;
 #if 0
-	g_mem_set_vtable(glib_mem_profiler_table);
+    g_mem_set_vtable(glib_mem_profiler_table);
 #endif
 
-	if (!GLIB_CHECK_VERSION(2, 6, 0)) {
-		g_critical("the glib header are too old, need at least 2.6.0, got: %d.%d.%d", 
-				GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
+    if (!GLIB_CHECK_VERSION(2, 6, 0)) {
+        g_critical("the glib header are too old, need at least 2.6.0, got: %d.%d.%d", 
+                GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
 
-		return -1;
-	}
+        return -1;
+    }
 
-	check_str = glib_check_version(GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
+    check_str = glib_check_version(GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
 
-	if (check_str) {
-		g_critical("%s, got: lib=%d.%d.%d, headers=%d.%d.%d", 
-			check_str,
-			glib_major_version, glib_minor_version, glib_micro_version,
-			GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
+    if (check_str) {
+        g_critical("%s, got: lib=%d.%d.%d, headers=%d.%d.%d", 
+            check_str,
+            glib_major_version, glib_minor_version, glib_micro_version,
+            GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
 
-		return -1;
-	}
+        return -1;
+    }
 
-	if (!g_module_supported()) {
-		g_critical("loading modules is not supported on this platform");
-		return -1;
-	}
+    if (!g_module_supported()) {
+        g_critical("loading modules is not supported on this platform");
+        return -1;
+    }
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -96,18 +96,18 @@ int chassis_frontend_init_glib() {
  */
 int chassis_frontend_init_win32() {
 #ifdef _WIN32
-	WSADATA wsaData;
+    WSADATA wsaData;
 
-	if (0 != WSAStartup(MAKEWORD( 2, 2 ), &wsaData)) {
-		g_critical("%s: WSAStartup(2, 2) failed to initialize the socket library",
-				G_STRLOC);
+    if (0 != WSAStartup(MAKEWORD( 2, 2 ), &wsaData)) {
+        g_critical("%s: WSAStartup(2, 2) failed to initialize the socket library",
+                G_STRLOC);
 
-		return -1;
-	}
+        return -1;
+    }
 
-	return 0;
+    return 0;
 #else
-	return -1;
+    return -1;
 #endif
 }
 
@@ -115,11 +115,11 @@ int chassis_frontend_init_win32() {
  * setup and check the logdir
  */
 int chassis_frontend_init_logdir(char *log_path) {
-	if (!log_path) {
-		g_critical("%s: Failed to get log directory, please set by --log-path",
-				G_STRLOC);
-		return -1;
-	}
+    if (!log_path) {
+        g_critical("%s: Failed to get log directory, please set by --log-path",
+                G_STRLOC);
+        return -1;
+    }
 
     return 0;
 }
@@ -128,32 +128,32 @@ int chassis_frontend_init_logdir(char *log_path) {
  * setup and check the basedir if nessesary 
  */
 int chassis_frontend_init_basedir(const char *prg_name, char **_base_dir) {
-	char *base_dir = *_base_dir;
+    char *base_dir = *_base_dir;
 
-	if (base_dir) { /* basedir is already known, check if it is absolute */
-		if (!g_path_is_absolute(base_dir)) {
-			g_critical("%s: --basedir option must be an absolute path, but was %s",
-					G_STRLOC,
-					base_dir);
-			return -1;
-		} else {
-			return 0;
-		}
-	}
+    if (base_dir) { /* basedir is already known, check if it is absolute */
+        if (!g_path_is_absolute(base_dir)) {
+            g_critical("%s: --basedir option must be an absolute path, but was %s",
+                    G_STRLOC,
+                    base_dir);
+            return -1;
+        } else {
+            return 0;
+        }
+    }
 
-	/* find our installation directory if no basedir was given
-	 * this is necessary for finding files when we daemonize
-	 */
-	base_dir = chassis_get_basedir(prg_name);
-	if (!base_dir) {
-		g_critical("%s: Failed to get base directory",
-				G_STRLOC);
-		return -1;
-	}
+    /* find our installation directory if no basedir was given
+     * this is necessary for finding files when we daemonize
+     */
+    base_dir = chassis_get_basedir(prg_name);
+    if (!base_dir) {
+        g_critical("%s: Failed to get base directory",
+                G_STRLOC);
+        return -1;
+    }
 
-	*_base_dir = base_dir;
+    *_base_dir = base_dir;
 
-	return 0;
+    return 0;
 
 }
 
@@ -166,50 +166,50 @@ int chassis_frontend_init_basedir(const char *prg_name, char **_base_dir) {
  * is safe.
  */
 static int chassis_frontend_lua_setenv(const char *key, const char *value) {
-	int r;
+    int r;
 #if _WIN32
-	r = _putenv_s(key, value);
+    r = _putenv_s(key, value);
 #else
-	r = g_setenv(key, value, 1) ? 0 : -1; /* g_setenv() returns TRUE/FALSE */
+    r = g_setenv(key, value, 1) ? 0 : -1; /* g_setenv() returns TRUE/FALSE */
 #endif
 
-	if (0 == r) {
-		/* the setenv() succeeded, double-check it */
-		if (!getenv(key)) {
-			/* check that getenv() returns what we did set */
-			g_critical("%s: setting %s = %s failed: (getenv() == NULL)", G_STRLOC,
-					key, value);
-		} else if (0 != strcmp(getenv(key), value)) {
-			g_critical("%s: setting %s = %s failed: (getenv() == %s)", G_STRLOC,
-					key, value,
-					getenv(key));
-		}
-	}
+    if (0 == r) {
+        /* the setenv() succeeded, double-check it */
+        if (!getenv(key)) {
+            /* check that getenv() returns what we did set */
+            g_critical("%s: setting %s = %s failed: (getenv() == NULL)", G_STRLOC,
+                    key, value);
+        } else if (0 != strcmp(getenv(key), value)) {
+            g_critical("%s: setting %s = %s failed: (getenv() == %s)", G_STRLOC,
+                    key, value,
+                    getenv(key));
+        }
+    }
 
-	return r;
+    return r;
 }
 
 /**
  * get the default value for LUA_PATH
  */
 char *chassis_frontend_get_default_lua_path(const char *base_dir, const char *prg_name) {
-	return g_build_filename(base_dir, "lib", prg_name, "lua", "?.lua", NULL);
+    return g_build_filename(base_dir, "lib", prg_name, "lua", "?.lua", NULL);
 }
 
 /**
  * get the default value for LUA_PATH
  */
 char *chassis_frontend_get_default_lua_cpath(const char *base_dir, const char *prg_name) {
-	/* each OS has its own way of declaring a shared-lib extension
-	 *
-	 * win32 has .dll
-	 * macosx has .so or .dylib
-	 * hpux has .sl
-	 */ 
+    /* each OS has its own way of declaring a shared-lib extension
+     *
+     * win32 has .dll
+     * macosx has .so or .dylib
+     * hpux has .sl
+     */ 
 #  if _WIN32
-	return g_build_filename(base_dir, "bin", "lua-?." G_MODULE_SUFFIX, NULL);
+    return g_build_filename(base_dir, "bin", "lua-?." G_MODULE_SUFFIX, NULL);
 #  else
-	return g_build_filename(base_dir, "lib", prg_name, "lua", "?." G_MODULE_SUFFIX, NULL);
+    return g_build_filename(base_dir, "lib", prg_name, "lua", "?." G_MODULE_SUFFIX, NULL);
 #  endif
 }
 
@@ -226,63 +226,63 @@ char *chassis_frontend_get_default_lua_cpath(const char *base_dir, const char *p
  * @param is_lua_path   TRUE if LUA_PATH should be set, FALSE if LUA_CPATH
  */
 static int chassis_frontend_init_lua_paths(const char *set_path,
-		const char *base_dir, char **lua_subdirs,
-		gboolean is_lua_path) {
-	const char *env_var = is_lua_path ? LUA_PATH : LUA_CPATH;
-	int ret = 0;
+        const char *base_dir, char **lua_subdirs,
+        gboolean is_lua_path) {
+    const char *env_var = is_lua_path ? LUA_PATH : LUA_CPATH;
+    int ret = 0;
 
-	if (set_path) {
-		if (0 != chassis_frontend_lua_setenv(env_var, set_path)) {
-			g_critical("%s: setting %s = %s failed: %s", G_STRLOC,
-					env_var, set_path,
-					g_strerror(errno));
-			ret = -1;
-		}
-	} else if (!g_getenv(env_var)) {
-		GString *lua_path = g_string_new(NULL);
-		guint i;
-		gboolean all_in_one_folder = FALSE;
+    if (set_path) {
+        if (0 != chassis_frontend_lua_setenv(env_var, set_path)) {
+            g_critical("%s: setting %s = %s failed: %s", G_STRLOC,
+                    env_var, set_path,
+                    g_strerror(errno));
+            ret = -1;
+        }
+    } else if (!g_getenv(env_var)) {
+        GString *lua_path = g_string_new(NULL);
+        guint i;
+        gboolean all_in_one_folder = FALSE;
 
 #ifdef _WIN32
-		/**
-		 * call the get_default_lua_cpath() only once on win32 as it has
-		 * all the lua-module-DLLs in one folder
-		 */
-		if (!is_lua_path) all_in_one_folder = TRUE;
+        /**
+         * call the get_default_lua_cpath() only once on win32 as it has
+         * all the lua-module-DLLs in one folder
+         */
+        if (!is_lua_path) all_in_one_folder = TRUE;
 #endif
 
-		/* build a path for each sub_name */
-		for (i = 0; (all_in_one_folder && i == 0) || (!all_in_one_folder && lua_subdirs[i] != NULL); i++) {
-			gchar *path;
-			const char *sub_name = all_in_one_folder ? NULL : lua_subdirs[i];
+        /* build a path for each sub_name */
+        for (i = 0; (all_in_one_folder && i == 0) || (!all_in_one_folder && lua_subdirs[i] != NULL); i++) {
+            gchar *path;
+            const char *sub_name = all_in_one_folder ? NULL : lua_subdirs[i];
 
-			if (is_lua_path) {
-				path = chassis_frontend_get_default_lua_path(base_dir, sub_name);
-			} else {
-				path = chassis_frontend_get_default_lua_cpath(base_dir, sub_name);
-			}
+            if (is_lua_path) {
+                path = chassis_frontend_get_default_lua_path(base_dir, sub_name);
+            } else {
+                path = chassis_frontend_get_default_lua_cpath(base_dir, sub_name);
+            }
 
-			if (lua_path->len > 0) {
-				g_string_append_len(lua_path, C(LUA_PATHSEP));
-			}
+            if (lua_path->len > 0) {
+                g_string_append_len(lua_path, C(LUA_PATHSEP));
+            }
 
-			g_string_append(lua_path, path);
+            g_string_append(lua_path, path);
 
-			g_free(path);
-		}
+            g_free(path);
+        }
 
-		if (lua_path->len) {
-			if (chassis_frontend_lua_setenv(env_var, lua_path->str)) {
-				g_critical("%s: setting %s = %s failed: %s", G_STRLOC,
-						env_var, lua_path->str,
-						g_strerror(errno));
-				ret = -1;
-			}
-		}
-		g_string_free(lua_path, TRUE);
-	}
+        if (lua_path->len) {
+            if (chassis_frontend_lua_setenv(env_var, lua_path->str)) {
+                g_critical("%s: setting %s = %s failed: %s", G_STRLOC,
+                        env_var, lua_path->str,
+                        g_strerror(errno));
+                ret = -1;
+            }
+        }
+        g_string_free(lua_path, TRUE);
+    }
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -297,7 +297,7 @@ static int chassis_frontend_init_lua_paths(const char *set_path,
  * @param subdir_names  list of sub directories to add to the path
   */
 int chassis_frontend_init_lua_path(const char *set_path, const char *base_dir, char **lua_subdirs) {
-	return chassis_frontend_init_lua_paths(set_path, base_dir, lua_subdirs, TRUE);
+    return chassis_frontend_init_lua_paths(set_path, base_dir, lua_subdirs, TRUE);
 }
 
 /**
@@ -312,31 +312,31 @@ int chassis_frontend_init_lua_path(const char *set_path, const char *base_dir, c
  * @param subdir_names  list of sub directories to add to the path
  */
 int chassis_frontend_init_lua_cpath(const char *set_path, const char *base_dir, char **lua_subdirs) {
-	return chassis_frontend_init_lua_paths(set_path, base_dir, lua_subdirs, FALSE);
+    return chassis_frontend_init_lua_paths(set_path, base_dir, lua_subdirs, FALSE);
 }
 
 int chassis_frontend_init_plugin_dir(char **_plugin_dir, const char *base_dir) {
-	char *plugin_dir = *_plugin_dir;
+    char *plugin_dir = *_plugin_dir;
 
-	if (plugin_dir) return 0;
+    if (plugin_dir) return 0;
 
 #ifdef WIN32
-	plugin_dir = g_build_filename(base_dir, "bin", NULL);
+    plugin_dir = g_build_filename(base_dir, "bin", NULL);
 #else
-	plugin_dir = g_build_filename(base_dir, "lib", "mysql-proxy", "plugins", NULL);
+    plugin_dir = g_build_filename(base_dir, "lib", "mysql-proxy", "plugins", NULL);
 #endif
 
-	*_plugin_dir = plugin_dir;
+    *_plugin_dir = plugin_dir;
 
-	return 0;
+    return 0;
 }
 
 int chassis_frontend_load_plugins(GPtrArray *plugins, const gchar *plugin_dir, gchar **plugin_names) {
-	int i;
+    int i;
 
-	/* load the plugins */
-	for (i = 0; plugin_names && plugin_names[i]; i++) {
-		chassis_plugin *p;
+    /* load the plugins */
+    for (i = 0; plugin_names && plugin_names[i]; i++) {
+        chassis_plugin *p;
 #ifdef WIN32
 #define G_MODULE_PREFIX "plugin-" /* we build the plugins with a prefix on win32 to avoid name-clashing in bin/ */
 #else
@@ -348,33 +348,33 @@ int chassis_frontend_load_plugins(GPtrArray *plugins, const gchar *plugin_dir, g
 #ifndef SHARED_LIBRARY_SUFFIX
 #define SHARED_LIBRARY_SUFFIX G_MODULE_SUFFIX
 #endif
-		char *plugin_filename;
-		/* skip trying to load a plugin when the parameter was --plugins= 
-		   that will never work...
-		*/
-		if (!g_strcmp0("", plugin_names[i])) {
-			continue;
-		}
+        char *plugin_filename;
+        /* skip trying to load a plugin when the parameter was --plugins= 
+           that will never work...
+        */
+        if (!g_strcmp0("", plugin_names[i])) {
+            continue;
+        }
 
-		plugin_filename = g_strdup_printf("%s%c%s%s.%s", 
-				plugin_dir, 
-				G_DIR_SEPARATOR, 
-				G_MODULE_PREFIX,
-				plugin_names[i],
-				SHARED_LIBRARY_SUFFIX);
+        plugin_filename = g_strdup_printf("%s%c%s%s.%s", 
+                plugin_dir, 
+                G_DIR_SEPARATOR, 
+                G_MODULE_PREFIX,
+                plugin_names[i],
+                SHARED_LIBRARY_SUFFIX);
 
-		p = chassis_plugin_load(plugin_filename);
-		g_free(plugin_filename);
+        p = chassis_plugin_load(plugin_filename);
+        g_free(plugin_filename);
 
-		if (NULL == p) {
-			g_critical("setting --plugin-dir=<dir> might help");
-			return -1;
-		}
-		p->option_grp_name = g_strdup(plugin_names[i]);
+        if (NULL == p) {
+            g_critical("setting --plugin-dir=<dir> might help");
+            return -1;
+        }
+        p->option_grp_name = g_strdup(plugin_names[i]);
 
-		g_ptr_array_add(plugins, p);
-	}
-	return 0;
+        g_ptr_array_add(plugins, p);
+    }
+    return 0;
 }
 
 int chassis_frontend_options_free(GOptionEntry *entries) {
@@ -407,234 +407,234 @@ int chassis_frontend_options_free(GOptionEntry *entries) {
 }
 
 int chassis_frontend_init_plugins(GPtrArray *plugins,
-		GOptionContext *option_ctx,
-		int *argc_p, char ***argv_p,
-		GKeyFile *keyfile,
-		const char *keyfile_section_name,
-		const char *base_dir,
-		GError **gerr) {
-	guint i;
+        GOptionContext *option_ctx,
+        int *argc_p, char ***argv_p,
+        GKeyFile *keyfile,
+        const char *keyfile_section_name,
+        const char *base_dir,
+        GError **gerr) {
+    guint i;
 
-	for (i = 0; i < plugins->len; i++) {
-		GOptionEntry *config_entries = NULL;
-		chassis_plugin *p = plugins->pdata[i];
+    for (i = 0; i < plugins->len; i++) {
+        GOptionEntry *config_entries = NULL;
+        chassis_plugin *p = plugins->pdata[i];
         chassis_options_t *plugin_opts = NULL;
 
         if (NULL != (plugin_opts = chassis_plugin_get_options(p))) {
-			gchar *group_desc = g_strdup_printf("%s-module", p->option_grp_name);
-			gchar *help_msg = g_strdup_printf("Show options for the %s-module", p->option_grp_name);
-			const gchar *group_name = p->option_grp_name;
+            gchar *group_desc = g_strdup_printf("%s-module", p->option_grp_name);
+            gchar *help_msg = g_strdup_printf("Show options for the %s-module", p->option_grp_name);
+            const gchar *group_name = p->option_grp_name;
 
             config_entries = chassis_options_to_g_option_entries(plugin_opts);
 
-			GOptionGroup *option_grp = g_option_group_new(group_name, group_desc, help_msg, NULL, NULL);
-			g_option_group_add_entries(option_grp, config_entries);
-			g_option_context_add_group(option_ctx, option_grp);
+            GOptionGroup *option_grp = g_option_group_new(group_name, group_desc, help_msg, NULL, NULL);
+            g_option_group_add_entries(option_grp, config_entries);
+            g_option_context_add_group(option_ctx, option_grp);
 
-			g_free(help_msg);
-			g_free(group_desc);
+            g_free(help_msg);
+            g_free(group_desc);
 
-			/* parse the new options */
-			if (FALSE == g_option_context_parse(option_ctx, argc_p, argv_p, gerr)) {
-				return -1;
-			}
-	
-			if (keyfile) {
-				if (chassis_keyfile_to_options(keyfile, keyfile_section_name, config_entries)) {
-					return -1;
-				}
-			}
+            /* parse the new options */
+            if (FALSE == g_option_context_parse(option_ctx, argc_p, argv_p, gerr)) {
+                return -1;
+            }
+    
+            if (keyfile) {
+                if (chassis_keyfile_to_options(keyfile, keyfile_section_name, config_entries)) {
+                    return -1;
+                }
+            }
 
-			/* resolve the path names for these config entries */
-			chassis_keyfile_resolve_path(base_dir, config_entries); 
-		}
+            /* resolve the path names for these config entries */
+            chassis_keyfile_resolve_path(base_dir, config_entries); 
+        }
 
         if (config_entries != NULL) {
-		    chassis_frontend_options_free(config_entries);
-		}
-	}
+            chassis_frontend_options_free(config_entries);
+        }
+    }
 
 
 
-	return 0;
+    return 0;
 }
 
 int chassis_frontend_init_base_options(GOptionContext *option_ctx,
-		int *argc_p, char ***argv_p,
-		int *print_version,
-		char **config_file,
-		GError **gerr) {
-	chassis_options_t *opts;
-	GOptionEntry *base_main_entries;
-	int ret = 0;
+        int *argc_p, char ***argv_p,
+        int *print_version,
+        char **config_file,
+        GError **gerr) {
+    chassis_options_t *opts;
+    GOptionEntry *base_main_entries;
+    int ret = 0;
 
-	opts = chassis_options_new();
-	chassis_options_set_cmdline_only_options(opts, print_version, config_file);
-	base_main_entries = chassis_options_to_g_option_entries(opts);
+    opts = chassis_options_new();
+    chassis_options_set_cmdline_only_options(opts, print_version, config_file);
+    base_main_entries = chassis_options_to_g_option_entries(opts);
 
-	g_option_context_add_main_entries(option_ctx, base_main_entries, NULL);
-	g_option_context_set_help_enabled(option_ctx, FALSE);
-	g_option_context_set_ignore_unknown_options(option_ctx, TRUE);
+    g_option_context_add_main_entries(option_ctx, base_main_entries, NULL);
+    g_option_context_set_help_enabled(option_ctx, FALSE);
+    g_option_context_set_ignore_unknown_options(option_ctx, TRUE);
 
-	if (FALSE == g_option_context_parse(option_ctx, argc_p, argv_p, gerr)) {
-		ret = -1;
-	}
+    if (FALSE == g_option_context_parse(option_ctx, argc_p, argv_p, gerr)) {
+        ret = -1;
+    }
 
-	/* do not use chassis_options_free_g_options... here, we need to hang on to the data until the end of the program! */
-	chassis_frontend_options_free(base_main_entries);
+    /* do not use chassis_options_free_g_options... here, we need to hang on to the data until the end of the program! */
+    chassis_frontend_options_free(base_main_entries);
 
-	chassis_options_free(opts);
+    chassis_options_free(opts);
 
-	return ret;
+    return ret;
 }
 
 GKeyFile *chassis_frontend_open_config_file(const char *filename, GError **gerr) {
-	GKeyFile *keyfile;
+    GKeyFile *keyfile;
 /*
-	if (chassis_filemode_check_full(filename, CHASSIS_FILEMODE_SECURE_MASK, gerr) != 0) {
-		return NULL;
-	}
+    if (chassis_filemode_check_full(filename, CHASSIS_FILEMODE_SECURE_MASK, gerr) != 0) {
+        return NULL;
+    }
 */
-	keyfile = g_key_file_new();
-	g_key_file_set_list_separator(keyfile, ',');
+    keyfile = g_key_file_new();
+    g_key_file_set_list_separator(keyfile, ',');
 
-	if (FALSE == g_key_file_load_from_file(keyfile, filename, G_KEY_FILE_NONE, gerr)) {
-		g_key_file_free(keyfile);
+    if (FALSE == g_key_file_load_from_file(keyfile, filename, G_KEY_FILE_NONE, gerr)) {
+        g_key_file_free(keyfile);
 
-		return NULL;
-	}
+        return NULL;
+    }
 
-	return keyfile;
+    return keyfile;
 }
 
 /**
  * setup the options that can only appear on the command-line
  */
 int chassis_options_set_cmdline_only_options(chassis_options_t *opts,
-		int *print_version,
-		char **config_file) {
+        int *print_version,
+        char **config_file) {
 
-	chassis_options_add(opts,
+    chassis_options_add(opts,
         "version", 'V', 0, G_OPTION_ARG_NONE, print_version, "Show version", NULL, NULL, NULL, 0);
 
-	chassis_options_add(opts,
+    chassis_options_add(opts,
         "defaults-file", 0, 0, G_OPTION_ARG_STRING, config_file, "configuration file", "<file>", NULL, NULL, 0);
 
-	return 0;
+    return 0;
 }
 
 int chassis_frontend_print_plugin_versions(GPtrArray *plugins) {
-	guint i;
+    guint i;
 
-	g_print("-- modules" CHASSIS_NEWLINE);
+    g_print("-- modules" CHASSIS_NEWLINE);
 
-	for (i = 0; i < plugins->len; i++) {
-		chassis_plugin *p = plugins->pdata[i];
+    for (i = 0; i < plugins->len; i++) {
+        chassis_plugin *p = plugins->pdata[i];
 
-		g_print("  %s: %s" CHASSIS_NEWLINE, p->name, p->version); 
-	}
+        g_print("  %s: %s" CHASSIS_NEWLINE, p->name, p->version); 
+    }
 
-	return 0;
+    return 0;
 }
 
 void chassis_frontend_print_lua_version() {
-	lua_State *L;
+    lua_State *L;
 
-	g_print("  LUA: %s" CHASSIS_NEWLINE, LUA_RELEASE);
-	L = luaL_newstate();
-	luaL_openlibs(L);
-	lua_getglobal(L, "package");
-	g_assert_cmpint(lua_type(L, -1), ==, LUA_TTABLE);
+    g_print("  LUA: %s" CHASSIS_NEWLINE, LUA_RELEASE);
+    L = luaL_newstate();
+    luaL_openlibs(L);
+    lua_getglobal(L, "package");
+    g_assert_cmpint(lua_type(L, -1), ==, LUA_TTABLE);
 
-	lua_getfield(L, -1, "path");
-	g_assert_cmpint(lua_type(L, -1), ==, LUA_TSTRING);
-	g_print("    package.path: %s" CHASSIS_NEWLINE, lua_tostring(L, -1));
-	lua_pop(L, 1);
+    lua_getfield(L, -1, "path");
+    g_assert_cmpint(lua_type(L, -1), ==, LUA_TSTRING);
+    g_print("    package.path: %s" CHASSIS_NEWLINE, lua_tostring(L, -1));
+    lua_pop(L, 1);
 
-	lua_getfield(L, -1, "cpath");
-	g_assert_cmpint(lua_type(L, -1), ==, LUA_TSTRING);
-	g_print("    package.cpath: %s" CHASSIS_NEWLINE, lua_tostring(L, -1));
-	lua_pop(L, 2);
+    lua_getfield(L, -1, "cpath");
+    g_assert_cmpint(lua_type(L, -1), ==, LUA_TSTRING);
+    g_print("    package.cpath: %s" CHASSIS_NEWLINE, lua_tostring(L, -1));
+    lua_pop(L, 2);
 
-	lua_close(L);
+    lua_close(L);
 }
 
 
 int chassis_frontend_write_pidfile(const char *pid_file, GError **gerr) {
-	int fd;
-	int ret = 0;
-	int my_pid = 0, other_pid = 0;
-	int len = 0;
-	gchar buffer[128];
-	gchar *pid_str;
+    int fd;
+    int ret = 0;
+    int my_pid = 0, other_pid = 0;
+    int len = 0;
+    gchar buffer[128];
+    gchar *pid_str;
 
-	my_pid = getpid();
+    my_pid = getpid();
 
-	/**
-	 * write the PID file
-	 */
-	if (-1 == (fd = open(pid_file, O_RDWR|O_CREAT|O_APPEND, 0600))) {
-		g_set_error(gerr,
-				G_FILE_ERROR,
-				g_file_error_from_errno(errno),
-				"%s: open(%s) failed: %s", 
-				G_STRLOC,
-				pid_file,
-				g_strerror(errno));
+    /**
+     * write the PID file
+     */
+    if (-1 == (fd = open(pid_file, O_RDWR|O_CREAT|O_APPEND, 0600))) {
+        g_set_error(gerr,
+                G_FILE_ERROR,
+                g_file_error_from_errno(errno),
+                "%s: open(%s) failed: %s", 
+                G_STRLOC,
+                pid_file,
+                g_strerror(errno));
 
-		return -1;
-	}
+        return -1;
+    }
 
-	len = read(fd, buffer, sizeof(buffer));
-	if (len > 0) {
-		other_pid = atoi(buffer);
-		if (other_pid > 0 && other_pid != my_pid) {
-			if (kill(other_pid, 0) == 0 || (errno != ESRCH && errno != EPERM)) {
-				g_set_error(gerr,
- 				G_FILE_ERROR,
-				g_file_error_from_errno(errno),
- 				"%s: pid(%d) is still alive: %s",
-				G_STRLOC,
- 				other_pid,
-				g_strerror(errno));
+    len = read(fd, buffer, sizeof(buffer));
+    if (len > 0) {
+        other_pid = atoi(buffer);
+        if (other_pid > 0 && other_pid != my_pid) {
+            if (kill(other_pid, 0) == 0 || (errno != ESRCH && errno != EPERM)) {
+                g_set_error(gerr,
+                G_FILE_ERROR,
+                g_file_error_from_errno(errno),
+                "%s: pid(%d) is still alive: %s",
+                G_STRLOC,
+                other_pid,
+                g_strerror(errno));
 
-				close(fd);
-				return -1;
-            		}
-		}
-    	}
+                close(fd);
+                return -1;
+                    }
+        }
+        }
  
-	if (ftruncate(fd, 0) < 0) {
-		g_set_error(gerr,
-				G_FILE_ERROR,
-				g_file_error_from_errno(errno),
-				"%s: truncate(%s) of %s failed: %s",
-				G_STRLOC,
-				pid_file,
-				pid_str,
-				g_strerror(errno));
+    if (ftruncate(fd, 0) < 0) {
+        g_set_error(gerr,
+                G_FILE_ERROR,
+                g_file_error_from_errno(errno),
+                "%s: truncate(%s) of %s failed: %s",
+                G_STRLOC,
+                pid_file,
+                pid_str,
+                g_strerror(errno));
 
-				close(fd);
-				return -1;
-	}
+                close(fd);
+                return -1;
+    }
 
-	pid_str = g_strdup_printf("%d", my_pid);
+    pid_str = g_strdup_printf("%d", my_pid);
 
-	if (write(fd, pid_str, strlen(pid_str)) < 0) {
-		g_set_error(gerr,
-				G_FILE_ERROR,
-				g_file_error_from_errno(errno),
-				"%s: write(%s) of %s failed: %s", 
-				G_STRLOC,
-				pid_file,
-				pid_str,
-				g_strerror(errno));
-		ret = -1;
-	}
-	g_free(pid_str);
+    if (write(fd, pid_str, strlen(pid_str)) < 0) {
+        g_set_error(gerr,
+                G_FILE_ERROR,
+                g_file_error_from_errno(errno),
+                "%s: write(%s) of %s failed: %s", 
+                G_STRLOC,
+                pid_file,
+                pid_str,
+                g_strerror(errno));
+        ret = -1;
+    }
+    g_free(pid_str);
 
-	close(fd);
+    close(fd);
 
-	return ret;
+    return ret;
 }
 

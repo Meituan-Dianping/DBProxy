@@ -63,22 +63,22 @@
 #include "network-address.h"
 
 typedef enum {
-	NETWORK_SOCKET_SUCCESS,
-	NETWORK_SOCKET_WAIT_FOR_EVENT,
-	NETWORK_SOCKET_ERROR,
-	NETWORK_SOCKET_ERROR_RETRY
+    NETWORK_SOCKET_SUCCESS,
+    NETWORK_SOCKET_WAIT_FOR_EVENT,
+    NETWORK_SOCKET_ERROR,
+    NETWORK_SOCKET_ERROR_RETRY
 } network_socket_retval_t;
 
 typedef enum {
-	AUTOCOMMIT_UNKNOWN,
-	AUTOCOMMIT_TRUE,
-	AUTOCOMMIT_FALSE
+    AUTOCOMMIT_UNKNOWN,
+    AUTOCOMMIT_TRUE,
+    AUTOCOMMIT_FALSE
 } network_socket_autocommit_t;
 
 typedef enum {
-	SOCKET_LISTEN,
-	SOCKET_SERVER,
-	SOCKET_CLIENT
+    SOCKET_LISTEN,
+    SOCKET_SERVER,
+    SOCKET_CLIENT
 } network_socket_dir_t;
 
 typedef struct{
@@ -94,40 +94,40 @@ typedef struct network_mysqld_auth_challenge network_mysqld_auth_challenge;
 typedef struct network_mysqld_auth_response network_mysqld_auth_response;
 
 typedef struct {
-	int fd;             /**< socket-fd */
-	struct event event; /**< events for this fd */
+    int fd;             /**< socket-fd */
+    struct event event; /**< events for this fd */
 
-	network_address *src; /**< getsockname() */
-	network_address *dst; /**< getpeername() */
+    network_address *src; /**< getsockname() */
+    network_address *dst; /**< getpeername() */
 
-	int socket_type; /**< SOCK_STREAM or SOCK_DGRAM for now */
+    int socket_type; /**< SOCK_STREAM or SOCK_DGRAM for now */
 
-	void *srv;
-	network_socket_dir_t socket_dir;
+    void *srv;
+    network_socket_dir_t socket_dir;
 
-	guint64 ts_connected;  // the time to create socket
+    guint64 ts_connected;  // the time to create socket
 
-	guint8   last_packet_id; /**< internal tracking of the packet_id's the automaticly set the next good packet-id */
-	gboolean packet_id_is_reset; /**< internal tracking of the packet_id sequencing */
+    guint8   last_packet_id; /**< internal tracking of the packet_id's the automaticly set the next good packet-id */
+    gboolean packet_id_is_reset; /**< internal tracking of the packet_id sequencing */
 
-	network_queue *recv_queue;
-	network_queue *recv_queue_raw;
-	network_queue *send_queue;
+    network_queue *recv_queue;
+    network_queue *recv_queue_raw;
+    network_queue *send_queue;
 
-	off_t header_read;
-	off_t to_read;
-	
-	/**
-	 * data extracted from the handshake  
-	 *
-	 * all server-side only
-	 */
-	network_mysqld_auth_challenge *challenge;
-	network_mysqld_auth_response  *response;
+    off_t header_read;
+    off_t to_read;
+    
+    /**
+     * data extracted from the handshake  
+     *
+     * all server-side only
+     */
+    network_mysqld_auth_challenge *challenge;
+    network_mysqld_auth_response  *response;
 
-	conn_attr_t	conn_attr;
+    conn_attr_t conn_attr;
 
-	gboolean is_authed;           /** did a client already authed this connection */
+    gboolean is_authed;           /** did a client already authed this connection */
 } network_socket;
 
 #define EMPTYSTR    ""

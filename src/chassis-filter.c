@@ -53,20 +53,20 @@ sql_filter_free(sql_filter *filter)
 gboolean
 sql_filter_insert(sql_filter *filter, const gchar *sql_rewrite, gchar *sql_md5str, int flag, int filter_status)
 {
-	if (filter == NULL) return FALSE;	
+    if (filter == NULL) return FALSE;   
 
-	sql_filter_hval *hval = sql_filter_hval_new(sql_rewrite, flag, filter_status);
+    sql_filter_hval *hval = sql_filter_hval_new(sql_rewrite, flag, filter_status);
 
-	return g_hash_table_insert(filter->blacklist, g_strdup(sql_md5str), hval);
+    return g_hash_table_insert(filter->blacklist, g_strdup(sql_md5str), hval);
 }
 
 sql_filter_hval *
 sql_filter_lookup(sql_filter *filter, const gchar *sql_md5str)
 {
-	if (filter == NULL || (filter != NULL && filter->blacklist == NULL)) return NULL;
-	if (sql_md5str == NULL) return NULL;	
+    if (filter == NULL || (filter != NULL && filter->blacklist == NULL)) return NULL;
+    if (sql_md5str == NULL) return NULL;    
 
-	return g_hash_table_lookup(filter->blacklist, sql_md5str);
+    return g_hash_table_lookup(filter->blacklist, sql_md5str);
 }
 
 gboolean
@@ -81,39 +81,39 @@ sql_filter_remove(sql_filter *filter, const gchar *sql_md5str)
 void
 sql_filter_show(sql_filter *filter)
 {
-	if (filter == NULL) return ;
+    if (filter == NULL) return ;
 
-	g_hash_table_foreach(filter->blacklist, sql_filter_item_show, NULL);
-	return ;
+    g_hash_table_foreach(filter->blacklist, sql_filter_item_show, NULL);
+    return ;
 }
 
 void
 sql_filter_item_show(gpointer key, gpointer value, gpointer userdata)
 {
-	gchar *hkey = (gchar *) key;
-	sql_filter_hval *hval = (sql_filter_hval *)	value;
+    gchar *hkey = (gchar *) key;
+    sql_filter_hval *hval = (sql_filter_hval *) value;
 
-	g_message("key = %s\tkval.flag = %d\tkval.hit_times = %dkval.sql_filter_item = %s",
-						hkey, hval->flag, hval->hit_times, hval->sql_filter_item);
+    g_message("key = %s\tkval.flag = %d\tkval.hit_times = %dkval.sql_filter_item = %s",
+                        hkey, hval->flag, hval->hit_times, hval->sql_filter_item);
 }
 
 static gboolean
 sql_filter_equal_func(gchar *sql1, gchar *sql2)
 {
-	return (strcasecmp(sql1, sql2) == 0);
+    return (strcasecmp(sql1, sql2) == 0);
 }
 
 static sql_filter_hval *
 sql_filter_hval_new(const gchar *sql_rewrite, int flag, int filter_status)
 {
-	sql_filter_hval *hval = g_new0(sql_filter_hval, 1);
+    sql_filter_hval *hval = g_new0(sql_filter_hval, 1);
 
-	hval->sql_filter_item = g_strdup(sql_rewrite);
-	hval->flag = flag;
-	hval->filter_status = filter_status;
-	hval->hit_times = 0;
+    hval->sql_filter_item = g_strdup(sql_rewrite);
+    hval->flag = flag;
+    hval->filter_status = filter_status;
+    hval->hit_times = 0;
 
-	return hval;
+    return hval;
 }
 
 GString *
@@ -169,12 +169,12 @@ sql_filter_sql_rewrite(GPtrArray *tokens)
 static void
 sql_filter_hval_free(sql_filter_hval* hval)
 {
-	if (hval == NULL) return ;
+    if (hval == NULL) return ;
 
-	g_free(hval->sql_filter_item);
-	g_free(hval);
+    g_free(hval->sql_filter_item);
+    g_free(hval);
 
-	return ;
+    return ;
 }
 
 int
@@ -296,33 +296,33 @@ sql_reserved_query_lookup(sql_reserved_query *srq, const char *sql_md5)
 reserved_query_item *
 reserved_query_item_new(gchar *sql_rewrite, gchar *sql_rewrite_hash)
 {
-	reserved_query_item *rqi = g_new0(reserved_query_item, 1);
+    reserved_query_item *rqi = g_new0(reserved_query_item, 1);
 
-	rqi->item_last_access_time = rqi->item_first_access_time = time(NULL);
-	rqi->item_gap_start_time = rqi->item_last_access_time;
+    rqi->item_last_access_time = rqi->item_first_access_time = time(NULL);
+    rqi->item_gap_start_time = rqi->item_last_access_time;
 
-	rqi->item_rewrite = g_string_new(sql_rewrite);
-	rqi->item_rewrite_md5 = g_string_new(sql_rewrite_hash);
-	rqi->item_access_num = 1;
-	rqi->item_gap_access_num = 0;
-	rqi->item_status = RQ_NO_STATUS;
+    rqi->item_rewrite = g_string_new(sql_rewrite);
+    rqi->item_rewrite_md5 = g_string_new(sql_rewrite_hash);
+    rqi->item_access_num = 1;
+    rqi->item_gap_access_num = 0;
+    rqi->item_status = RQ_NO_STATUS;
 
-	rqi->list_pos = NULL;
+    rqi->list_pos = NULL;
 
-	g_mutex_init(&rqi->rq_item_lock);
+    g_mutex_init(&rqi->rq_item_lock);
 
-	return rqi;
+    return rqi;
 }
 
 void
 reserved_query_item_free(reserved_query_item *rqi)
 {
-	g_assert(rqi != NULL);
+    g_assert(rqi != NULL);
 
-	g_mutex_clear(&rqi->rq_item_lock);
-	if (rqi->item_rewrite) g_string_free(rqi->item_rewrite, TRUE);
-	if (rqi->item_rewrite_md5) g_string_free(rqi->item_rewrite_md5, TRUE);
-	g_free(rqi);
+    g_mutex_clear(&rqi->rq_item_lock);
+    if (rqi->item_rewrite) g_string_free(rqi->item_rewrite, TRUE);
+    if (rqi->item_rewrite_md5) g_string_free(rqi->item_rewrite_md5, TRUE);
+    g_free(rqi);
 }
 
 gint

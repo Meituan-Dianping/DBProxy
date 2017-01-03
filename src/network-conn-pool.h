@@ -35,9 +35,9 @@ typedef GHashTable network_connection_pool;
 #define REMOVE_SERVER_ABNORMAL  2
 
 typedef struct {
-	network_socket *sock;          /** the idling socket */
-	
-	network_connection_pool *pool; /** a pointer back to the pool */
+    network_socket *sock;          /** the idling socket */
+    
+    network_connection_pool *pool; /** a pointer back to the pool */
 } network_connection_pool_entry;
 
 NETWORK_API network_socket *network_connection_pool_get(network_connection_pool *pool,

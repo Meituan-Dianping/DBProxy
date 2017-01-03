@@ -31,24 +31,24 @@
 #include "chassis-exports.h"
 
 typedef struct {
-	void (*func)(gpointer _udata);
-	gpointer udata;
-	gboolean is_called;
+    void (*func)(gpointer _udata);
+    gpointer udata;
+    gboolean is_called;
 } chassis_shutdown_hook_t;
 
 CHASSIS_API chassis_shutdown_hook_t *chassis_shutdown_hook_new(void);
 CHASSIS_API void chassis_shutdown_hook_free(chassis_shutdown_hook_t *);
 
 typedef struct {
-	GMutex mutex;
-	GHashTable *hooks;
+    GMutex mutex;
+    GHashTable *hooks;
 } chassis_shutdown_hooks_t;
 
 CHASSIS_API chassis_shutdown_hooks_t *chassis_shutdown_hooks_new(void);
 CHASSIS_API void chassis_shutdown_hooks_free(chassis_shutdown_hooks_t *);
 CHASSIS_API gboolean chassis_shutdown_hooks_register(chassis_shutdown_hooks_t *hooks,
-		const char *key, gsize key_len,
-		chassis_shutdown_hook_t *hook);
+        const char *key, gsize key_len,
+        chassis_shutdown_hook_t *hook);
 CHASSIS_API void chassis_shutdown_hooks_call(chassis_shutdown_hooks_t *hooks);
 
 #endif

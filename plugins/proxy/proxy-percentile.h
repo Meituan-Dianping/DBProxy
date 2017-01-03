@@ -14,39 +14,39 @@
 
 
 typedef enum pt_percentile_state {
-	pt_off = 0,
-	pt_on 
+    pt_off = 0,
+    pt_on 
 } pt_percentile_state;
 
 typedef enum pt_time_type {
-	PERCENTILE_MIN = 0,
-	PERCENTILE_HOUR = 1,
-	PERCENTILE_TYPE_ERROR = 2
+    PERCENTILE_MIN = 0,
+    PERCENTILE_HOUR = 1,
+    PERCENTILE_TYPE_ERROR = 2
 } pt_time_type;
 
 typedef struct pt_histc_t {
-	guint64 response_num[MAX_RESPONSE_TIME_HIST_LEVELS_PT];
-	guint   number;
+    guint64 response_num[MAX_RESPONSE_TIME_HIST_LEVELS_PT];
+    guint   number;
 } pt_histc_t;
 
 typedef struct pt_queue_t {
-	pt_histc_t *base;
-	gint   front;
-	gint   rear;
-	gint   max_size;
+    pt_histc_t *base;
+    gint   front;
+    gint   rear;
+    gint   max_size;
 } pt_queue_t;
 
 typedef struct pt_percentile_t {
-	pt_queue_t sec_statis;
-	pt_queue_t min_statis;
-	pt_queue_t hor_statis;
-	gdouble range_min;
-  	gdouble range_max;
-	gdouble range_deduct;
- 	gdouble range_mult;
-	gint need_update_num;
-	gint percentile_switch;
-	gint percentile_value;
+    pt_queue_t sec_statis;
+    pt_queue_t min_statis;
+    pt_queue_t hor_statis;
+    gdouble range_min;
+    gdouble range_max;
+    gdouble range_deduct;
+    gdouble range_mult;
+    gint need_update_num;
+    gint percentile_switch;
+    gint percentile_value;
 } pt_percentile_t;
 
 void* check_percentile(void *user_data);

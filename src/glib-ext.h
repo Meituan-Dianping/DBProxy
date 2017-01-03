@@ -33,7 +33,7 @@ CHASSIS_API guint    g_hash_table_string_hash(gconstpointer _key);
 CHASSIS_API gboolean g_hash_table_string_equal(gconstpointer _a, gconstpointer _b);
 CHASSIS_API void     g_hash_table_string_free(gpointer data);
 CHASSIS_API gpointer g_hash_table_lookup_const(GHashTable *h, const gchar *name, gsize name_len);
-CHASSIS_API guint	g_istr_hash(gconstpointer v);
+CHASSIS_API guint   g_istr_hash(gconstpointer v);
 
 CHASSIS_API GString *g_string_dup(GString *);
 
