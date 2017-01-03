@@ -30,6 +30,7 @@ DBProxy is a MySQL protocol-based database middleware project developed and main
 5. [DBProxy release notes](./doc/RELEASE_NOTES.md)
 6. [DBProxy tests guide](./doc/TEST_GUIDE.md)
 7. [FAQ](./doc/FAQ.md)
+8. [DEVELOPMENT NORM](./doc/DEVELOPMENT_NORM.md)
 
 ###5.Requirement and feedback
 

@@ -31,6 +31,7 @@ DBProxy是由美团点评公司技术工程部DBA团队（北京）开发维护�
 5. [DBProxy release notes](./doc/RELEASE_NOTES.md)
 6. [DBProxy 测试手册](./doc/TEST_GUIDE.md)
 7. [FAQ](./doc/FAQ.md)
+8. [DBProxy开发规范](./doc/DEVELOPMENT_NORM.md)
 
 ###四、DBProxy的需求及Bug反馈方式
 
