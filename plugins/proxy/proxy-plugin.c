@@ -2181,7 +2181,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query) {
 		network_mysqld_queue_reset(send_sock);
 		network_mysqld_queue_append(send_sock, send_sock->send_queue, S(inj->query));
 
-		network_mysqld_send_query_stat(con, inj->query->str[0], (inj->id == INJECTION_EXPLICIT_MULTI_WRITE_QUERY) || (inj->id == INJECTION_EXPLICIT_SINGLE_WRITE_QUERY && inj->resultset_is_needed));
+		network_mysqld_send_query_stat(con, inj->query->str[0], IS_EXPLICIT_WRITE_QUERY(inj));
 
 		while ((packet = g_queue_pop_head(recv_sock->recv_queue->chunks))) g_string_free(packet, TRUE);
 
@@ -2291,7 +2291,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_send_query_result) {
 	network_mysqld_queue_reset(send_sock);
 	network_mysqld_queue_append(send_sock, send_sock->send_queue, S(inj->query));
 
-	network_mysqld_send_query_stat(con, inj->query->str[0], (inj->id == INJECTION_EXPLICIT_MULTI_WRITE_QUERY) || (inj->id == INJECTION_EXPLICIT_SINGLE_WRITE_QUERY && inj->resultset_is_needed));
+	network_mysqld_send_query_stat(con, inj->query->str[0], IS_EXPLICIT_WRITE_QUERY(inj));
 
 
 	network_mysqld_con_reset_command_response_state(con);

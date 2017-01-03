@@ -56,7 +56,7 @@
 
 #define IS_IMPLICIT_INJ(inj)    ((inj->id) >= INJECTION_IMPLICIT_SET && \
                                 (inj->id) <= INJECTION_IMPLICIT_LAST_INSERT_ID)
-
+#define IS_EXPLICIT_WRITE_QUERY(inj) ((inj->id) == INJECTION_EXPLICIT_SINGLE_WRITE_QUERY || (inj->id) == INJECTION_EXPLICIT_MULTI_WRITE_QUERY)
 typedef struct {
 	/**
 	 * the content of the OK packet 
