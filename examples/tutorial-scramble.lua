@@ -24,46 +24,46 @@ local proto = assert(require("mysql.proto"))
 ---
 -- map usernames to another login
 local map_auth = {
-	["replace"] = {
-		password = "me",
-		new_user = "root",
-		new_password = "secret"
-	}
+    ["replace"] = {
+        password = "me",
+        new_user = "root",
+        new_password = "secret"
+    }
 }
 
 ---
 -- show how to use the mysql.password functions
 --
 function read_auth()
-	local c = proxy.connection.client
-	local s = proxy.connection.server
+    local c = proxy.connection.client
+    local s = proxy.connection.server
 
-	print(("for challenge %q the client sent %q"):format(
-		s.scramble_buffer,
-		c.scrambled_password
-	))
+    print(("for challenge %q the client sent %q"):format(
+        s.scramble_buffer,
+        c.scrambled_password
+    ))
 
-	-- if we know this user, replace its credentials
-	local mapped = map_auth[c.username]
-	
-	if mapped and
-		password.check(
-			s.scramble_buffer,
-			c.scrambled_password,
-			password.hash(password.hash(mapped.password))
-		) then
+    -- if we know this user, replace its credentials
+    local mapped = map_auth[c.username]
+    
+    if mapped and
+        password.check(
+            s.scramble_buffer,
+            c.scrambled_password,
+            password.hash(password.hash(mapped.password))
+        ) then
 
-		proxy.queries:append(1, 
-			proto.to_response_packet({
-				username = mapped.new_user,
-				response = password.scramble(s.scramble_buffer, password.hash(mapped.new_password)),
-				charset  = 8, -- default charset
-				database = c.default_db,
-				max_packet_size = 1 * 1024 * 1024
-			})
-		)
+        proxy.queries:append(1, 
+            proto.to_response_packet({
+                username = mapped.new_user,
+                response = password.scramble(s.scramble_buffer, password.hash(mapped.new_password)),
+                charset  = 8, -- default charset
+                database = c.default_db,
+                max_packet_size = 1 * 1024 * 1024
+            })
+        )
 
-		return proxy.PROXY_SEND_QUERY
-	end
+        return proxy.PROXY_SEND_QUERY
+    end
 end
 

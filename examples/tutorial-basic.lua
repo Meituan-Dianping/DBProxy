@@ -37,17 +37,17 @@
 -- for a COM_QUERY it is the query itself in plain-text
 --
 function read_query( packet )
-	print("read hello world")
-	if string.byte(packet) == proxy.COM_QUERY then
-		print("we got a normal query: " .. string.sub(packet, 2))
-	end
-	print("default_charset is: " .. proxy.connection.client.default_charset)
-	proxy.queries:append(1, packet, { resultset_is_needed = true})
-	return proxy.PROXY_SEND_QUERY
+    print("read hello world")
+    if string.byte(packet) == proxy.COM_QUERY then
+        print("we got a normal query: " .. string.sub(packet, 2))
+    end
+    print("default_charset is: " .. proxy.connection.client.default_charset)
+    proxy.queries:append(1, packet, { resultset_is_needed = true})
+    return proxy.PROXY_SEND_QUERY
 end
 function read_query_result( inj )
-	print("hellowrold!!")
-	print("client charset is: " ..  proxy.connection.client.default_charset)
-	print("server charset is: " ..  proxy.connection.server.default_charset)
+    print("hellowrold!!")
+    print("client charset is: " ..  proxy.connection.client.default_charset)
+    print("server charset is: " ..  proxy.connection.server.default_charset)
 end
 

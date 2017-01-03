@@ -39,13 +39,13 @@ assert(proxy.PROXY_VERSION >= 0x00501, "you need at least mysql-proxy 0.5.1 to r
 -- * proxy.MYSQL_FIELD_*
 --
 function read_query( packet )
-	if packet:byte() == proxy.COM_QUERY then
-		print("get got a Query: " .. packet:sub(2))
+    if packet:byte() == proxy.COM_QUERY then
+        print("get got a Query: " .. packet:sub(2))
 
-		-- proxy.PROXY_VERSION is the proxy version as HEX number
-		-- 0x00501 is 0.5.1 
-		print("we are: " .. string.format("%05x", proxy.PROXY_VERSION))
-		print("lua is: " .. _VERSION)
-	end
+        -- proxy.PROXY_VERSION is the proxy version as HEX number
+        -- 0x00501 is 0.5.1 
+        print("we are: " .. string.format("%05x", proxy.PROXY_VERSION))
+        print("lua is: " .. _VERSION)
+    end
 end
 

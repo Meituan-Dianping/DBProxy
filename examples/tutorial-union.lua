@@ -21,47 +21,47 @@
 res = { }
 
 function read_query(packet)
-	if packet:byte() ~= proxy.COM_QUERY then return end
+    if packet:byte() ~= proxy.COM_QUERY then return end
 
-	local q = packet:sub(2)
+    local q = packet:sub(2)
 
-	res = { }
+    res = { }
 
-	if q:sub(1, 6):upper() == "SELECT" then
-		proxy.queries:append(1, packet, { resultset_is_needed = true })
-		proxy.queries:append(2, packet, { resultset_is_needed = true })
+    if q:sub(1, 6):upper() == "SELECT" then
+        proxy.queries:append(1, packet, { resultset_is_needed = true })
+        proxy.queries:append(2, packet, { resultset_is_needed = true })
 
-		return proxy.PROXY_SEND_QUERY
-	end
+        return proxy.PROXY_SEND_QUERY
+    end
 end
 
 function read_query_result(inj)
-	for row in inj.resultset.rows do
-		res[#res + 1] = row
-	end
+    for row in inj.resultset.rows do
+        res[#res + 1] = row
+    end
 
-	if inj.id ~= 2 then
-		return proxy.PROXY_IGNORE_RESULT
-	end
+    if inj.id ~= 2 then
+        return proxy.PROXY_IGNORE_RESULT
+    end
 
-	proxy.response = {
-		type = proxy.MYSQLD_PACKET_OK,
-		resultset = {
-			rows = res
-		}
-	}
+    proxy.response = {
+        type = proxy.MYSQLD_PACKET_OK,
+        resultset = {
+            rows = res
+        }
+    }
 
-	local fields = {} 
-	for n = 1, #inj.resultset.fields do
-		fields[#fields + 1] = { 
-			type = inj.resultset.fields[n].type,
-			name = inj.resultset.fields[n].name,
-		}
-	end
+    local fields = {} 
+    for n = 1, #inj.resultset.fields do
+        fields[#fields + 1] = { 
+            type = inj.resultset.fields[n].type,
+            name = inj.resultset.fields[n].name,
+        }
+    end
 
-	proxy.response.resultset.fields = fields
+    proxy.response.resultset.fields = fields
 
-	return proxy.PROXY_SEND_RESULT
+    return proxy.PROXY_SEND_RESULT
 end
 
 

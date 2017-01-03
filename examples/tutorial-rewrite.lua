@@ -37,45 +37,45 @@
 --   * proxy.PROXY_SEND_RESULT to send your own result-set
 --
 function read_query( packet )
-	if string.byte(packet) == proxy.COM_QUERY then
-		local query = string.sub(packet, 2)
+    if string.byte(packet) == proxy.COM_QUERY then
+        local query = string.sub(packet, 2)
 
-		print("we got a normal query: " .. query)
+        print("we got a normal query: " .. query)
 
-		-- try to match the string up to the first non-alphanum
-		local f_s, f_e, command = string.find(packet, "^%s*(%w+)", 2)
-		local option
+        -- try to match the string up to the first non-alphanum
+        local f_s, f_e, command = string.find(packet, "^%s*(%w+)", 2)
+        local option
 
-		if f_e then
-			-- if that match, take the next sub-string as option
-			f_s, f_e, option = string.find(packet, "^%s+(%w+)", f_e + 1)
-		end
-		
-		-- support 
-		--
-		-- ls [db]
-		-- cd db
-		-- who
+        if f_e then
+            -- if that match, take the next sub-string as option
+            f_s, f_e, option = string.find(packet, "^%s+(%w+)", f_e + 1)
+        end
+        
+        -- support 
+        --
+        -- ls [db]
+        -- cd db
+        -- who
 
-		if command == "ls" then
-			if option then
-				-- FIXME: SQL INJECTION
-				proxy.queries:append(1, string.char(proxy.COM_QUERY) .. "SHOW TABLES FROM " .. option )
-			else
-				proxy.queries:append(1, string.char(proxy.COM_QUERY) .. "SHOW TABLES" )
-			end
+        if command == "ls" then
+            if option then
+                -- FIXME: SQL INJECTION
+                proxy.queries:append(1, string.char(proxy.COM_QUERY) .. "SHOW TABLES FROM " .. option )
+            else
+                proxy.queries:append(1, string.char(proxy.COM_QUERY) .. "SHOW TABLES" )
+            end
 
-			return proxy.PROXY_SEND_QUERY
-		elseif command == "who" then
-			proxy.queries:append(1, string.char(proxy.COM_QUERY) .. "SHOW PROCESSLIST" )
+            return proxy.PROXY_SEND_QUERY
+        elseif command == "who" then
+            proxy.queries:append(1, string.char(proxy.COM_QUERY) .. "SHOW PROCESSLIST" )
 
-			return proxy.PROXY_SEND_QUERY
-		elseif command == "cd" and option then
-			proxy.queries:append(1, string.char(proxy.COM_INIT_DB) .. option )
+            return proxy.PROXY_SEND_QUERY
+        elseif command == "cd" and option then
+            proxy.queries:append(1, string.char(proxy.COM_INIT_DB) .. option )
 
-			return proxy.PROXY_SEND_QUERY
-		end
-	end
+            return proxy.PROXY_SEND_QUERY
+        end
+    end
 end
 
 ---
@@ -92,6 +92,6 @@ end
 --   got used in read_query()
 --
 function read_query_result(inj)
-	 
+     
 end
 

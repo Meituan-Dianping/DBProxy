@@ -37,13 +37,13 @@
 --   * proxy.PROXY_SEND_QUERY to send the queries from the proxy.queries queue
 --
 function read_query( packet )
-	if packet:byte() == proxy.COM_QUERY then
-		print("we got a normal query: " .. packet:sub(2))
+    if packet:byte() == proxy.COM_QUERY then
+        print("we got a normal query: " .. packet:sub(2))
 
-		proxy.queries:append(1, packet, { resultset_is_needed = false} )
+        proxy.queries:append(1, packet, { resultset_is_needed = false} )
 
-		return proxy.PROXY_SEND_QUERY
-	end
+        return proxy.PROXY_SEND_QUERY
+    end
 end
 
 ---
@@ -56,6 +56,6 @@ end
 --   * nothing or proxy.PROXY_SEND_RESULT to pass the result-set to the client
 -- 
 function read_query_result(inj)
-	print("query-time: " .. (inj.query_time / 1000) .. "ms")
-	print("response-time: " .. (inj.response_time / 1000) .. "ms")
+    print("query-time: " .. (inj.query_time / 1000) .. "ms")
+    print("response-time: " .. (inj.response_time / 1000) .. "ms")
 end

@@ -37,11 +37,11 @@
 --   * proxy.PROXY_SEND_RESULT to send your own result-set
 --
 function read_query( packet )
-	if string.byte(packet) == proxy.COM_QUERY then
-		proxy.queries:append(1, packet, { resultset_is_needed = true } )
+    if string.byte(packet) == proxy.COM_QUERY then
+        proxy.queries:append(1, packet, { resultset_is_needed = true } )
 
-		return proxy.PROXY_SEND_QUERY
-	end
+        return proxy.PROXY_SEND_QUERY
+    end
 end
 
 ---
@@ -59,19 +59,19 @@ end
 -- 
 function read_query_result(inj)
 
-	if (inj.id == 1) then
-  		local res = assert(inj.resultset)
+    if (inj.id == 1) then
+        local res = assert(inj.resultset)
 
-		if res.warning_count > 0 then
-			print("Query had warnings: " .. inj.query:sub(2))
-			proxy.queries:append(2, string.char(proxy.COM_QUERY) .. "SHOW WARNINGS", { resultset_is_needed = true } )
-		end
-	elseif (inj.id == 2) then
-		for row in inj.resultset.rows do
-			print(string.format("warning: [%d] %s", row[2], row[1]))
-		end
+        if res.warning_count > 0 then
+            print("Query had warnings: " .. inj.query:sub(2))
+            proxy.queries:append(2, string.char(proxy.COM_QUERY) .. "SHOW WARNINGS", { resultset_is_needed = true } )
+        end
+    elseif (inj.id == 2) then
+        for row in inj.resultset.rows do
+            print(string.format("warning: [%d] %s", row[2], row[1]))
+        end
 
-		return proxy.PROXY_IGNORE_RESULT
-	end
+        return proxy.PROXY_IGNORE_RESULT
+    end
 end
 

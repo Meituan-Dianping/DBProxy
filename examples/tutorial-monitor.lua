@@ -38,36 +38,36 @@ end
 -- map the constants to strings 
 -- lua starts at 1
 local command_names = {
-	"COM_SLEEP",
-	"COM_QUIT",
-	"COM_INIT_DB",
-	"COM_QUERY",
-	"COM_FIELD_LIST",
-	"COM_CREATE_DB",
-	"COM_DROP_DB",
-	"COM_REFRESH",
-	"COM_SHUTDOWN",
-	"COM_STATISTICS",
-	"COM_PROCESS_INFO",
-	"COM_CONNECT",
-	"COM_PROCESS_KILL",
-	"COM_DEBUG",
-	"COM_PING",
-	"COM_TIME",
-	"COM_DELAYED_INSERT",
-	"COM_CHANGE_USER",
-	"COM_BINLOG_DUMP",
-	"COM_TABLE_DUMP",
-	"COM_CONNECT_OUT",
-	"COM_REGISTER_SLAVE",
-	"COM_STMT_PREPARE",
-	"COM_STMT_EXECUTE",
-	"COM_STMT_SEND_LONG_DATA",
-	"COM_STMT_CLOSE",
-	"COM_STMT_RESET",
-	"COM_SET_OPTION",
-	"COM_STMT_FETCH",
-	"COM_DAEMON"
+    "COM_SLEEP",
+    "COM_QUIT",
+    "COM_INIT_DB",
+    "COM_QUERY",
+    "COM_FIELD_LIST",
+    "COM_CREATE_DB",
+    "COM_DROP_DB",
+    "COM_REFRESH",
+    "COM_SHUTDOWN",
+    "COM_STATISTICS",
+    "COM_PROCESS_INFO",
+    "COM_CONNECT",
+    "COM_PROCESS_KILL",
+    "COM_DEBUG",
+    "COM_PING",
+    "COM_TIME",
+    "COM_DELAYED_INSERT",
+    "COM_CHANGE_USER",
+    "COM_BINLOG_DUMP",
+    "COM_TABLE_DUMP",
+    "COM_CONNECT_OUT",
+    "COM_REGISTER_SLAVE",
+    "COM_STMT_PREPARE",
+    "COM_STMT_EXECUTE",
+    "COM_STMT_SEND_LONG_DATA",
+    "COM_STMT_CLOSE",
+    "COM_STMT_RESET",
+    "COM_SET_OPTION",
+    "COM_STMT_FETCH",
+    "COM_DAEMON"
 }
 
 --- dump the result-set to stdout
@@ -156,10 +156,10 @@ end
 
 function read_query()
 
---[[	for i = 1, #proxy.global.backends do
-		local s = proxy.global.backends[i]
-		local pool     = s.pool -- we don't have a username yet, try to find a connections which is idling
-		local cur_idle = pool.users[""].cur_idle_connections
+--[[    for i = 1, #proxy.global.backends do
+        local s = proxy.global.backends[i]
+        local pool     = s.pool -- we don't have a username yet, try to find a connections which is idling
+        local cur_idle = pool.users[""].cur_idle_connections
 
         print("  [".. i .."].connected_clients = " .. s.connected_clients)
         print("  [".. i .."].idling_connections = " .. cur_idle)
@@ -168,7 +168,7 @@ function read_query()
     end
 --]]
 
-	proxy.queries:append(1, string.char(proxy.COM_QUERY) .. "SELECT NOW()", { resultset_is_needed = true } )
+    proxy.queries:append(1, string.char(proxy.COM_QUERY) .. "SELECT NOW()", { resultset_is_needed = true } )
     if proxy.connection then
         print ("inject monitor query into backend # " .. proxy.connection.backend_ndx)
     else
@@ -178,11 +178,11 @@ end
 
 function read_query_result ( inj )
 
-	local res      = assert(inj.resultset)
-	local packet   = assert(inj.query)
+    local res      = assert(inj.resultset)
+    local packet   = assert(inj.query)
  
-	decode_query_packet(packet)
+    decode_query_packet(packet)
 
-	print "read query result, dumping"
-	dump_query_result(inj)
+    print "read query result, dumping"
+    dump_query_result(inj)
 end

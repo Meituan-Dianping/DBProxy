@@ -26,24 +26,24 @@
 local tokenizer = require("proxy.tokenizer")
 
 function read_query(packet) 
-	if packet:byte() == proxy.COM_QUERY then
-		local tokens = tokenizer.tokenize(packet:sub(2))
+    if packet:byte() == proxy.COM_QUERY then
+        local tokens = tokenizer.tokenize(packet:sub(2))
 
-		-- just for debug
-		for i = 1, #tokens do
-			-- print the token and what we know about it
-            		local token = tokens[i]
-			local txt = token["text"]
-            		if token["token_name"] == 'TK_STRING' then
-                		txt = string.format("%q", txt)
-            		end
-			-- print(i .. ": " .. " { " .. token["token_name"] .. ", " .. token["text"] .. " }" )
-			print(i .. ": " .. " { " .. token["token_name"] .. ", " .. txt .. " }" )
+        -- just for debug
+        for i = 1, #tokens do
+            -- print the token and what we know about it
+                    local token = tokens[i]
+            local txt = token["text"]
+                    if token["token_name"] == 'TK_STRING' then
+                        txt = string.format("%q", txt)
+                    end
+            -- print(i .. ": " .. " { " .. token["token_name"] .. ", " .. token["text"] .. " }" )
+            print(i .. ": " .. " { " .. token["token_name"] .. ", " .. txt .. " }" )
 
 
-		end
+        end
 
-		print("normalized query: " .. tokenizer.normalize(tokens))
+        print("normalized query: " .. tokenizer.normalize(tokens))
         print("")
-	end
+    end
 end

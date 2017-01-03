@@ -35,7 +35,7 @@
 --]]
 
 assert(proxy.PROXY_VERSION >= 0x00600,
-  	"you need at least mysql-proxy 0.6.0 to run this module")
+    "you need at least mysql-proxy 0.6.0 to run this module")
 
 --[[
    If the environmental variable 'DEBUG' is set, then
@@ -285,7 +285,7 @@ function read_query( packet )
     proxy.queries:append(xtab_id_before, 
         string.char(proxy.COM_QUERY) .. 
         "set group_concat_max_len = 1024*1024",
-	{ resultset_is_needed = true })
+    { resultset_is_needed = true })
 
     --[[
        If further queries need to be executed before the 
@@ -315,7 +315,7 @@ function read_query( packet )
             table_name, 
             col_field
         ),
-	{ resultset_is_needed = true }
+    { resultset_is_needed = true }
     )
     return proxy.PROXY_SEND_QUERY
 end

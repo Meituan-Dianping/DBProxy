@@ -37,17 +37,17 @@
 --   * proxy.PROXY_SEND_RESULT to send your own result-set
 --
 function read_query( packet )
-	if string.byte(packet) == proxy.COM_QUERY then
-		print("we got a normal query: " .. string.sub(packet, 2))
+    if string.byte(packet) == proxy.COM_QUERY then
+        print("we got a normal query: " .. string.sub(packet, 2))
 
-		proxy.queries:append(1, packet )
-		-- generate a new COM_QUERY packet
-		--   [ \3SELECT NOW() ]
-		-- and inject it with the id = 2
-		proxy.queries:append(2, string.char(proxy.COM_QUERY) .. "SELECT NOW()", { resultset_is_needed = true } )
+        proxy.queries:append(1, packet )
+        -- generate a new COM_QUERY packet
+        --   [ \3SELECT NOW() ]
+        -- and inject it with the id = 2
+        proxy.queries:append(2, string.char(proxy.COM_QUERY) .. "SELECT NOW()", { resultset_is_needed = true } )
 
-		return proxy.PROXY_SEND_QUERY
-	end
+        return proxy.PROXY_SEND_QUERY
+    end
 end
 
 ---
@@ -64,17 +64,17 @@ end
 --   * proxy.PROXY_IGNORE_RESULT to drop the result-set
 -- 
 function read_query_result(inj)
-	print("injected result-set: id = " .. inj.id)
+    print("injected result-set: id = " .. inj.id)
 
-	-- inj.id = 2 was assigned above in the  proxy.queries:append()
-	-- 
-	-- drop the resultset when we are done to hide it from the client
-	-- (in lua the first index is 1, not 0)
-	if (inj.id == 2) then
-		for row in inj.resultset.rows do
-			print("injected query returned: " .. row[1])
-		end
+    -- inj.id = 2 was assigned above in the  proxy.queries:append()
+    -- 
+    -- drop the resultset when we are done to hide it from the client
+    -- (in lua the first index is 1, not 0)
+    if (inj.id == 2) then
+        for row in inj.resultset.rows do
+            print("injected query returned: " .. row[1])
+        end
 
-		return proxy.PROXY_IGNORE_RESULT
-	end
+        return proxy.PROXY_IGNORE_RESULT
+    end
 end
