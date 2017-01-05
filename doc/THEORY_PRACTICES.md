@@ -10,14 +10,14 @@
 
 1. 支持多语言MySQL客户端
 1. 读写分离
-2. 负载均衡
-3. Slave故障感知与摘除（Master需要需要MHA等其他联动）
-4. 后端连接池
-5. 自定义SQL拦截与过滤
-6. 流量分组与控制
-8. 丰富的监控状态
-9. 支持分表（分库版本正在内测中）
-10. Client IP限制
+1. 负载均衡
+1. Slave故障感知与摘除（Master需要需要MHA等其他联动）
+1. 后端连接池
+1. 自定义SQL拦截与过滤
+1. 流量分组与控制
+1. 丰富的监控状态
+1. 支持分表（分库版本正在内测中）
+1. Client IP限制
 
 使用DBProxy典型场景:
 
@@ -33,9 +33,9 @@
 使用后：
 
 1. 应用程序在连接串中设置DBProxy的地址，不需要关注整个数据库集群的拓扑结构；
-1. DBProxy内部实现负载均衡，读写分离；
-1. Slave上下线的操作由DBA通过Atlas Admin管理接口完成；
-2. Slave故障时，DBProxy自动摘除。
+2. DBProxy内部实现负载均衡，读写分离；
+3. Slave上下线的操作由DBA通过Atlas Admin管理接口完成；
+4. Slave故障时，DBProxy自动摘除。
 ```
 
 这样极大的减轻了DBA和应用开发人员的工作，引入DBProxy对于系统的可管理性和便利性都有非常大的帮助。
@@ -99,10 +99,10 @@ DBProxy的监控体系实现了一个从无到有的过程，目前主要监控�
 对于sharding版本，做了如下的改进：
 
 1. 把分库变成分库分表，并且提供了5种分库分表的方式；
-2. 改进了Lemon基本上兼容MySQL语法；
-3. 有限支持单个库内部的JOIN，经过Lemon解析后，发现涉及的表都是在同一个库，那么表的JOIN是支持的；
-4. 支持单库的事务；
-5. 增加错误处理：在一个库上面执行出错的时候，会相应有一些rollback的机制，来处理一些异常情况导致的执行失败。
+1. 改进了Lemon基本上兼容MySQL语法；
+1. 有限支持单个库内部的JOIN，经过Lemon解析后，发现涉及的表都是在同一个库，那么表的JOIN是支持的；
+1. 支持单库的事务；
+1. 增加错误处理：在一个库上面执行出错的时候，会相应有一些rollback的机制，来处理一些异常情况导致的执行失败。
 
 ![sharding 版本](img/p9.jpg)
 
@@ -184,11 +184,11 @@ DBProxy在开源Atlas的基础上，我们做了以下努力和工作（截止�
 # DBProxy手册
 
 1. [DBProxy快速入门教程](./doc/QUICK_START.md)
-2. [DBProxy用户使用手册](./doc/USER_GUIDE.md)
-3. [DBProxy开发手册](./doc/PROGRAMMING_GUIDE.md)
-4. [DBProxy架构和实践](./doc/THEORY_PRACTICES.md)
-5. [DBProxy release notes](./doc/RELEASE_NOTES.md)
-6. [DBProxy 测试手册](./doc/TEST_GUIDE.md)
-7. [FAQ](./doc/FAQ.md)
-8. [DBProxy开发规范](./doc/DEVELOPMENT_NORM.md)
+1. [DBProxy用户使用手册](./doc/USER_GUIDE.md)
+1. [DBProxy开发手册](./doc/PROGRAMMING_GUIDE.md)
+1. [DBProxy架构和实践](./doc/THEORY_PRACTICES.md)
+1. [DBProxy release notes](./doc/RELEASE_NOTES.md)
+1. [DBProxy 测试手册](./doc/TEST_GUIDE.md)
+1. [FAQ](./doc/FAQ.md)
+1. [DBProxy开发规范](./doc/DEVELOPMENT_NORM.md)
 
