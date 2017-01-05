@@ -1,4 +1,4 @@
-# 编译/安装/运行
+## 编译/安装/运行
 
 详见[快速入门手册](./QUICK_START.md) 对应章节
 
@@ -932,7 +932,7 @@ DBProxy 使用较多的
      将event添加到event_base中
  * 示例: WAIT\_FOR\_EVENT
  
-### LUA(todo)
+### LUA
 Lua 与 C 的简单交互  
    
    * C 与 Lua 交互的基础  
@@ -1039,4 +1039,133 @@ Lua 与 C 的简单交互
         * [Lua5.3参考手册](https://cloudwu.github.io/lua53doc/manual.html)
         * [Lua C 接口](https://www.lua.org/manual/5.3/manual.html#4)
         * [Lua C API 的正确用法](http://blog.codingnow.com/2015/05/lua_c_api.html)
+
+### 修改的bug介绍
+
+#### 解决用户权限不足、Atlas用户名密码配置错误等导致使用错误用户的问题  
+    连接池的优化
+  
+    ```
+    network_connection_pool *network_connection_pool_new(void) {
+	network_connection_pool *pool =
+	            g_hash_table_new_full((GHashFunc)network_connection_pool_hash_func,
+			                            (GEqualFunc)network_connection_pool_equal_func,
+			                            (GDestroyNotify)network_connection_pool_key_free,
+			                            (GDestroyNotify)network_connection_pool_value_free);
+    key:value : network_connection_pool_add
+    ```
+#### 解决SQL语句中有注释时语句分析不正确的问题
+
+    ```
+    check_flags
+    skip_comment_token
+    ```
+#### 屏蔽了KILL语句，避免在后端MySQL可能误KILL的问题。
+
+    ```
+    is_in_blacklist
+    
+    ```
+#### 解决客户端发送空串导致Atlas挂掉的问题
+
+    ```
+    proxy_read_query
+            if (type == COM_QUERY && tokens->len <= 1) {
+    ```
+#### 解决在分表情况下，返回值有 NULL 的情况下，查询超时的问题  
+    此问题是Atlas在多个分表merge结果的过程中未处理 NULL 值，导致结果集返回不对，而JDBC接口会认为此种情况下是未收到结果，会处于一直等待状态，触发超时。
+
+    ```
+    merge_rows
+    ```
+#### 解决在分表情况下， IN 子句中分表列只支持int32，不支持int64的问题
+    
+    ```
+    combine_sql
+        for (i = 0; i < num; ++i) mt[i] = g_array_new(FALSE, FALSE, sizeof(guint64));
+    ```
+#### 解决0.0.2版本连接断开的内存泄露问题  
+在连接的结构体的释放接口中，lock 的成员变量未释放，导致在连接断开，回收连接对象时会泄漏24个字节。
+
+    ```
+    network_mysqld_con_free
+    g_hash_table_remove_all(con->locks);
+	g_hash_table_destroy(con->locks);
+    ```
+#### 修改了事务内语句执行错误时，Atlas未保留后台连接导致rollback发送到其它结点的问题 
+    http://wiki.sankuai.com/pages/viewpage.action?pageId=441093332
+
+#### 解决了绑定后端连接断开时，客户端连接未及时断开的问题。
+
+    ```
+    network_mysqld_con_handle
+    CON_STATE_READ_QUERY:
+    服务端连接
+    // 异常，server端收到了数据，直接断开连接
+    if (con->server && event_fd == con->server->fd) {
+        gchar *log_str = g_strdup_printf("there is something to read from server(%s).",
+                                    NETWORK_SOCKET_SRC_NAME(con->server));
+        CON_MSG_HANDLE(g_critical, con, log_str);
+        g_free(log_str);
+        g_atomic_int_add(&srv->proxy_aborted_clients, 1);
+        con->state = CON_STATE_ERROR;
+        break;
+    }
+    ```
+
+#### 解决了show processlist在显示backend host时引起core dump的问题。
+
+    ```
+    show processlist
+    con->server_lock
+    ```
+
+#### 修复分表查询结果合并时列字符集错误的问题，该问题可能会导致结果乱码。
+
+    ```
+    函数 network_mysqld_con_send_resultset
+    g_string_append_c(s, field->charsetnr & 0xff); /* charset */
+    g_string_append_c(s, (field->charsetnr >> 8) & 0xff); /* charset */
+    ```
+### 连接保持
+####  相关代码
+
+```
+    proxy_read_query_result()
+    case PROXY_SEND_RESULT:
+        gboolean b_reserve_conn = (inj->qstat.insert_id > 0) || (inj->qstat.warning_count > 0) || (inj->qstat.affected_rows > 0); //found_rows(), last_insert_id(), row_count(), show warnings
+        if (!con->conn_status.is_in_transaction &&
+                 !con->conn_status.is_in_select_calc_found_rows &&
+                 !b_reserve_conn && g_hash_table_size(con->locks) == 0) {
+			network_connection_pool_lua_add_connection(con); //放回连接池
+	    }
+```
+
+#### 特殊情况描述
+1. 查询上下文信息: found_rows(), last_insert_id(), row_count(), show warnings
+2. 事务内
+3. 显示锁
+
+### 连接的状态迁移
+
+#### proxy 建立的连接的状态迁移
+
+![](./img/proxy_state.jpg)
+
+#### admin 建立的连接的状态迁移
+       
+![](./img/proxy_state.jpg)
+
+### event_thread/backends/pool 的关系
+
+![](./img/backend_pool.jpg)
+
+**注释：**
+
+1. 每个backend为每个thread-event线程都保存了独立的连接池，例如backend为event-thread2提供了连接池et2
+2. 每个连接池中的socket按照用户名来组织，例如客户端需要以user2的用户名连接后端数据库，则从连接池的user2的链表中取出其中的一个socket，分配给客户端
+3. 在分配event-thread时，是轮询方式分配event-thread的
+4. 在选择backend的时，最基本的选择方式是轮询方式。
+       
+       
        
