@@ -4,7 +4,7 @@
 
 目前美团点评内部使用的中间件DBProxy是在奇虎360公司开源的Atlas上继续开发，逐渐满足公司内部需求。
 
-美团点评致力于将DBProxy打造成一款高可靠、高可用的一款企业级数据库中间件，选择将已经在公司内部使用的较为成熟、稳定的DBProxy进行开源，[github地址](https://github.com/Meituan-Dianping/DBProxy)。希望与业内同样有数据库中间件需求的团队，在DBProxy基础上一起打造一款企业级优良的数据库中间件产品。
+美团点评致力于将DBProxy打造成一款高可靠、高可用的一款企业级数据库中间件，选择将已经**在公司内部使用的较为成熟（包括支付、外卖、团购、酒旅等）**、稳定的DBProxy进行开源，[github地址](https://github.com/Meituan-Dianping/DBProxy)。希望与业内同样有数据库中间件需求的团队，在DBProxy基础上一起打造一款企业级优良的数据库中间件产品。
 
 # DBProxy的优点
 
