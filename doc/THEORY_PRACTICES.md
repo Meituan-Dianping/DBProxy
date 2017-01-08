@@ -183,12 +183,12 @@ DBProxy在开源Atlas的基础上，我们做了以下努力和工作（截止�
 
 # DBProxy手册
 
-1. [DBProxy快速入门教程](./doc/QUICK_START.md)
-1. [DBProxy用户使用手册](./doc/USER_GUIDE.md)
-1. [DBProxy开发手册](./doc/PROGRAMMING_GUIDE.md)
-1. [DBProxy架构和实践](./doc/THEORY_PRACTICES.md)
-1. [DBProxy release notes](./doc/RELEASE_NOTES.md)
-1. [DBProxy 测试手册](./doc/TEST_GUIDE.md)
-1. [FAQ](./doc/FAQ.md)
-1. [DBProxy开发规范](./doc/DEVELOPMENT_NORM.md)
+1. [DBProxy快速入门教程](./QUICK_START.md)
+1. [DBProxy用户使用手册](./USER_GUIDE.md)
+1. [DBProxy开发手册](./PROGRAMMING_GUIDE.md)
+1. [DBProxy架构和实践](./THEORY_PRACTICES.md)
+1. [DBProxy release notes](./RELEASE_NOTES.md)
+1. [DBProxy 测试手册](./TEST_GUIDE.md)
+1. [FAQ](./FAQ.md)
+1. [DBProxy开发规范](./DEVELOPMENT_NORM.md)
 
