@@ -43,6 +43,49 @@ DBProxy中连接池中连接的数量目前还没有限制；目前也没有针�
 
 **需要注意：**DBproxy 配置文件中需要配置下后端mysql的版本，默认5.5 。例如，使用mysql是5.6时候，配置文件中配置参数 mysql-version=5.6。
 
+### Q9: 美团已经把DBProxy 的所有代码都开源了吗？
+
+DBProxy 完全开源了，美团点评 目前内部使用的版本和github上的版本一致。我们后续的所有维护、开发都会直接在github上进行。
+
+
+### Q10: DBProxy自己管理与MySQL的连接池么？
+
+是的。
+
+### Q11: DBProxy和主mysql放一台物理机对性能影响大吗?
+
+DBProxy消耗资源不大，性能影响不大。
+
+### Q12: DBProxy 前面加个lvs这种方式，程序支持没有问题吧？
+
+没有问题，美团点评也使用lvs。
+
+### Q13: DBProxy 支持分库分表吗？还是只支持分表？
+
+目前开源的版本只支持分表，分库分表版本在内测，稳定后会立即开源。
+
+### Q14: DBProxy 主要是什么语言编写的？
+
+主要是C，有一小部分Lua。
+
+### Q15: DBProxy的负载均衡算法是什么？
+
+现阶段：   
+ 
+- 权重一样，简单的从库轮询（RR）；    
+
+- 权重不同，按权重比例轮询（例如：只有两个可用的slave, slave 1:weight 4  , slave 2: weight 1, 每5次4次发送查询语句到slave1,1次 发送查询语句到slave2）；   
+ 
+- 配置了tag，会根据配置的tag发送到指定的从库（tag详细参考 [从库流量配置](https://github.com/Meituan-Dianping/DBProxy/blob/master/doc/USER_GUIDE.md#3.3.7.2)）；
+
+- 支持threadrunning功能，进行过载保护（DBProxy会周期获取MySQL的实际threadrunning，根据DBProxy 上配置的threadrunning来选择可用的从库）。
+
+
+
+
+
+
+
 
 
 
