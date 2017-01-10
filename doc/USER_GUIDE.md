@@ -297,7 +297,7 @@ $install_path/mysql-proxyd $instance_name start/restart/stop
 <h1 id="3.1.2"></h1>
 
 ```
-$install_path/bin/mysql-proxy --default-file=$config_file_path/instance_name.cnf   #$install_path安装路径  $instance_name实例名字    
+$install_path/bin/mysql-proxy --defaults-file=$config_file_path/instance_name.cnf   #$install_path安装路径  $instance_name实例名字    
 ```
 
 ## 3.2 DBProxy兼容的SQL语法    
