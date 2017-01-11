@@ -86,9 +86,13 @@ DBProxy消耗资源不大，性能影响不大。
 
 - 支持threadrunning功能，进行过载保护（DBProxy会周期获取MySQL的实际threadrunning，根据DBProxy 上配置的threadrunning来选择可用的从库）。
 
+### Q17: DBProxy如果处理客户端已关闭的连接？
 
+正常情况下，客户端在连接断开时会发送FIN报文，DBProxy收到FIN报文后，会自动关闭客户端连接；对于异常情况，首先DBProxy加入了TCP协议的keepalive机制检测错误连接，其次DBProxy会自动关闭空闲超过一定时间（可通过wait-timeout配置，默认为8小时）的连接。
 
+### Q18: DBProxy的日志有几种，如何命名？
 
+DBProxy的日志有两种，第一种是记录Atlas运行状态的日志，另一种是记录SQL执行情况的日志；记录运行状态的日志类似于mysql 的 error.log, 其命名方式是由配置文件的instance参数指定，类似$instance.log；而记录SQL执行情况的日志类似于MySQL的general log，其命名方式是第一种日志的名称加前缀"sql_"， 类似sql_$instance.log。可以根据具体的情况查找对应的log.
 
 
 
