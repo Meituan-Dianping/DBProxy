@@ -131,6 +131,10 @@ DBProxy的日志有两种，第一种是记录DBProxy运行状态的日志，另
  
 >`(warning)set backend(backend_name) state to DOWN for retry %d times to get thread_running ##由于开启threadrunning功能后，%d次尝试 获得后台MySQL数据库当前threadrunning值均失败导致的`
 
+>#### 特别注意：
+
+>常见的mysql_msg:` MySQL server has gone away `, 导致该错误码的原因之一可能主要是由于DBProxy在连接MySQL时，设置了超时（mysql_options()），该超时参数可以在配置文件中设置（check-state-conn-timeout=1），默认1s。由于网络等原因，引起超时时，便会导致该错误信息。
+
 - MySQL server has gone away
 
 >管理日志中出现该错误，说明在atlas在获取后台MySQL的状态时失败，失败返回的errmsg为：MySQL server has gone away。
