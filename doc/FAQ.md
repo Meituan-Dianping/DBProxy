@@ -127,10 +127,9 @@ DBProxy的日志有两种，第一种是记录DBProxy运行状态的日志，另
 
 >如果被设置了DOWN状态，可以继续查找什么原因导致：
 
->(warning)set backend(backend_name) state to DOWN for: %mysql_errno(%mysql_errmsg)##由于连接不上MySQL数据库导致的（具体错误见mysql_errmsg）。注
-意：check_state线程中连接MySQL时，或是获取MySQL threadrunning值时均可能引起该错误
+>`(warning)set backend(backend_name) state to DOWN for: %mysql_errno(%mysql_errmsg)##由于连接不上MySQL数据库导致的（具体错误见mysql_errmsg）。注意：check_state线程中连接MySQL时，或是获取MySQL threadrunning值时均可能引起该错误`
  
->(warning)set backend(backend_name) state to DOWN for retry %d times to get thread_running ##由于开启threadrunning功能后，%d次尝试 获得后台MySQL数据库当前threadrunning值均失败导致的
+>`(warning)set backend(backend_name) state to DOWN for retry %d times to get thread_running ##由于开启threadrunning功能后，%d次尝试 获得后台MySQL数据库当前threadrunning值均失败导致的`
 
 - MySQL server has gone away
 
