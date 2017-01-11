@@ -95,8 +95,7 @@ DBProxy消耗资源不大，性能影响不大。
 
 ### Q20: DBProxy的日志有几种，如何命名？
 
-DBProxy的日志有两种，第一种是记录Atlas运行状态的日志，另一种是记录SQL执行情况的日志；记录运行状态的日志类似于mysql 的 error.log, 其命名方式是由配置文件的instance参数指定，类似$instance.log；而记录SQL执行情况的日志类似于MySQL的general log，其命名方式是第一种日志的名称加前缀"sql_"， 类似sql_$instance.log。可以根据具体的情况查找对应的log.
-
+DBProxy的日志有两种，第一种是记录DBProxy运行状态的日志，另一种是记录SQL执行情况的日志；记录运行状态的日志类似于mysql 的 error.log, 其命名方式是由配置文件的instance参数指定，类似$instance.log；而记录SQL执行情况的日志类似于MySQL的general log，其命名方式是第一种日志的名称加前缀"sql_"， 类似sql_$instance.log。可以根据具体的情况查找对应的log。
 ### Q21: DBProxy 日志中常见错误汇总
 
 - I have no server backend, closing connection
