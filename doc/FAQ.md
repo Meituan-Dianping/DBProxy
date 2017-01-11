@@ -104,19 +104,19 @@ DBProxy的日志有两种，第一种是记录Atlas运行状态的日志，另�
 >`管理日志`中出现该错误日志时，一般情况下，说明当前的所有从库和主库均不可用（DOWN状态、PENDING状态、OFFLINE状态、OFFLINING/REMOVING状态）。
 检查主库和从库状态，是由DBProxy中周期线程check_state完成，周期检查主从数据库的状态。
 
->####造成DOWN状态一般原因：
+>#### 造成DOWN状态一般原因：
 
 >后台数据库crash、网络不通、网络延迟、人为将数据库摘除或是设置成DOWN。
 
->####造成PENDING状态一般原因：
+>#### 造成PENDING状态一般原因：
 
 >后台数据库压力过大超过设置的threadrunning阈值，进行流量保护。
 
->####造成OFFLINE状态一般原因：(排查问题时极少遇到)
+>#### 造成OFFLINE状态一般原因：(排查问题时极少遇到)
 
 >人为将数据库状态设置成OFFLINE状态。
 
->####造成OFFLINING/REMOVING状态一般原因：（排查问题时极少遇到）
+>#### 造成OFFLINING/REMOVING状态一般原因：（排查问题时极少遇到）
 
 >在通过admin端口设置数据库状态为OFFLINE或摘除数据库时，如果当前有事务中的连接，且没有超过最大等待时间，则会变成中间状态OFFLINING/REMOVING状态，该状态时，同样不会接受新建立的连接的请求。
 
