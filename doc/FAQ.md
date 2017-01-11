@@ -120,6 +120,19 @@ DBProxy的日志有两种，第一种是记录Atlas运行状态的日志，另�
 
 >在通过admin端口设置数据库状态为OFFLINE或摘除数据库时，如果当前有事务中的连接，且没有超过最大等待时间，则会变成中间状态OFFLINING/REMOVING状态，该状态时，同样不会接受新建立的连接的请求。
 
+>#### 排查方法：
+
+>backend的状态被修改时，会打印日志，可以根据日志查看是backend被设置了什么状态导致了该错误：
+
+>`(message)set backend (backend_name) state to UP|DOWN|PENDING`
+
+>如果被设置了DOWN状态，可以继续查找什么原因导致：
+
+>(warning)set backend(backend_name) state to DOWN for: %mysql_errno(%mysql_errmsg)##由于连接不上MySQL数据库导致的（具体错误见mysql_errmsg）。注
+意：check_state线程中连接MySQL时，或是获取MySQL threadrunning值时均可能引起该错误
+ 
+>(warning)set backend(backend_name) state to DOWN for retry %d times to get thread_running ##由于开启threadrunning功能后，%d次尝试 获得后台MySQL数据库当前threadrunning值均失败导致的
+
 - MySQL server has gone away
 
 >管理日志中出现该错误，说明在atlas在获取后台MySQL的状态时失败，失败返回的errmsg为：MySQL server has gone away。
