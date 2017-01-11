@@ -97,9 +97,40 @@ DBProxy消耗资源不大，性能影响不大。
 
 DBProxy的日志有两种，第一种是记录Atlas运行状态的日志，另一种是记录SQL执行情况的日志；记录运行状态的日志类似于mysql 的 error.log, 其命名方式是由配置文件的instance参数指定，类似$instance.log；而记录SQL执行情况的日志类似于MySQL的general log，其命名方式是第一种日志的名称加前缀"sql_"， 类似sql_$instance.log。可以根据具体的情况查找对应的log.
 
+### Q21: DBProxy 日志中常见错误汇总
 
+- I have no server backend, closing connection
 
+>`管理日志`中出现该错误日志时，一般情况下，说明当前的所有从库和主库均不可用（DOWN状态、PENDING状态、OFFLINE状态、OFFLINING/REMOVING状态）。
+检查主库和从库状态，是由DBProxy中周期线程check_state完成，周期检查主从数据库的状态。
 
+>####造成DOWN状态一般原因：
+
+>后台数据库crash、网络不通、网络延迟、人为将数据库摘除或是设置成DOWN。
+
+>####造成PENDING状态一般原因：
+
+>后台数据库压力过大超过设置的threadrunning阈值，进行流量保护。
+
+>####造成OFFLINE状态一般原因：(排查问题时极少遇到)
+
+>人为将数据库状态设置成OFFLINE状态。
+
+>####造成OFFLINING/REMOVING状态一般原因：（排查问题时极少遇到）
+
+>在通过admin端口设置数据库状态为OFFLINE或摘除数据库时，如果当前有事务中的连接，且没有超过最大等待时间，则会变成中间状态OFFLINING/REMOVING状态，该状态时，同样不会接受新建立的连接的请求。
+
+- MySQL server has gone away
+
+>管理日志中出现该错误，说明在atlas在获取后台MySQL的状态时失败，失败返回的errmsg为：MySQL server has gone away。
+
+- CON_STATE_SEND_QUERY_RESULT send query result to client failed
+
+>sql日志中出现上述错误，主要原因：客户端将连接断开。（断开原因可能是客户端连接超时断开的等等
+
+- DBProxy `sql日志`中记录了慢查询（`[Slow Query]`），但在mysql慢查询日志中却没有发现该慢查询日志
+
+>原因主要因为：DBProxy本身延迟（可能是互斥造成，也可能对sql处理等造成），从而该查询在MySQL上执行没有被认为是慢查询，而在Atlas中认为是慢查询。
 
 
 
