@@ -139,7 +139,6 @@ const char *network_mysqld_stat_desc[PROXY_STAT_END] =
     "Aborted_connects",
     "Closed_clients",
     "Aborted_clients",
-	"Global_event_waiting",
     "Invalid",              // GLOBAL_STAT_END
     "Threads_running",
     "Percentile"
