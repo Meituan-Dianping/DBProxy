@@ -128,6 +128,7 @@ const char *network_mysqld_stat_desc[PROXY_STAT_END] =
     "Net_server_write_packets",
     "Net_client_read_packets",
     "Net_client_write_packets",
+	"Event_waiting",
     "Invalid",              // THREAD_STAT_END
     "Max_connections",
     "Max_used_connections",
@@ -138,6 +139,7 @@ const char *network_mysqld_stat_desc[PROXY_STAT_END] =
     "Aborted_connects",
     "Closed_clients",
     "Aborted_clients",
+	"Global_event_waiting",
     "Invalid",              // GLOBAL_STAT_END
     "Threads_running",
     "Percentile"

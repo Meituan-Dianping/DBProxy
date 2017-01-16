@@ -242,7 +242,7 @@ static int network_mysqld_status_get(lua_State *L) {
 
     if (strleq(key, keysize, C("proxy_status"))) {
         guint64 status_sum = 0;
-        gint socket_num = 0, cached_socket_num = 0, thread_running = 0;
+        gint socket_num = 0, cached_socket_num = 0, thread_running = 0, global_event_waiting = 0;
 
         lua_newtable(L);
         for (stat_index = 0; stat_index < THREAD_STAT_END; stat_index++)
@@ -309,6 +309,15 @@ static int network_mysqld_status_get(lua_State *L) {
         lua_pushstring(L, network_mysqld_stat_desc[GLOBAL_STAT_ABORTED_CLIENTS]);
         lua_pushnumber(L, g_atomic_int_get(&chas->proxy_aborted_clients));
         lua_settable(L,-3);
+
+        for (event_index = 0; event_index <= chas->event_thread_count; event_index++)
+	    {
+			chassis_event_thread_t *event_thread = g_ptr_array_index(chas->threads, event_index);
+			global_event_waiting += g_async_queue_length(event_thread->event_queue);
+	    }
+	    lua_pushstring(L, network_mysqld_stat_desc[GLOBAL_STAT_EVENT_WAITING]);
+	    lua_pushnumber(L, global_event_waiting);
+	    lua_settable(L,-3);
 
         for (event_index = 0; event_index <= chas->event_thread_count; event_index++)
         {
