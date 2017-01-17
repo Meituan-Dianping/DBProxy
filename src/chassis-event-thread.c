@@ -134,7 +134,7 @@ void chassis_event_handle(int G_GNUC_UNUSED event_fd, short G_GNUC_UNUSED events
 
     network_mysqld_con* client_con = g_async_queue_try_pop(thread->event_queue);
     if (client_con != NULL) {
-    	g_atomic_pointer_add(&(thread->thread_status_var.thread_stat[THREAD_STAT_EVENT_WAITING]), -1);
+        g_atomic_pointer_add(&(thread->thread_status_var.thread_stat[THREAD_STAT_EVENT_WAITING]), -1);
         chassis_event_add_connection(NULL, thread, client_con);
 
         network_mysqld_con_handle(-1, 0, client_con);
@@ -181,7 +181,7 @@ void chassis_event_thread_free(chassis_event_thread_t *thread) {
 
     network_mysqld_con* con;
     while (con = g_async_queue_try_pop(thread->event_queue)) {
-    	g_atomic_pointer_add(&(thread->thread_status_var.thread_stat[THREAD_STAT_EVENT_WAITING]), -1);
+        g_atomic_pointer_add(&(thread->thread_status_var.thread_stat[THREAD_STAT_EVENT_WAITING]), -1);
         network_mysqld_con_free(con);
     }
     g_async_queue_unref(thread->event_queue);
