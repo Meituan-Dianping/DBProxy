@@ -23,7 +23,7 @@ plugindir = ${libdir}/mysql-proxy/plugins
 
 BUILD_CPPFLAGS = $(LUA_CFLAGS) $(MYSQL_CFLAGS) $(GLIB_CFLAGS) $(GMODULE_CFLAGS) $(GTHREAD_CFLAGS)
 BUILD_CFLAGS   = -DLUAEXTDIR="\"$(luaextdir)\""  -DPLUGINDIR="\"$(plugindir)\""
-BUILD_LDADD    = $(GLIB_LIBS) $(GMODULE_LIBS) $(GTHREAD_LIBS) libmysql-proxy.la -L$(luaextdir) $(LUA_LIBS)
+BUILD_LDADD    = $(GLIB_LIBS) $(GMODULE_LIBS) $(GTHREAD_LIBS) libmysql-proxy.la -L$(luaextdir) $(LUA_LIBS) -lm
 
 BUILT_SOURCES =
 if USE_WRAPPER_SCRIPT

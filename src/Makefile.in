@@ -381,7 +381,7 @@ luaextdir = ${libdir}/mysql-proxy/lua
 plugindir = ${libdir}/mysql-proxy/plugins
 BUILD_CPPFLAGS = $(LUA_CFLAGS) $(MYSQL_CFLAGS) $(GLIB_CFLAGS) $(GMODULE_CFLAGS) $(GTHREAD_CFLAGS)
 BUILD_CFLAGS = -DLUAEXTDIR="\"$(luaextdir)\""  -DPLUGINDIR="\"$(plugindir)\""
-BUILD_LDADD = $(GLIB_LIBS) $(GMODULE_LIBS) $(GTHREAD_LIBS) libmysql-proxy.la -L$(luaextdir) $(LUA_LIBS)
+BUILD_LDADD = $(GLIB_LIBS) $(GMODULE_LIBS) $(GTHREAD_LIBS) libmysql-proxy.la -L$(luaextdir) $(LUA_LIBS) -lm
 BUILT_SOURCES = $(am__append_2)
 mysql_proxy_SOURCES = mysql-proxy-cli.c
 mysql_proxy_CPPFLAGS = $(BUILD_CPPFLAGS)
