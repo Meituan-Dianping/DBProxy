@@ -2,14 +2,22 @@
 ## 1.1 安装依赖项
 <h1 id="1.1"></h1>
 
+>### CentOS
+
 ```
 yum install -y Percona-Server-devel-55.x86_64 Percona-Server-client-55.x86_64 Percona-Server-shared-55 jemalloc jemalloc-devel libevent openssl lua lua-devel glib2 glib2-devel bison flex libtool.x86_64
 ```
 
+>### Ubuntu & Debian
+
+```
+apt-get install libmysqlclient-dev libgcrypt11-dev  pkg-config lua5.1-0 liblua5.1-0-dev libtool flex bison openssl  libssl-dev libjemalloc1 libjemalloc-dev  libevent-dev
+```
+
 **注意**
 
-1. 操作系统版本：CentOS 6.5
-2. 目前确认有效的glib2版本是2.42.0-1.el6，centos默认源中的版本是2.28.8-4.el6，会导致make报错。
+1. 操作系统版本：CentOS6.5 Ubuntu14.04 Debian8.2
+2. 目前确认有效的glib2版本是2.42.0-1.el6，CentOS、Ubuntu和Debian默认源中的版本都不是2.42.0-1.el6，会导致make报错。
 
 ## 1.2 源码安装
 
