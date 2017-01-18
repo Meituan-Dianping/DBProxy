@@ -8,9 +8,40 @@
 
 详见 [release_notes](https://github.com/Meituan-Dianping/DBProxy/blob/master/doc/RELEASE_NOTES.md)
 
-### Q2：CentOS默认源中glib2的版本是2.28.8-4.el6，会导致DBProxy make报错，如何获取正确glib2版本？
+### Q2：CentOS/Ubuntu/Debian默认源中glib2的版本是2.28.8-4.el6，会导致DBProxy make报错，如何获取正确glib2版本？
 
 [glib-2.4.2.0.tar.xz download](http://pkgs.fedoraproject.org/repo/pkgs/mingw-glib2/glib-2.42.0.tar.xz/71af99768063ac24033ac738e2832740/)
+
+>#### 编译安装的步骤
+
+>##### (1) 安装依赖项
+
+>###### Ubuntu & Debian
+
+> `apt-get install gettext libffi-dev automake python`
+
+>###### CentOS
+> `yum install zlib-devel zlib libffi libffi-devel gettext automake libtool autoconf`
+
+>##### (2) 运行 autoreconf命令
+
+> `autoreconf -ivf`
+
+>##### (3) 运行如下命令进行安装
+
+> `tar xf glib-2.42.0.tar.xz`
+
+> `cd glib-2.42.0`
+
+> `./configure`
+
+> `make`
+
+> `[ Become root if necessary ]`
+
+> `rm -rf /install-prefix/include/glib.h /install-prefix/include/gmodule.h`
+
+> `make install              # install GLIB`
 
 ### Q3: DBProxy的后端连接是怎么复用的？代码中没有看到change user这个过程。
 
