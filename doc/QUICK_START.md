@@ -160,7 +160,7 @@ proxy-address=0.0.0.0:3307
 - 连接(与连接mysql的命令一样)
 
 ```
-mysql -uguest -puqmOY9A= -P3307 -h127.0.0.1
+mysql -uguest -pguest -P3307 -h127.0.0.1
 ```
 
 - 发送sql语句 
