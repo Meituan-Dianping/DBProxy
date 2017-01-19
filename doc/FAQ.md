@@ -178,5 +178,42 @@ DBProxy的日志有两种，第一种是记录DBProxy运行状态的日志，另
 
 >原因主要因为：DBProxy本身延迟（可能是互斥造成，也可能对sql处理等造成），从而该查询在MySQL上执行没有被认为是慢查询，而在Atlas中认为是慢查询。
 
+### Q22: DBProxy和MHA能否一起使用，需要配置什么？
 
+DBProxy 可以和MHA一起用，需要配置MHA的switchover和failover脚本里面提升新主库的时候增加上对DBProxy的操作，对DBProxy的主要操作可以参考 [backend管理]( https://github.com/Meituan-Dianping/DBProxy/blob/master/doc/USER_GUIDE.md#3.3.5)。
 
+### Q23: 能否从管理接口看到SQL是发到哪个实例？
+
+目前还不能从管理接口看到某条SQL的路由信息 ，在日志里是可以看到每一条SQL的路由情况。
+
+### Q24: sysbench压 DBProxy会报错，和DBProxy里面什么限制有关系么？
+
+DBProxy的限制参考 [SQL语句支持限制](https://github.com/Meituan-Dianping/DBProxy/blob/master/doc/USER_GUIDE.md#3.2)。
+
+### Q25: 连接DBProxy发送SQL语句时，报错：I have no server backend，是什么导致的？
+
+登陆管理端口查看backend的状态，执行的语句：select * from backends;
+
+如果backend的状态均为非UP状态，则检查当前连接DBProxy的用户名密码是否能直连上MySQL，网络是否通畅等；
+
+如果backend的状态为UP状态，且只有部分语句报错，可能由于网络的抖动引起的。
+
+### Q26: DBProxy配置的数据库是否可以跨机房？
+
+网络可用就可以，跨机房可能会有网络延迟。
+
+### Q27: select  * from backends 看到的threads_running都是0，什么原因导致的？
+
+可能由于在配置文件中没有配置backend-monitor-pwds，或该参数配置有误。
+
+### Q28: 配置的密码，哪些是需要加密的？
+
+配置文件中：pwds和backend-monitor-pwds的密码需要加密。
+
+### Q29: 连接DBProxy的proxy端口的密码是加密前还是加密后的？
+
+加密前的，连接DBProxy和直连MySQL一样。
+
+### Q30: 监控账户密码 一般给予什么样的权限？
+
+监控账户最多会执行语句：SHOW STATUS LIKE 'Threads_running';，配置最基本的权限就可以。
