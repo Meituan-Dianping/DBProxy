@@ -1017,6 +1017,11 @@ save_config(chassis *chas) {
     guint len = backends->len;
     for (i = 0; i < len; ++i) {
         network_backend_t *backend = g_ptr_array_index(backends, i);
+        /* if the backend state is BACKEND_STATE_OFFLINING or BACKEND_STATE_OFFLINE or  BACKEND_STATE_REMOVING don't save it to config. */
+        if (backend->state == BACKEND_STATE_OFFLINING || backend->state == BACKEND_STATE_OFFLINE
+                || backend->state == BACKEND_STATE_REMOVING) {
+            continue;
+        }
         if (backend->type == BACKEND_TYPE_RW) {
             g_string_append_printf(master, ",%s", backend->addr->name->str);
         } else if (backend->type == BACKEND_TYPE_RO) {
