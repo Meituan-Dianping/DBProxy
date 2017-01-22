@@ -5,7 +5,7 @@
 >### CentOS
 
 ```
-yum install -y Percona-Server-devel-55.x86_64 Percona-Server-client-55.x86_64 Percona-Server-shared-55 jemalloc jemalloc-devel libevent openssl lua lua-devel glib2 glib2-devel bison flex libtool.x86_64
+yum install -y Percona-Server-devel-55.x86_64 Percona-Server-client-55.x86_64 Percona-Server-shared-55 jemalloc jemalloc-devel libevent libevent-devel openssl lua lua-devel bison flex libtool.x86_64
 ```
 
 >### Ubuntu & Debian
@@ -19,8 +19,16 @@ apt-get install libmysqlclient-dev libgcrypt11-dev  pkg-config lua5.1-0 liblua5.
 1. 操作系统版本：CentOS6.5 Ubuntu14.04 Debian8.2
 2. 目前确认有效的glib2版本是2.42.0-1.el6，CentOS、Ubuntu和Debian默认源中的版本都不是2.42.0-1.el6，会导致make报错。
 
-## 1.2 源码安装
+下载glib-2.4.2.0([下载地址](http://pkgs.fedoraproject.org/repo/pkgs/mingw-glib2/glib-2.42.0.tar.xz/71af99768063ac24033ac738e2832740/))
 
+```
+cd glib-2.42.0
+autoreconf -ivf
+./configure
+make && make install
+```
+
+## 1.2 安装DBProxy源码
 - 源码从代码仓库下载到本地  
  
 ```
