@@ -14,11 +14,6 @@ yum install -y Percona-Server-devel-55.x86_64 Percona-Server-client-55.x86_64 Pe
 apt-get install libmysqlclient-dev libgcrypt11-dev  pkg-config lua5.1-0 liblua5.1-0-dev libtool flex bison openssl  libssl-dev libjemalloc1 libjemalloc-dev  libevent-dev
 ```
 
-**注意**
-
-1. 操作系统版本：CentOS6.5 Ubuntu14.04 Debian8.2
-2. 目前确认有效的glib2版本是2.42.0-1.el6，CentOS、Ubuntu和Debian默认源中的版本都不是2.42.0-1.el6，会导致make报错。
-
 下载glib-2.4.2.0([下载地址](http://pkgs.fedoraproject.org/repo/pkgs/mingw-glib2/glib-2.42.0.tar.xz/71af99768063ac24033ac738e2832740/))
 
 ```
@@ -28,6 +23,10 @@ autoreconf -ivf
 make && make install
 ```
 
+**注意**
+
+1. 操作系统版本：CentOS6.5 CentOS7 Ubuntu14.04 Debian8.2；
+2. 目前确认有效的glib2版本是2.42.0-1.el6，CentOS、Ubuntu和Debian默认源中的版本都不是2.42.0-1.el6，会导致make报错，因此在上面增加对glib的下载编译安装；
 ## 1.2 安装DBProxy源码
 - 源码从代码仓库下载到本地  
  
