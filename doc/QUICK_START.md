@@ -5,7 +5,7 @@
 >### CentOS
 
 ```
-yum install -y Percona-Server-devel-55.x86_64 Percona-Server-client-55.x86_64 Percona-Server-shared-55 jemalloc jemalloc-devel libevent libevent-devel openssl lua lua-devel bison flex libtool.x86_64
+yum install -y Percona-Server-devel-55.x86_64 Percona-Server-client-55.x86_64 Percona-Server-shared-55 jemalloc jemalloc-devel libevent libevent-devel openssl openssl-devel lua lua-devel bison flex libtool.x86_64
 ```
 
 >### Ubuntu & Debian
