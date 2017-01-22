@@ -627,7 +627,7 @@ function read_query(packet)
         local ret = proxy.global.sys_config("", "saveblacklist")
 
         if ret == 1 then
-            set_error("save blacklist file falied")
+            set_error("save blacklist file falied, please check the admin log to find reason. ")
             return proxy.PROXY_SEND_RESULT
         end
 
