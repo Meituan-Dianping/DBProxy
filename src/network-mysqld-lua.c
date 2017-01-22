@@ -1622,17 +1622,17 @@ save_blacklists(sql_filter *cur_filter)
     if (0 == access(cur_filter->blacklist_file, 0)) {//check whether the blacklist-file is exist
             if (unlink(cur_filter->blacklist_file) != 0)//if the blacklist-file is exist, then unlink the file
             {
-                    g_warning("[filter][save][unlink old file failed]: [%s]", g_strerror(errno));
+                g_warning("[filter][save][unlink old file failed]: [%s]", g_strerror(errno));
             if (unlink(tmp_name) != 0) {//if unlink the old file failed, then unlink the temporary file
                 g_warning("[filter][save][unlink temporary file failed]: [%s]", g_strerror(errno));
             }
                 return ret;
             }
     }
-        if (rename(tmp_name, cur_filter->blacklist_file) != 0) {
-            g_warning("[filter][save][rename failed][%s]", g_strerror(errno));
+    if (rename(tmp_name, cur_filter->blacklist_file) != 0) {
+        g_warning("[filter][save][rename failed][%s]", g_strerror(errno));
         if (unlink(tmp_name) != 0) {
-        g_warning("[filter][save][unlink temporary file failed]: [%s]", g_strerror(errno));
+            g_warning("[filter][save][unlink temporary file failed]: [%s]", g_strerror(errno));
         }
             return ret;
         }
