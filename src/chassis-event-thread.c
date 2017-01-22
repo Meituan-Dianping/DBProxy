@@ -181,9 +181,9 @@ void chassis_event_thread_free(chassis_event_thread_t *thread) {
 
     network_mysqld_con* con;
     while (con = g_async_queue_try_pop(thread->event_queue)) {
-        g_atomic_pointer_add(&(thread->thread_status_var.thread_stat[THREAD_STAT_EVENT_WAITING]), -1);
         network_mysqld_con_free(con);
     }
+    g_atomic_pointer_set(&(thread->thread_status_var.thread_stat[THREAD_STAT_EVENT_WAITING]), 0);
     g_async_queue_unref(thread->event_queue);
 
     g_rw_lock_clear(&thread->connection_lock);
