@@ -479,7 +479,7 @@ const char *network_mysqld_proto_field_get_typestring(enum enum_field_types type
         if ((guchar)field_type_name[i].type == (guchar)type) return field_type_name[i].name;
     }
 
-    g_log_dbproxy(g_error, "field-type %d isn't known yet", type);
+    g_log_dbproxy(g_critical, "field-type %d isn't known yet", type);
 
     return unknown_type;
 }
@@ -592,7 +592,7 @@ static int network_mysqld_proto_field_append_to_string(GString *out, network_mys
         g_string_append_printf(out, "'...(decimal)'");
         break;
     default:
-        g_log_dbproxy(g_critical, "field-type '%s' (%d) isn't known",
+        g_log_dbproxy(g_error, "field-type '%s' (%d) isn't known",
                 network_mysqld_proto_field_get_typestring(field->fielddef->type),
                 field->fielddef->type);
         break;
