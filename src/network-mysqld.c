@@ -128,7 +128,8 @@ const char *network_mysqld_stat_desc[PROXY_STAT_END] =
     "Net_server_write_packets",
     "Net_client_read_packets",
     "Net_client_write_packets",
-	"Event_waiting",
+    "Event_waiting",
+    "Threads_running",
     "Invalid",              // THREAD_STAT_END
     "Max_connections",
     "Max_used_connections",
@@ -140,7 +141,6 @@ const char *network_mysqld_stat_desc[PROXY_STAT_END] =
     "Closed_clients",
     "Aborted_clients",
     "Invalid",              // GLOBAL_STAT_END
-    "Threads_running",
     "Percentile"
 };
 
@@ -482,6 +482,13 @@ void network_mysqld_con_free(network_mysqld_con *con) {
     g_ptr_array_remove_fast(con->srv->priv->cons, con);
     g_mutex_unlock(&con_mutex);
 */
+
+    if(con->conn_status_var.query_running)
+    {
+        thread_status_var_t *thread_status_var = chassis_event_thread_get_status(con->srv);
+        g_atomic_pointer_add(&(thread_status_var->thread_stat[THREAD_STAT_THREADS_RUNNING]), -1);
+    }
+
     g_string_free(con->conn_status.set_charset_client, TRUE);
     g_string_free(con->conn_status.set_charset_results, TRUE);
     g_string_free(con->conn_status.set_charset_connection, TRUE);
@@ -2775,6 +2782,9 @@ void network_mysqld_stat_stmt_start(network_mysqld_con *con, const char *cur_que
 {
     con->conn_status_var.query_running = TRUE;
 
+    thread_status_var_t *thread_status_var = chassis_event_thread_get_status(con->srv);
+    g_atomic_pointer_add(&(thread_status_var->thread_stat[THREAD_STAT_THREADS_RUNNING]), 1);
+
     if (con->srv->query_response_time_stats > 0) {
         con->conn_status_var.cur_query_type = COM_OTHER;
     }
@@ -2844,6 +2854,11 @@ void network_mysqld_stat_stmt_end(network_mysqld_con *con, gint64 cur_time)
     con->conn_status_var.cur_query_start_time = cur_time;
     memset(con->conn_status_var.cur_query, 0, STMT_LENTH);
     con->conn_status_var.cur_query_com_type = 0;
+    if(con->conn_status_var.query_running)
+    {
+        thread_status_var_t *thread_status_var = chassis_event_thread_get_status(con->srv);
+        g_atomic_pointer_add(&(thread_status_var->thread_stat[THREAD_STAT_THREADS_RUNNING]), -1);
+    }
     con->conn_status_var.query_running = FALSE;
 
     return ;

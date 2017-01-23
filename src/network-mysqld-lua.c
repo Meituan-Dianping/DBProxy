@@ -242,7 +242,7 @@ static int network_mysqld_status_get(lua_State *L) {
 
     if (strleq(key, keysize, C("proxy_status"))) {
         guint64 status_sum = 0;
-        gint socket_num = 0, cached_socket_num = 0, thread_running = 0;
+        gint socket_num = 0, cached_socket_num = 0;
 
         lua_newtable(L);
         for (stat_index = 0; stat_index < THREAD_STAT_END; stat_index++)
@@ -308,27 +308,6 @@ static int network_mysqld_status_get(lua_State *L) {
 
         lua_pushstring(L, network_mysqld_stat_desc[GLOBAL_STAT_ABORTED_CLIENTS]);
         lua_pushnumber(L, g_atomic_int_get(&chas->proxy_aborted_clients));
-        lua_settable(L,-3);
-
-        for (event_index = 0; event_index <= chas->event_thread_count; event_index++)
-        {
-            chassis_event_thread_t *event_thread = g_ptr_array_index(chas->threads, event_index);
-            network_mysqld_con *conn = NULL;
-            GList *gl_conn = NULL;
-
-            g_rw_lock_reader_lock(&event_thread->connection_lock);
-            gl_conn = event_thread->connection_list;
-            while (gl_conn)
-            {
-                conn = gl_conn->data;
-                if (conn->conn_status_var.query_running) thread_running++;
-                gl_conn = g_list_next(gl_conn);
-            }
-            g_rw_lock_reader_unlock(&event_thread->connection_lock);
-        }
-
-        lua_pushstring(L, network_mysqld_stat_desc[CONN_STAT_THREADS_RUNNING]);
-        lua_pushnumber(L, thread_running);
         lua_settable(L,-3);
 
         lua_pushstring(L, network_mysqld_stat_desc[PERCENTILE]);

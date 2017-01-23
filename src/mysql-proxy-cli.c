@@ -731,6 +731,30 @@ int main_cmdline(int argc, char **argv) {
 
             setgid(user_info->pw_gid);
             setuid(user_info->pw_uid);
+
+            g_log_dbproxy(g_debug, "running as user: %s (%d/%d)", srv->user, user_info->pw_uid, user_info->pw_gid);
+
+            /*check the config file can read or write, and the config file dir can execute*/
+            gchar *config_file = frontend->default_file;
+
+            /*if the config_file is relative get the real path */
+            char resolved_path[PATH_MAX];
+            if (g_path_is_absolute(config_file) == FALSE) {
+                realpath(config_file, resolved_path);
+                config_file = resolved_path;
+            }
+
+            gchar *config_dir = g_path_get_dirname(config_file);
+
+            if (-1 == faccessat(0, config_file, R_OK | W_OK, AT_EACCESS)
+                    || -1 == faccessat(0, config_dir, X_OK | W_OK, AT_EACCESS)) {
+                g_free(config_dir);
+                g_log_dbproxy(g_critical, "%s don't have correct privilege for the user %s set in the config file, config file should have read write privileges and the config file dir should have execute and write privilege.", config_file, srv->user);
+                GOTO_EXIT(EXIT_FAILURE);
+            }
+
+            g_free(config_dir);
+
             g_log_dbproxy(g_message, "running as user: %s (%s/%s)", srv->user, user_info->pw_uid, user_info->pw_gid);
         } 
     }
@@ -917,6 +941,30 @@ int main_cmdline(int argc, char **argv) {
         srv->proxy_filter->blacklist_file = g_strdup("conf/blacklist.dat");
         chassis_resolve_path(srv->base_dir, &srv->proxy_filter->blacklist_file);
     }
+
+    /*check the black list file dir exist execute and write*/
+    gchar *blacklist_file = srv->proxy_filter->blacklist_file;
+
+    /*if the blacklist file is relative get the real path */
+    char blacklist_file_real[PATH_MAX];
+    if (g_path_is_absolute(blacklist_file) == FALSE) {
+        realpath(blacklist_file, blacklist_file_real);
+        blacklist_file = blacklist_file_real;
+    }
+
+    gchar *blacklist_file_dir = g_path_get_dirname(blacklist_file);
+
+    if ( -1 == faccessat(0, blacklist_file_dir, F_OK | X_OK | W_OK, AT_EACCESS)) {
+        if (ENOENT == errno) {//black file dir is not exit.
+            g_log_dbproxy(g_warning, "dir of %s don't exit ,the blacklist file dir should exit, otherwise save blacklist should be fail.", blacklist_file);
+
+        }
+        else if (EACCES == errno) {//black file dir don't have correct privilges.
+            g_log_dbproxy(g_warning, "%s don't have correct privilege for the user %s set in the blacklist file, blacklist file dir should have execute and write privilege, otherwise save blacklist should be fail.", blacklist_file, srv->user);
+        }
+    }
+    g_free(blacklist_file_dir);
+
     load_sql_filter_from_file(srv->proxy_filter);
 
     if (srv->proxy_reserved->access_num_per_time_window > 0 &&
