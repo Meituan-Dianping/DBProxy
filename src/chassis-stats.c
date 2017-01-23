@@ -25,6 +25,7 @@
 
 #include <glib.h>
 #include "chassis-stats.h"
+#include "chassis-log.h"
 
 chassis_stats_t *chassis_global_stats = NULL;
 
@@ -32,7 +33,7 @@ chassis_stats_t * chassis_stats_new(void) {
     if (chassis_global_stats != NULL) return chassis_global_stats;
     
     chassis_global_stats = g_new0(chassis_stats_t, 1);
-    g_debug("%s: created new global chassis stats at %p", G_STRLOC, (void*)chassis_global_stats);
+    g_log_dbproxy(g_debug, "created new global chassis stats at %p", (void*)chassis_global_stats);
     
     return chassis_global_stats;
 }

@@ -242,7 +242,7 @@ static int network_mysqld_status_get(lua_State *L) {
 
     if (strleq(key, keysize, C("proxy_status"))) {
         guint64 status_sum = 0;
-        gint socket_num = 0, cached_socket_num = 0;
+        gint socket_num = 0, cached_socket_num = 0, thread_running = 0;
 
         lua_newtable(L);
         for (stat_index = 0; stat_index < THREAD_STAT_END; stat_index++)
@@ -308,6 +308,27 @@ static int network_mysqld_status_get(lua_State *L) {
 
         lua_pushstring(L, network_mysqld_stat_desc[GLOBAL_STAT_ABORTED_CLIENTS]);
         lua_pushnumber(L, g_atomic_int_get(&chas->proxy_aborted_clients));
+        lua_settable(L,-3);
+
+        for (event_index = 0; event_index <= chas->event_thread_count; event_index++)
+        {
+            chassis_event_thread_t *event_thread = g_ptr_array_index(chas->threads, event_index);
+            network_mysqld_con *conn = NULL;
+            GList *gl_conn = NULL;
+
+            g_rw_lock_reader_lock(&event_thread->connection_lock);
+            gl_conn = event_thread->connection_list;
+            while (gl_conn)
+            {
+                conn = gl_conn->data;
+                if (conn->conn_status_var.query_running) thread_running++;
+                gl_conn = g_list_next(gl_conn);
+            }
+            g_rw_lock_reader_unlock(&event_thread->connection_lock);
+        }
+
+        lua_pushstring(L, network_mysqld_stat_desc[CONN_STAT_THREADS_RUNNING]);
+        lua_pushnumber(L, thread_running);
         lua_settable(L,-3);
 
         lua_pushstring(L, network_mysqld_stat_desc[PERCENTILE]);
@@ -754,16 +775,14 @@ int network_mysqld_lua_load_script(lua_scope *sc, const char *lua_script) {
     lua_scope_load_script(sc, lua_script);
 
     if (lua_isstring(sc->L, -1)) {
-        g_critical("%s: lua_load_file(%s) failed: %s", 
-                G_STRLOC, 
+        g_log_dbproxy(g_critical, "lua_load_file(%s) failed: %s", 
                 lua_script, lua_tostring(sc->L, -1));
 
         lua_pop(sc->L, 1); /* remove the error-msg from the stack */
         
         return -1;
     } else if (!lua_isfunction(sc->L, -1)) {
-        g_error("%s: luaL_loadfile(%s): returned a %s", 
-                G_STRLOC, 
+        g_log_dbproxy(g_critical, "luaL_loadfile(%s): returned a %s", 
                 lua_script, lua_typename(sc->L, lua_type(sc->L, -1)));
     }
 
@@ -966,7 +985,7 @@ network_mysqld_register_callback_ret network_mysqld_con_lua_register_callback(ne
 
     /* run the script once to get the functions set in the global scope */
     if (lua_pcall(L, 0, 0, 0) != 0) {
-        g_critical("(lua-error) [%s]\n%s", lua_script, lua_tostring(L, -1));
+        g_log_dbproxy(g_critical, "(lua-error) [%s]\n%s", lua_script, lua_tostring(L, -1));
 
         lua_pop(L, 1); /* errmsg */
 
@@ -1138,14 +1157,13 @@ int network_mysqld_con_lua_handle_proxy_response(network_mysqld_con *con, const 
 
     lua_getfield(L, -1, "response"); /* proxy.response */
     if (lua_isnil(L, -1)) {
-        g_message("%s.%d: proxy.response isn't set in %s", __FILE__, __LINE__, 
-                lua_script);
+        g_log_dbproxy(g_critical, "proxy.response isn't set in %s", lua_script);
 
         lua_pop(L, 2); /* proxy + nil */
 
         return -1;
     } else if (!lua_istable(L, -1)) {
-        g_message("%s.%d: proxy.response has to be a table, is %s in %s", __FILE__, __LINE__,
+        g_log_dbproxy(g_critical, "proxy.response has to be a table, is %s in %s",
                 lua_typename(L, lua_type(L, -1)),
                 lua_script);
 
@@ -1158,15 +1176,14 @@ int network_mysqld_con_lua_handle_proxy_response(network_mysqld_con *con, const 
         /**
          * nil is fine, we expect to get a raw packet in that case
          */
-        g_message("%s.%d: proxy.response.type isn't set in %s", __FILE__, __LINE__, 
-                lua_script);
+        g_log_dbproxy(g_critical, "proxy.response.type isn't set in %s", lua_script);
 
         lua_pop(L, 3); /* proxy + nil */
 
         return -1;
 
     } else if (!lua_isnumber(L, -1)) {
-        g_message("%s.%d: proxy.response.type has to be a number, is %s in %s", __FILE__, __LINE__,
+        g_log_dbproxy(g_critical, "proxy.response.type has to be a number, is %s in %s",
                 lua_typename(L, lua_type(L, -1)),
                 lua_script);
         
@@ -1205,10 +1222,9 @@ int network_mysqld_con_lua_handle_proxy_response(network_mysqld_con *con, const 
                     if (!lua_isstring(L, -1)) {
                         field->name = g_strdup("no-field-name");
     
-                        g_warning("%s.%d: proxy.response.type = OK, "
+                        g_log_dbproxy(g_warning, "proxy.response.type = OK, "
                                 "but proxy.response.resultset.fields[%u].name is not a string (is %s), "
                                 "using default", 
-                                __FILE__, __LINE__,
                                 i,
                                 lua_typename(L, lua_type(L, -1)));
                     } else {
@@ -1218,10 +1234,9 @@ int network_mysqld_con_lua_handle_proxy_response(network_mysqld_con *con, const 
     
                     lua_getfield(L, -1, "type"); /* proxy.response.resultset.fields[].type */
                     if (!lua_isnumber(L, -1)) {
-                        g_warning("%s.%d: proxy.response.type = OK, "
+                        g_log_dbproxy(g_warning, "proxy.response.type = OK, "
                                 "but proxy.response.resultset.fields[%u].type is not a integer (is %s), "
                                 "using MYSQL_TYPE_STRING", 
-                                __FILE__, __LINE__,
                                 i,
                                 lua_typename(L, lua_type(L, -1)));
     
@@ -1239,7 +1254,7 @@ int network_mysqld_con_lua_handle_proxy_response(network_mysqld_con *con, const 
                     lua_pop(L, 1); /* pop the nil and leave the loop */
                     break;
                 } else {
-                    g_error("proxy.response.resultset.fields[%d] should be a table, but is a %s", 
+                    g_log_dbproxy(g_critical, "proxy.response.resultset.fields[%d] should be a table, but is a %s", 
                             i,
                             lua_typename(L, lua_type(L, -1)));
                 }
@@ -1279,7 +1294,7 @@ int network_mysqld_con_lua_handle_proxy_response(network_mysqld_con *con, const 
                     lua_pop(L, 1); /* pop the nil and leave the loop */
                     break;
                 } else {
-                    g_error("proxy.response.resultset.rows[%d] should be a table, but is a %s", 
+                    g_log_dbproxy(g_critical, "proxy.response.resultset.rows[%d] should be a table, but is a %s", 
                             i,
                             lua_typename(L, lua_type(L, -1)));
                 }
@@ -1378,14 +1393,14 @@ int network_mysqld_con_lua_handle_proxy_response(network_mysqld_con *con, const 
          */
         lua_getfield(L, -1, "packets"); /* proxy.response.packets */
         if (lua_isnil(L, -1)) {
-            g_message("%s.%d: proxy.response.packets isn't set in %s", __FILE__, __LINE__,
+            g_log_dbproxy(g_critical, "proxy.response.packets isn't set in %s",
                     lua_script);
 
             lua_pop(L, 2 + 1); /* proxy + response + nil */
 
             return -1;
         } else if (!lua_istable(L, -1)) {
-            g_message("%s.%d: proxy.response.packets has to be a table, is %s in %s", __FILE__, __LINE__,
+            g_log_dbproxy(g_critical, "proxy.response.packets has to be a table, is %s in %s",
                     lua_typename(L, lua_type(L, -1)),
                     lua_script);
 
@@ -1407,8 +1422,7 @@ int network_mysqld_con_lua_handle_proxy_response(network_mysqld_con *con, const 
                 lua_pop(L, 1); /* pop the nil and leave the loop */
                 break;
             } else {
-                g_error("%s.%d: proxy.response.packets should be array of strings, field %u was %s", 
-                        __FILE__, __LINE__, 
+                g_log_dbproxy(g_critical, "proxy.response.packets should be array of strings, field %u was %s", 
                         i,
                         lua_typename(L, lua_type(L, -1)));
             }
@@ -1420,7 +1434,7 @@ int network_mysqld_con_lua_handle_proxy_response(network_mysqld_con *con, const 
 
         break; }
     default:
-        g_message("proxy.response.type is unknown: %d", resp_type);
+        g_log_dbproxy(g_critical, "proxy.response.type is unknown: %d", resp_type);
 
         lua_pop(L, 2); /* proxy + response */
 
@@ -1448,7 +1462,7 @@ add_blacklists_item(chassis *chas, const char *sql_raw, int inflag)
 
     if (sql_rewrite == NULL)
     {
-       g_warning("[filter][add blacklist][failed], raw sql = %s", sql_raw);
+       g_log_dbproxy(g_warning, "[filter][add blacklist][failed], raw sql = %s", sql_raw);
        return 1;
     }
 
@@ -1473,7 +1487,7 @@ add_blacklists_item(chassis *chas, const char *sql_raw, int inflag)
         }
         g_rw_lock_writer_unlock(&cur_filter->sql_filter_lock);
 
-        g_message("[filter][add blacklist][success][flag = %d] [filter: %s] [hashcode: %s]",
+        g_log_dbproxy(g_message, "[filter][add blacklist][success][flag = %d] [filter: %s] [hashcode: %s]",
                         flag, sql_rewrite->str, sql_rewrite_md5);
     }
 
@@ -1497,7 +1511,7 @@ update_blacklists_item(chassis *chas, const char *hash_code, int flag)
         g_rw_lock_writer_unlock(&up_filter->sql_filter_lock);
     }
 
-    g_message("[filter][update blacklist][success][flag = %d][hashcode: %s]", flag, hash_code);
+    g_log_dbproxy(g_message, "[filter][update blacklist][success][flag = %d][hashcode: %s]", flag, hash_code);
     return 0;
 }
 
@@ -1508,7 +1522,7 @@ remove_blacklists_item(chassis *chas, const char *hash_code)
 
     if (chas->proxy_filter == NULL)
     {
-        g_warning("[filter][remove blacklist][not exist][hashcode: %s]", hash_code);
+        g_log_dbproxy(g_warning, "[filter][remove blacklist][not exist][hashcode: %s]", hash_code);
         return 0;
     }
 
@@ -1516,7 +1530,7 @@ remove_blacklists_item(chassis *chas, const char *hash_code)
     sql_filter_remove(chas->proxy_filter, hash_code);
     g_rw_lock_writer_unlock(&chas->proxy_filter->sql_filter_lock);
 
-    g_message("[filter][remove blacklist][success][hashcode: %s]", hash_code);
+    g_log_dbproxy(g_message, "[filter][remove blacklist][success][hashcode: %s]", hash_code);
 
     return 0;
 }
@@ -1539,7 +1553,7 @@ clear_blacklists(chassis *chas)
         g_rw_lock_writer_unlock(&chas->proxy_filter->sql_filter_lock);
     }
 
-    g_message("[filter][clear blacklist][success]");
+    g_log_dbproxy(g_message, "%s", "[filter][clear blacklist][success]");
     return 0;
 }
 
@@ -1559,7 +1573,7 @@ save_blacklists(sql_filter *cur_filter)
     FILE *fp = fopen(tmp_name, "a+");
     if (fp == NULL)
     {
-        g_warning("[filter][save][open temp file failed][%s]", tmp_name);
+        g_log_dbproxy(g_warning, "[filter][save][open temp file failed][%s]", tmp_name);
         g_free(tmp_name);
         return ret;
     }
@@ -1581,7 +1595,7 @@ save_blacklists(sql_filter *cur_filter)
         content = g_key_file_to_data(config, &length, NULL);
         if (fwrite(content, length, 1, fp) != 1)
         {
-            g_warning("[filter][write file][failed]:%s", content);
+            g_log_dbproxy(g_warning, "[filter][write file][failed]:%s", content);
             g_free(filter_name);
             g_free(content);
             g_key_file_free(config);
@@ -1601,22 +1615,22 @@ save_blacklists(sql_filter *cur_filter)
     if (0 == access(cur_filter->blacklist_file, 0)) {//check whether the blacklist-file is exist
             if (unlink(cur_filter->blacklist_file) != 0)//if the blacklist-file is exist, then unlink the file
             {
-                g_warning("[filter][save][unlink old file failed]: [%s]", g_strerror(errno));
+                    g_log_dbproxy(g_warning, "[filter][save][unlink old file failed]: [%s]", g_strerror(errno));
             if (unlink(tmp_name) != 0) {//if unlink the old file failed, then unlink the temporary file
-                g_warning("[filter][save][unlink temporary file failed]: [%s]", g_strerror(errno));
+                g_log_dbproxy(g_warning, "[filter][save][unlink temporary file failed]: [%s]", g_strerror(errno));
             }
                 return ret;
             }
     }
-    if (rename(tmp_name, cur_filter->blacklist_file) != 0) {
-        g_warning("[filter][save][rename failed][%s]", g_strerror(errno));
+        if (rename(tmp_name, cur_filter->blacklist_file) != 0) {
+            g_log_dbproxy(g_warning, "[filter][save][rename failed][%s]", g_strerror(errno));
         if (unlink(tmp_name) != 0) {
-            g_warning("[filter][save][unlink temporary file failed]: [%s]", g_strerror(errno));
+        g_log_dbproxy(g_warning, "[filter][save][unlink temporary file failed]: [%s]", g_strerror(errno));
         }
             return ret;
         }
 
-        g_message("[filter][save blacklist][success][%s]", cur_filter->blacklist_file);
+        g_log_dbproxy(g_message, "[filter][save blacklist][success][%s]", cur_filter->blacklist_file);
         ret = 0;
     }
     return ret;
@@ -1749,7 +1763,7 @@ proxy_sys_config_call(lua_State *L)
             }
 
             if (ret == 1) {
-                g_debug("kill invalid connection id %lu in event_thread %lu",
+                g_log_dbproxy(g_warning, "kill invalid connection id %lu in event_thread %lu",
                                                     con_id, GET_THEAD_ID(con_id));
             }
         }
