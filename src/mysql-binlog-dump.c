@@ -216,7 +216,7 @@ int network_mysqld_proto_field_get(network_packet *packet,
             if (!err) field->data.i = i16;
             break;
         default:
-            g_log_dbproxy(g_critical, "enum-length = %lu", field->fielddef->max_length);
+            g_log_dbproxy(g_error, "enum-length = %lu", field->fielddef->max_length);
             break;
         }
         break;
@@ -245,7 +245,7 @@ int network_mysqld_proto_field_get(network_packet *packet,
         default:
             /* unknown blob-length */
             g_debug_hexdump(G_STRLOC, S(packet->data));
-            g_log_dbproxy(g_critical, "blob-length = %lu", field->fielddef->max_length);
+            g_log_dbproxy(g_error, "blob-length = %lu", field->fielddef->max_length);
             break;
         }
         err = err || network_mysqld_proto_get_string_len(packet, &field->data.s, length);
@@ -296,7 +296,7 @@ int network_mysqld_proto_field_get(network_packet *packet,
         break; }
     default:
         g_debug_hexdump(G_STRLOC, packet->data->str, packet->data->len);
-        g_log_dbproxy(g_critical, "unknown field-type '%d' to fetch from offset = %04x",
+        g_log_dbproxy(g_error, "unknown field-type '%d' to fetch from offset = %04x",
                 field->fielddef->type,
                 packet->offset);
         break;
@@ -479,7 +479,7 @@ const char *network_mysqld_proto_field_get_typestring(enum enum_field_types type
         if ((guchar)field_type_name[i].type == (guchar)type) return field_type_name[i].name;
     }
 
-    g_log_dbproxy(g_warning, "field-type %d isn't known yet", type);
+    g_log_dbproxy(g_error, "field-type %d isn't known yet", type);
 
     return unknown_type;
 }
@@ -1097,14 +1097,14 @@ int main(int argc, char **argv) {
     };
 
     if (!GLIB_CHECK_VERSION(2, 6, 0)) {
-        g_log_dbproxy(g_critical, "the glib header are too old, need at least 2.6.0, got: %d.%d.%d", 
+        g_log_dbproxy(g_error, "the glib header are too old, need at least 2.6.0, got: %d.%d.%d", 
                 GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
     }
 
     check_str = glib_check_version(GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
 
     if (check_str) {
-        g_log_dbproxy(g_critical, "%s, got: lib=%d.%d.%d, headers=%d.%d.%d", 
+        g_log_dbproxy(g_error, "%s, got: lib=%d.%d.%d, headers=%d.%d.%d", 
             check_str,
             glib_major_version, glib_minor_version, glib_micro_version,
             GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);

@@ -704,7 +704,7 @@ int network_mysqld_binlog_event_tablemap_get(
             field->type = col_type;
             break;
         default:
-            g_log_dbproxy(g_critical, "field-type %d isn't handled", col_type);
+            g_log_dbproxy(g_error, "field-type %d isn't handled", col_type);
             break;
         }
 

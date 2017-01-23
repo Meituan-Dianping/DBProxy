@@ -89,7 +89,7 @@ int chassis_keyfile_to_options(GKeyFile *keyfile, const gchar *ini_group_name, G
             break;
 #endif
         default:
-            g_log_dbproxy(g_critical, "(keyfile) the option %d can't be handled", entry->arg);
+            g_log_dbproxy(g_error, "(keyfile) the option %d can't be handled", entry->arg);
             break;
         }
 

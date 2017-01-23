@@ -923,7 +923,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_handshake) {
         g_string_free(g_queue_pop_tail(recv_sock->recv_queue->chunks), TRUE);
         return NETWORK_SOCKET_ERROR;
     default:
-        g_log_dbproxy(g_critical, "%s", "proxy_lua_read_handshake returns invalid value");
+        g_log_dbproxy(g_error, "%s", "proxy_lua_read_handshake returns invalid value");
         break;
     } 
 
@@ -1239,7 +1239,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_auth_result) {
 
         break;
     default:
-        g_log_dbproxy(g_critical, "%s", "注释");
+        g_log_dbproxy(g_error, "%s", "注释");
         break;
     }
 */
@@ -2184,7 +2184,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query) {
 
         break; }
     default:
-        CON_MSG_HANDLE(g_critical, con, "invalid lua stmt ret");
+        CON_MSG_HANDLE(g_error, con, "invalid lua stmt ret");
     }
 
     if (proxy_query) {
@@ -2892,7 +2892,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_disconnect_client) {
     case PROXY_IGNORE_RESULT:
         break;
     default:
-        g_log_dbproxy(g_critical, "%s", "注释");
+        g_log_dbproxy(g_error, "%s", "注释");
         break;
     }
 */

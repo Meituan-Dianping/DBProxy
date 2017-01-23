@@ -116,7 +116,7 @@ void network_mysqld_com_query_result_free(network_mysqld_com_query_result_t *uda
  * @see network_mysqld_proto_get_com_query_result
  */
 int network_mysqld_com_query_result_track_state(network_packet G_GNUC_UNUSED *packet, network_mysqld_com_query_result_t G_GNUC_UNUSED *udata) {
-    g_log_dbproxy(g_warning, "%s", "this function is deprecated and network_mysqld_proto_get_com_query_result() should be used instead");
+    g_log_dbproxy(g_error, "%s", "this function is deprecated and network_mysqld_proto_get_com_query_result() should be used instead");
 }
 
 static void
@@ -520,7 +520,7 @@ int network_mysqld_proto_get_com_stmt_prepare_result(
         case MYSQLD_PACKET_OK:
         case MYSQLD_PACKET_NULL:
         case MYSQLD_PACKET_ERR:
-            g_log_dbproxy(g_warning, "%s should not be (OK|ERR|NULL), got: %02x", GET_COM_NAME(COM_STMT_PREPARE), status);
+            g_log_dbproxy(g_error, "%s should not be (OK|ERR|NULL), got: %02x", GET_COM_NAME(COM_STMT_PREPARE), status);
             break;
         case MYSQLD_PACKET_EOF:
             if (--udata->want_eofs == 0) {

@@ -871,7 +871,7 @@ network_socket_retval_t network_mysqld_read(chassis G_GNUC_UNUSED*chas, network_
     case NETWORK_SOCKET_SUCCESS:
         break;
     case NETWORK_SOCKET_ERROR_RETRY:
-        g_log_dbproxy(g_critical, "sock->src:%s sock->dst:%s read data by sock return NETWORK_SOCKET_ERROR_RETRY which wasn't expected",
+        g_log_dbproxy(g_error, "sock->src:%s sock->dst:%s read data by sock return NETWORK_SOCKET_ERROR_RETRY which wasn't expected",
                     NETWORK_SOCKET_SRC_NAME(con), NETWORK_SOCKET_DST_NAME(con));
         break;
     }
@@ -966,7 +966,7 @@ network_socket_retval_t plugin_call(chassis *srv, network_mysqld_con *con, int s
                 {
                 gchar *msg = g_strdup_printf("unexpected state for SEND_AUTH_RESULT: %02x",
                         con->auth_result_state);
-                CON_MSG_HANDLE(g_critical, con, msg);
+                CON_MSG_HANDLE(g_error, con, msg);
                 g_free(msg);
                 }
                 }
@@ -1066,7 +1066,7 @@ network_socket_retval_t plugin_call(chassis *srv, network_mysqld_con *con, int s
     default:
         {
             gchar *msg = g_strdup_printf("unhandled con state: %d", state);
-            CON_MSG_HANDLE(g_critical, con, msg);
+            CON_MSG_HANDLE(g_error, con, msg);
             g_free(msg);
         }
     }
@@ -1227,7 +1227,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
             } else if (con->server && event_fd == con->server->fd) {
                 con->server->to_read = b;
             } else {
-                g_log_dbproxy(g_critical, "%s", "unexpected situation ioctl get data from neither client nor backend");
+                g_log_dbproxy(g_error, "%s", "unexpected situation ioctl get data from neither client nor backend");
             }
         } else if (!will_exit) { /* Linux */
             /*  no data, may be in idle transaction during exit process. */

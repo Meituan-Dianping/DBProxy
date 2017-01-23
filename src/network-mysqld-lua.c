@@ -761,7 +761,7 @@ int network_mysqld_lua_load_script(lua_scope *sc, const char *lua_script) {
         
         return -1;
     } else if (!lua_isfunction(sc->L, -1)) {
-        g_log_dbproxy(g_critical, "luaL_loadfile(%s): returned a %s", 
+        g_log_dbproxy(g_error, "luaL_loadfile(%s): returned a %s", 
                 lua_script, lua_typename(sc->L, lua_type(sc->L, -1)));
     }
 
@@ -1233,7 +1233,7 @@ int network_mysqld_con_lua_handle_proxy_response(network_mysqld_con *con, const 
                     lua_pop(L, 1); /* pop the nil and leave the loop */
                     break;
                 } else {
-                    g_log_dbproxy(g_critical, "proxy.response.resultset.fields[%d] should be a table, but is a %s", 
+                    g_log_dbproxy(g_error, "proxy.response.resultset.fields[%d] should be a table, but is a %s", 
                             i,
                             lua_typename(L, lua_type(L, -1)));
                 }
@@ -1273,7 +1273,7 @@ int network_mysqld_con_lua_handle_proxy_response(network_mysqld_con *con, const 
                     lua_pop(L, 1); /* pop the nil and leave the loop */
                     break;
                 } else {
-                    g_log_dbproxy(g_critical, "proxy.response.resultset.rows[%d] should be a table, but is a %s", 
+                    g_log_dbproxy(g_error, "proxy.response.resultset.rows[%d] should be a table, but is a %s", 
                             i,
                             lua_typename(L, lua_type(L, -1)));
                 }
@@ -1401,7 +1401,7 @@ int network_mysqld_con_lua_handle_proxy_response(network_mysqld_con *con, const 
                 lua_pop(L, 1); /* pop the nil and leave the loop */
                 break;
             } else {
-                g_log_dbproxy(g_critical, "proxy.response.packets should be array of strings, field %u was %s", 
+                g_log_dbproxy(g_error, "proxy.response.packets should be array of strings, field %u was %s", 
                         i,
                         lua_typename(L, lua_type(L, -1)));
             }

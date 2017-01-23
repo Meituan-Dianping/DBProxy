@@ -82,7 +82,7 @@ void chassis_event_add(network_mysqld_con* client_con) {        //���߳�
 
     g_async_queue_push(thread->event_queue, client_con);
     g_atomic_pointer_add(&(thread->thread_status_var.thread_stat[THREAD_STAT_EVENT_WAITING]), 1);
-    if (write(thread->notify_send_fd, "", 1) != 1) g_log_dbproxy(g_critical, "pipes - write error: %s", g_strerror(errno));
+    if (write(thread->notify_send_fd, "", 1) != 1) g_log_dbproxy(g_error, "pipes - write error: %s", g_strerror(errno));
 }
 
 static GPrivate tls_index;
@@ -130,7 +130,7 @@ void chassis_event_handle(int G_GNUC_UNUSED event_fd, short G_GNUC_UNUSED events
     chassis_event_thread_t* thread = user_data;
 
     char ping[1];
-    if (read(thread->notify_receive_fd, ping, 1) != 1) g_log_dbproxy(g_critical, "%s", "pipes - read error");
+    if (read(thread->notify_receive_fd, ping, 1) != 1) g_log_dbproxy(g_error, "%s", "pipes - read error");
 
     network_mysqld_con* client_con = g_async_queue_try_pop(thread->event_queue);
     if (client_con != NULL) {
@@ -210,7 +210,7 @@ int chassis_event_threads_init_thread(chassis_event_thread_t *thread, chassis *c
     if (pipe(fds)) {
         int err;
         err = errno;
-        g_log_dbproxy(g_critical, "evutil_socketpair() failed: %s (%d)", 
+        g_log_dbproxy(g_error, "evutil_socketpair() failed: %s (%d)", 
                 g_strerror(err),
                 err);
     }
