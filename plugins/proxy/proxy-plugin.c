@@ -796,7 +796,7 @@ static network_mysqld_lua_stmt_ret proxy_lua_read_handshake(network_mysqld_con *
         case PROXY_NO_DECISION:
             break;
         case PROXY_SEND_QUERY:
-            g_log_dbproxy(g_warning, "%s", "(read_handshake) return proxy.PROXY_SEND_QUERY is deprecated, use PROXY_SEND_RESULT instead");
+            g_log_dbproxy(g_warning, "(read_handshake) return proxy.PROXY_SEND_QUERY is deprecated, use PROXY_SEND_RESULT instead");
             ret = PROXY_SEND_RESULT;
         case PROXY_SEND_RESULT:
             /**
@@ -923,7 +923,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_handshake) {
         g_string_free(g_queue_pop_tail(recv_sock->recv_queue->chunks), TRUE);
         return NETWORK_SOCKET_ERROR;
     default:
-        g_log_dbproxy(g_critical, "%s", "proxy_lua_read_handshake returns invalid value");
+        g_log_dbproxy(g_error, "proxy_lua_read_handshake returns invalid value");
         break;
     } 
 
@@ -1239,7 +1239,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_auth_result) {
 
         break;
     default:
-        g_log_dbproxy(g_critical, "%s", "注释");
+        g_log_dbproxy(g_error, "注释");
         break;
     }
 */
@@ -1479,7 +1479,7 @@ static gboolean check_flags(GPtrArray* tokens, network_mysqld_con* con) {
             con->client->conn_attr.autocommit_status != AUTOCOMMIT_TRUE) {
         con->conn_status.is_in_transaction = TRUE;
 #ifdef PROXY_DEBUG
-        g_log_dbproxy(g_debug, "%s", "set con in transaction because of con autocommit_status=false");
+        g_log_dbproxy(g_debug, "set con in transaction because of con autocommit_status=false");
 #endif
     }
 
@@ -2184,7 +2184,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query) {
 
         break; }
     default:
-        CON_MSG_HANDLE(g_critical, con, "invalid lua stmt ret");
+        CON_MSG_HANDLE(g_error, con, "invalid lua stmt ret");
     }
 
     if (proxy_query) {
@@ -2892,7 +2892,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_disconnect_client) {
     case PROXY_IGNORE_RESULT:
         break;
     default:
-        g_log_dbproxy(g_critical, "%s", "注释");
+        g_log_dbproxy(g_error, "注释");
         break;
     }
 */
@@ -3487,14 +3487,14 @@ set_state:
         g_mutex_lock(g_mutex);
         end_time = g_get_monotonic_time() + config->check_state_interval * G_TIME_SPAN_SECOND;
         if (!g_cond_wait_until(g_cond, g_mutex, end_time)) {
-            g_log_dbproxy(g_warning, "%s", "check state waiting meet timeout");
+            g_log_dbproxy(g_warning, "check state waiting meet timeout");
         } else {
-            g_log_dbproxy(g_message, "%s", "check_state thread get exit signal");
+            g_log_dbproxy(g_message, "check_state thread get exit signal");
         }
         g_mutex_unlock(g_mutex);
     }
 exit:
-    g_log_dbproxy(g_message, "%s", "check_state thread will exit");
+    g_log_dbproxy(g_message, "check_state thread will exit");
     g_thread_exit(0);
 }
 
@@ -3513,7 +3513,7 @@ int network_mysqld_proxy_plugin_apply_config(chassis *chas, chassis_plugin_confi
     }
 
     if (!config->address) {
-        g_log_dbproxy(g_critical, "%s", "Failed to get bind address, please set by --proxy-address=<host:port>");
+        g_log_dbproxy(g_critical, "Failed to get bind address, please set by --proxy-address=<host:port>");
         return -1;
     }
 
@@ -3573,13 +3573,13 @@ int network_mysqld_proxy_plugin_apply_config(chassis *chas, chassis_plugin_confi
 
     /* sql log init */
     if (sql_log_t_load_options(chas)) {
-        g_log_dbproxy(g_critical, "%s", "init proxy sql log failed");
+        g_log_dbproxy(g_critical, "init proxy sql log failed");
         return -1;
     }
 
     /* percentile init */
     if (config->percentile_controller == NULL) {
-        g_log_dbproxy(g_critical, "%s", "get percentile controller failed");
+        g_log_dbproxy(g_critical, "get percentile controller failed");
         return -1;
     }
     if (config->percentile_switch && 0 == strcasecmp(config->percentile_switch, "on")) {
@@ -3636,7 +3636,7 @@ int network_mysqld_proxy_plugin_apply_config(chassis *chas, chassis_plugin_confi
                 return -1;
             }
         } else {
-            g_log_dbproxy(g_critical, "%s", "incorrect password settings");
+            g_log_dbproxy(g_critical, "incorrect password settings");
             g_free(tmp_for_free);
             return -1;
         }
@@ -4073,7 +4073,7 @@ add_shard_tables(chassis_plugin_config *config, gchar **shard_tables)
             g_hash_table_insert(config->dt_table, key, dt);
             g_rw_lock_writer_unlock(&config->config_lock);
         } else {
-            g_log_dbproxy(g_critical, "%s", "incorrect sub-table settings");
+            g_log_dbproxy(g_critical, "incorrect sub-table settings");
             dt_table_free(dt);
             return 1;
         }

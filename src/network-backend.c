@@ -1079,7 +1079,7 @@ add_slave_tag(network_backends_t *bs, gchar *tagname, gchar *idxs)
     gint ret = 1;
 
     if(NULL == idxs ||0 >= strlen(idxs)) {
-        g_log_dbproxy(g_critical, "%s", "current backend_ndx is invalid");
+        g_log_dbproxy(g_critical, "current backend_ndx is invalid");
         return ret;
     }
 

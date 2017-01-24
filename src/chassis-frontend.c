@@ -82,7 +82,7 @@ int chassis_frontend_init_glib() {
     }
 
     if (!g_module_supported()) {
-        g_log_dbproxy(g_critical, "%s", "loading modules is not supported on this platform");
+        g_log_dbproxy(g_critical, "loading modules is not supported on this platform");
         return -1;
     }
 
@@ -99,7 +99,7 @@ int chassis_frontend_init_win32() {
     WSADATA wsaData;
 
     if (0 != WSAStartup(MAKEWORD( 2, 2 ), &wsaData)) {
-        g_log_dbproxy(g_critical, "%s", "WSAStartup(2, 2) failed to initialize the socket library");
+        g_log_dbproxy(g_critical, "WSAStartup(2, 2) failed to initialize the socket library");
 
         return -1;
     }
@@ -115,7 +115,7 @@ int chassis_frontend_init_win32() {
  */
 int chassis_frontend_init_logdir(char *log_path) {
     if (!log_path) {
-        g_log_dbproxy(g_critical, "%s", "Failed to get log directory, please set by --log-path");
+        g_log_dbproxy(g_critical, "Failed to get log directory, please set by --log-path");
         return -1;
     }
 
@@ -130,7 +130,7 @@ int chassis_frontend_init_basedir(const char *prg_name, char **_base_dir) {
 
     if (base_dir) { /* basedir is already known, check if it is absolute */
         if (!g_path_is_absolute(base_dir)) {
-            g_log_dbproxy(g_critical, "%s", "--basedir option must be an absolute path, but was %s", base_dir);
+            g_log_dbproxy(g_critical, "--basedir option must be an absolute path, but was %s", base_dir);
             return -1;
         } else {
             return 0;
@@ -142,7 +142,7 @@ int chassis_frontend_init_basedir(const char *prg_name, char **_base_dir) {
      */
     base_dir = chassis_get_basedir(prg_name);
     if (!base_dir) {
-        g_log_dbproxy(g_critical, "%s", "Failed to get base directory");
+        g_log_dbproxy(g_critical, "Failed to get base directory");
         return -1;
     }
 
@@ -355,7 +355,7 @@ int chassis_frontend_load_plugins(GPtrArray *plugins, const gchar *plugin_dir, g
         g_free(plugin_filename);
 
         if (NULL == p) {
-            g_log_dbproxy(g_critical, "%s", "setting --plugin-dir=<dir> might help");
+            g_log_dbproxy(g_critical, "setting --plugin-dir=<dir> might help");
             return -1;
         }
         p->option_grp_name = g_strdup(plugin_names[i]);

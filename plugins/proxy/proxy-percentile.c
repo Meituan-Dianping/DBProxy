@@ -337,7 +337,7 @@ check_percentile(void *user_data)
 
     g_log_dbproxy(g_message, "%s thread start", PROXY_PERCENTILE_THREAD);
     if (NULL == percentile_controller) {
-        g_log_dbproxy(g_critical, "%s", "check_percentile thread get argument failed.");
+        g_log_dbproxy(g_critical, "check_percentile thread get argument failed.");
         return ;
     }
 
@@ -346,10 +346,10 @@ check_percentile(void *user_data)
         while (percentile_controller->percentile_switch == pt_off) {
             end_time = g_get_monotonic_time () + SECONDS_PER_MIN * G_TIME_SPAN_SECOND;
             if (!g_cond_wait_until(g_cond, g_mutex, end_time)) {
-                g_log_dbproxy(g_warning, "%s", "percentile waiting meet timeout");
+                g_log_dbproxy(g_warning, "percentile waiting meet timeout");
             } else {
                 if (chassis_is_shutdown()) {
-                    g_log_dbproxy(g_message, "%s", "check_percentile thread get exit signal");
+                    g_log_dbproxy(g_message, "check_percentile thread get exit signal");
                     g_mutex_unlock(g_mutex);
                     goto exit;
                 }
@@ -382,7 +382,7 @@ check_percentile(void *user_data)
 #endif
     }
 exit:
-    g_log_dbproxy(g_message, "%s", "check_percentile thread will exit");
+    g_log_dbproxy(g_message, "check_percentile thread will exit");
 
     g_thread_exit(0);
 }

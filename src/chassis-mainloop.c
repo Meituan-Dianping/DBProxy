@@ -124,7 +124,7 @@ chassis *chassis_new() {
     chas->opts = NULL;//need to free
 
     if (0 != ret) {
-        g_log_dbproxy(g_critical, "%s", "create thread exit semphore failed.");
+        g_log_dbproxy(g_critical, "create thread exit semphore failed.");
         return NULL;
     }
 
@@ -238,11 +238,11 @@ static void sigint_handler(int G_GNUC_UNUSED fd, short G_GNUC_UNUSED event_type,
 static void sighup_handler(int G_GNUC_UNUSED fd, short G_GNUC_UNUSED event_type, void *_data) {
     chassis *chas = _data;
 
-    g_log_dbproxy(g_message, "%s", "received a SIGHUP, closing log file"); /* this should go into the old logfile */
+    g_log_dbproxy(g_message, "received a SIGHUP, closing log file"); /* this should go into the old logfile */
 
     chassis_log_set_logrotate(chas->log);
     
-    g_log_dbproxy(g_message, "%s", "re-opened log file after SIGHUP"); /* ... and this into the new one */
+    g_log_dbproxy(g_message, "re-opened log file after SIGHUP"); /* ... and this into the new one */
 }
 
 
@@ -309,7 +309,7 @@ int chassis_mainloop(void *_chas) {
     signal_set(&ev_sighup, SIGHUP, sighup_handler, chas);
     event_base_set(chas->event_base, &ev_sighup);
     if (signal_add(&ev_sighup, NULL)) {
-        g_log_dbproxy(g_critical, "%s", "signal_add(SIGHUP) failed");
+        g_log_dbproxy(g_critical, "signal_add(SIGHUP) failed");
     }
 #endif
 

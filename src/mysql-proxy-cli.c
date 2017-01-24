@@ -684,7 +684,7 @@ int main_cmdline(int argc, char **argv) {
     log->use_syslog = frontend->use_syslog;
 
     if (log->log_filename && log->use_syslog) {
-        g_log_dbproxy(g_critical, "%s", "log-file and log-use-syslog were given, but only one is allowed");
+        g_log_dbproxy(g_critical, "log-file and log-use-syslog were given, but only one is allowed");
         GOTO_EXIT(EXIT_FAILURE);
     }
 
@@ -716,7 +716,7 @@ int main_cmdline(int argc, char **argv) {
         uid_t user_id= geteuid();
         /* Don't bother if we aren't superuser */
         if (user_id) {
-            g_log_dbproxy(g_warning, "%s", "current user is not root, --user is ignored");
+            g_log_dbproxy(g_warning, "current user is not root, --user is ignored");
         } else {
             if (NULL == (user_info = getpwnam(srv->user))) {
                 g_log_dbproxy(g_critical, "unknown user: %s", srv->user);
@@ -804,7 +804,7 @@ int main_cmdline(int argc, char **argv) {
 
         if ((user = strsep(&cur_pwd_info, ":")) != NULL && (pwd = strsep(&cur_pwd_info, ":")) != NULL) {
             if (network_backends_set_monitor_pwd(srv->backends, user, pwd, TRUE) != 0) {
-                g_log_dbproxy(g_critical, "%s", "set monitor pwd failed");
+                g_log_dbproxy(g_critical, "set monitor pwd failed");
             }
          } else {
                 g_log_dbproxy(g_critical, "set monitor pwd failed: invalid value %s", frontend->backend_pwds);
@@ -978,7 +978,7 @@ int main_cmdline(int argc, char **argv) {
 
     if (chassis_mainloop(srv)) {
         /* looks like we failed */
-        g_log_dbproxy(g_critical, "%s", "Failure from chassis_mainloop. Shutting down.");
+        g_log_dbproxy(g_critical, "Failure from chassis_mainloop. Shutting down.");
         GOTO_EXIT(EXIT_FAILURE);
     }
 

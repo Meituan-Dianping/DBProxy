@@ -704,7 +704,7 @@ int network_mysqld_binlog_event_tablemap_get(
             field->type = col_type;
             break;
         default:
-            g_log_dbproxy(g_critical, "field-type %d isn't handled", col_type);
+            g_log_dbproxy(g_error, "field-type %d isn't handled", col_type);
             break;
         }
 
@@ -716,7 +716,7 @@ int network_mysqld_binlog_event_tablemap_get(
         g_debug_hexdump(G_STRLOC, event->event.table_map_event.metadata, event->event.table_map_event.metadata_len);
     }
     if (metadata_packet.offset != metadata_packet.data->len) {
-        g_log_dbproxy(g_critical, "%s", "metadata_packet.offset != metadata_packet.data->len");
+        g_log_dbproxy(g_critical, "metadata_packet.offset != metadata_packet.data->len");
         err = 1;
     }
 

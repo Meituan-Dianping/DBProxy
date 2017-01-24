@@ -148,7 +148,7 @@ int main_win32(int argc, char **argv, int (*_main_cmdline)(int, char **)) {
     };
 
     if (0 != WSAStartup(MAKEWORD( 2, 2 ), &wsaData)) {
-        g_log_dbproxy(g_critical, "%s", "WSAStartup failed to initialize the socket library.\n");
+        g_log_dbproxy(g_critical, "WSAStartup failed to initialize the socket library.\n");
 
         return -1;
     }
@@ -170,7 +170,7 @@ int main_win32(int argc, char **argv, int (*_main_cmdline)(int, char **)) {
             chassis_win32_running_as_service = FALSE;
             return shell_main(shell_argc, shell_argv);
         case ERROR_SERVICE_ALREADY_RUNNING:
-            g_log_dbproxy(g_critical, "%s", "service is already running, shutting down");
+            g_log_dbproxy(g_critical, "service is already running, shutting down");
             return 0;
         default:
             g_log_dbproxy(g_critical, "unhandled error-code (%d) for StartServiceCtrlDispatcher(), shutting down", err);

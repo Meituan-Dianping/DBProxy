@@ -212,7 +212,7 @@ reset_thread_running(chassis *chas)
 
     g_rw_lock_reader_unlock(&bs->backends_lock);
 
-    g_log_dbproxy(g_message, "%s", "[filter][reset thread running][success]");
+    g_log_dbproxy(g_message, "[filter][reset thread running][success]");
 
     return 0;
 }
@@ -1134,7 +1134,7 @@ save_config(chassis *chas) {
         return 2;
     }
 
-    g_log_dbproxy(g_message, "%s", "saving config file succeed");
+    g_log_dbproxy(g_message, "saving config file succeed");
     g_free(file_buf);
     g_key_file_free(keyfile);
 

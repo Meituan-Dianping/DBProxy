@@ -38,10 +38,10 @@ log_manager(void *user_data) {
             while (sql_log->sql_log_type == OFF) {
                 end_time =  g_get_monotonic_time() + CHECK_LOG_MANAGER_TIMEOUT * G_TIME_SPAN_SECOND;
                 if (!g_cond_wait_until(g_cond, g_mutex, end_time)) {
-                    g_log_dbproxy(g_warning, "%s", "log manager waiting meet timeout");
+                    g_log_dbproxy(g_warning, "log manager waiting meet timeout");
                 } else if (chassis_is_shutdown()) {
                     g_mutex_unlock(g_mutex);
-                    g_log_dbproxy(g_message, "%s", "log manager thread get exit signal");
+                    g_log_dbproxy(g_message, "log manager thread get exit signal");
                     goto exit;
                 }
             }
@@ -53,7 +53,7 @@ log_manager(void *user_data) {
                 sql_log->sql_log_fp = fopen(sql_log->sql_log_filename, "a");
                 if (sql_log->sql_log_fp == NULL) {
                     sql_log->sql_log_type = OFF;
-                    g_log_dbproxy(g_warning, "%s", "open sql log failed");
+                    g_log_dbproxy(g_warning, "open sql log failed");
                     continue;
                 }
                 fstat(fileno(sql_log->sql_log_fp), &st);
@@ -81,7 +81,7 @@ log_manager(void *user_data) {
                                             message->len,
                                             (off_t)sql_log->sql_log_cur_size);
             if (write_data_len != message->len) {
-                g_log_dbproxy(g_warning, "%s", "write sql log file failed");
+                g_log_dbproxy(g_warning, "write sql log file failed");
             }
             if (sql_log->sql_log_type == REALTIME) fsync(fd);
             sql_log->sql_log_cur_size += message->len;
@@ -91,7 +91,7 @@ log_manager(void *user_data) {
     }
 
 exit:
-    g_log_dbproxy(g_message, "%s", "log manager thread will exit");
+    g_log_dbproxy(g_message, "log manager thread will exit");
 
     g_thread_exit(0);
 }
