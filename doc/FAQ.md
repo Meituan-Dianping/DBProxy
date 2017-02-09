@@ -217,3 +217,10 @@ DBProxy的限制参考 [SQL语句支持限制](https://github.com/Meituan-Dianpi
 ### Q30: 监控账户密码 一般给予什么样的权限？
 
 监控账户最多会执行语句：SHOW STATUS LIKE 'Threads_running';，配置最基本的权限就可以。
+
+### Q31: 编译 GLIB2.0过程中出现 No package 'glib-2.0' found 如何解决?
+vim ~/.bashrc
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+source ~/.bashrc
+
+
