@@ -117,8 +117,7 @@ static void WINAPI chassis_win32_service_start(DWORD argc, LPTSTR *argv) {
     if (chassis_win32_service_status_handle == (SERVICE_STATUS_HANDLE)0) {
         int err = GetLastError();
 
-        g_critical("%s: RegisterServiceCtrlHandler(%s, ...) failed: %s (%d)",
-                G_STRLOC,
+        g_log_dbproxy(g_critical, "RegisterServiceCtrlHandler(%s, ...) failed: %s (%d)",
                 service_name,
                 g_strerror(err),
                 err);
@@ -149,7 +148,7 @@ int main_win32(int argc, char **argv, int (*_main_cmdline)(int, char **)) {
     };
 
     if (0 != WSAStartup(MAKEWORD( 2, 2 ), &wsaData)) {
-        g_critical("WSAStartup failed to initialize the socket library.\n");
+        g_log_dbproxy(g_critical, "WSAStartup failed to initialize the socket library.\n");
 
         return -1;
     }
@@ -171,10 +170,10 @@ int main_win32(int argc, char **argv, int (*_main_cmdline)(int, char **)) {
             chassis_win32_running_as_service = FALSE;
             return shell_main(shell_argc, shell_argv);
         case ERROR_SERVICE_ALREADY_RUNNING:
-            g_critical("service is already running, shutting down");
+            g_log_dbproxy(g_critical, "service is already running, shutting down");
             return 0;
         default:
-            g_critical("unhandled error-code (%d) for StartServiceCtrlDispatcher(), shutting down", err);
+            g_log_dbproxy(g_critical, "unhandled error-code (%d) for StartServiceCtrlDispatcher(), shutting down", err);
             return -1;
         }
     } else {
