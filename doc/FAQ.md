@@ -223,4 +223,78 @@ vim ~/.bashrc
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 source ~/.bashrc
 
+### Q32: github上的代码是美团线上运行的么？是否是最新的代码？
+	
+是的，最新的。
 
+### Q33: DBProxy 0.2版本分表策略只有一种吗？
+
+目前版本只支持简单的按 分表键 hash/取模 这一种分表策略，后续版本会支持range。
+
+### Q34: 有专门连接DBProxy的驱动吗？
+
+使用DBProxy和使用MySQL几乎没区别，业务透明，用什么驱动连接MySQL就用什么连接DBProxy。
+
+### Q35: DBproxy必须要跟mysql安装在同一台机器上么？
+
+DBProxy的部署和MySQL的部署位置没有必然联系，可以同一台也可以分别部署。
+
+### Q36: DBProxy源码编译时，为什么需要 --with-mysql选项？
+
+DBProxy用到了MySQL C API，需要相关的库和头文件。
+
+### Q37: DBProxy本身高可用?
+
+DBProxy本身高可用通过lvs、haproxy4层负载均衡来保证。backends(MySQL)的master节点的高可用通过mha保证；slave节点的高可用通过DBProxy保证。
+
+### Q38: 有相关DBProxy结合mha的文档吗?
+
+mha相关文档还没有整理。
+
+### Q39: DBProxy在美团中如何实现高可用的？
+
+DNS——MGW(LVS)——DBProxy——MySQL 再配合 mha。
+
+### Q40: DBProxy不支持空密码连接么？
+
+不支持，安全角度考虑，生产环境 不会配置空MySQL 密码。
+
+### Q41: DBProxy支持MyBatis吗？
+
+支持，配置方法也和直连MySQL一样，DBProxy对上游应用是透明的。
+
+### Q42: 目前支持分表的，全局唯一ID吗？
+
+不支持，目前分表只是按照指定的分表键做hash之后表名替换。
+
+### Q43: 支持官网版本的mysql 吗？还是只能用percona?
+
+只适配过Percona，生产环境用的也是Percona，不过有些公司也使用了官方MySQL。因为DBProxy与MySQL交互只与MySQL协议有关，所以使用官方MySQL也应该没问题。但是保证DBProxy所在机器安装Percona。
+
+### Q44: set names utf8 collate utf8_unicode_ci;设置该字符集报错
+
+https://github.com/Meituan-Dianping/DBProxy/blob/master/doc/USER_GUIDE.md#3.2.1.5
+
+### Q45: pdo客户端连接执行报错： 1105 Proxy Warning - Syntax Forbidden Prepare:XXXX ？
+
+https://github.com/Meituan-Dianping/DBProxy/blob/master/doc/USER_GUIDE.md#3.2.2.4
+
+### Q46: backend-max-thread-running＝64,如果数据库的连接大于这个参数会出现什么问题？
+
+首先backend-max-thread-running的限制跟你说的连接数可能不是一回事，我理解你说的可能是MySQL 端 max_connections 变量，DBProxy backend-max-thread-running参数对应MySQL Threads_running变量。在DBProxy上，该功能可以通过设置选择开启或不开启。如果开启该功能，在路由某一后台MySQL时，发现当前的MySQL Threads_running过高，则会找其他的后端MySQL，直到找到一个可用的MySQL，将SQL路由给该后端MySQL。
+
+### Q47: DBPrxoy 执行：show processlist 显示出来的backend是实时的么？
+
+是。
+
+### Q48: backend-max-thread-running 作用？
+
+控制MySQL并发量，降低MySQL的压力等，也是为了对MySQL进行保护。
+
+### Q49: 读写分离是不是只用配置backend就可以了?
+
+是的。
+
+### Q50: 哪些语句DBProxy会发往主库？
+
+一条语句满足以下条件会路由到主库：1 写/更新 操作 2 事务中 3 通过注释强制走主库 4 其他从库不可用 等。
