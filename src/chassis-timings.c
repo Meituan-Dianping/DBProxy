@@ -22,6 +22,7 @@
 
 #include "chassis-timings.h"
 #include "glib-ext.h"
+#include "chassis-log.h"
 
 #define MICROS_IN_SEC 1000000
 
@@ -95,7 +96,7 @@ guint64 chassis_calc_rel_microseconds(guint64 start, guint64 stop) {
     g_assert(chassis_timestamps_global != NULL);
     frequency = chassis_timestamps_global->microseconds_frequency;
     if (0 == frequency) {
-        g_critical("High resolution counter QueryPerformanceCounter not available on this system. All timer values will be meaningless.");
+        g_log_dbproxy(g_critical, "High resolution counter QueryPerformanceCounter not available on this system. All timer values will be meaningless.");
         return stop - start;
     }
     return (guint64) ((stop - start) * (1.0 / frequency) * MICROS_IN_SEC);
@@ -114,14 +115,14 @@ void chassis_timestamps_global_init(chassis_timestamps_global_t *gl) {
 
     if (NULL == gl) {
         if (NULL != chassis_timestamps_global) {
-            g_warning("%s: invalid attempt to reinitialize the global chassis timer info, ignoring call, still using %p",
-                    G_STRLOC, (void*)chassis_timestamps_global);
+            g_log_dbproxy(g_warning, "invalid attempt to reinitialize the global chassis timer info, ignoring call, still using %p",
+                    (void*)chassis_timestamps_global);
             return;
         } else {
             chassis_timestamps_global = g_new0(chassis_timestamps_global_t, 1);
         }
         timestamps = chassis_timestamps_global;
-        g_debug("%s: created new global chassis timer info at %p", G_STRLOC, (void*)chassis_timestamps_global);
+        g_log_dbproxy(g_debug, "created new global chassis timer info at %p", (void*)chassis_timestamps_global);
     }
     my_timer_init(timestamps);
 }

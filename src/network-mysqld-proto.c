@@ -27,6 +27,7 @@
 
 #include "sys-pedantic.h"
 #include "glib-ext.h"
+#include "chassis-log.h"
 
 /** @file
  *
@@ -147,10 +148,7 @@ int network_mysqld_proto_get_lenenc_int(network_packet *packet, guint64 *v) {
         off += 8;
     } else {
         /* if we hit this place we complete have no idea about the protocol */
-        g_critical("%s: bytestream[%d] is %d", 
-            G_STRLOC,
-            off, bytestream[off]);
-
+        g_log_dbproxy(g_warning, "bytestream[%d] is %d", off, bytestream[off]);
         /* either ERR (255) or NULL (251) */
 
         return -1;
@@ -436,8 +434,7 @@ int network_mysqld_proto_get_string_len(network_packet *packet, gchar **s, gsize
         return -1;
     }
     if (packet->offset + len > packet->data->len) {
-        g_critical("%s: packet-offset out of range: %u + "F_SIZE_T" > "F_SIZE_T, 
-                G_STRLOC,
+        g_log_dbproxy(g_warning, "packet-offset out of range: %u + "F_SIZE_T" > "F_SIZE_T, 
                 packet->offset, len, packet->data->len);
 
         return -1;

@@ -84,9 +84,7 @@ void network_mysqld_proto_field_free(network_mysqld_proto_field *field) {
         if (field->data.s) g_free(field->data.s);
         break;
     default:
-        g_message("%s: unknown field_type to free: %d",
-                G_STRLOC,
-                field->fielddef->type);
+        g_log_dbproxy(g_warning, "unknown field_type to free: %d", field->fielddef->type);
         break;
     }
 
@@ -137,9 +135,7 @@ int network_mysqld_proto_field_get(network_packet *packet,
             if (!err) field->data.i = i16;
             break;
         default:
-            g_error("%s: enum-length = %lu", 
-                    G_STRLOC,
-                    field->fielddef->max_length);
+            g_log_dbproxy(g_error, "enum-length = %lu", field->fielddef->max_length);
             break;
         }
         break;
@@ -164,9 +160,7 @@ int network_mysqld_proto_field_get(network_packet *packet,
         default:
             /* unknown blob-length */
             g_debug_hexdump(G_STRLOC, S(packet->data));
-            g_error("%s: blob-length = %lu", 
-                    G_STRLOC,
-                    field->fielddef->max_length);
+            g_log_dbproxy(g_error, "blob-length = %lu", field->fielddef->max_length);
             break;
         }
         err = err || network_mysqld_proto_get_string_len(packet, &field->data.s, length);
@@ -206,8 +200,7 @@ int network_mysqld_proto_field_get(network_packet *packet,
         g_debug_hexdump(G_STRLOC " (NEWDECIMAL)", packet->data->str, packet->data->len);
 #endif
 #if 0
-        g_critical("%s: don't know how to decode NEWDECIMAL(%lu, %u) at offset %u (%d)",
-                G_STRLOC,
+        g_log_dbproxy(g_critical, "don't know how to decode NEWDECIMAL(%lu, %u) at offset %u (%d)",
                 field->fielddef->max_length,
                 field->fielddef->decimals,
                 packet->offset,
@@ -218,9 +211,7 @@ int network_mysqld_proto_field_get(network_packet *packet,
         break; }
     default:
         g_debug_hexdump(G_STRLOC, packet->data->str, packet->data->len);
-        g_error("%s: unknown field-type to fetch: %d",
-                G_STRLOC,
-                field->fielddef->type);
+        g_log_dbproxy(g_error, "unknown field-type to fetch: %d", field->fielddef->type);
         break;
     }
 
@@ -249,10 +240,7 @@ GPtrArray *network_mysqld_proto_fields_new_full(
         /* the field is defined as NOT NULL, so the null-bit shouldn't be set */
         if ((fielddef->flags & NOT_NULL_FLAG) != 0) {
             if (field->is_null) {
-                g_error("%s: [%d] field is defined as NOT NULL, but nul-bit is set",
-                        G_STRLOC,
-                        i
-                        );
+                g_log_dbproxy(g_error, "[%d] field is defined as NOT NULL, but nul-bit is set", i);
             }
         }
         g_ptr_array_add(fields, field);
@@ -316,9 +304,7 @@ const char *network_mysqld_proto_field_get_typestring(enum enum_field_types type
         if ((guchar)field_type_name[i].type == (guchar)type) return field_type_name[i].name;
     }
 
-    g_critical("%s: field-type %d isn't known yet", 
-            G_STRLOC,
-            type);
+    g_log_dbproxy(g_warning, "field-type %d isn't known yet", type);
 
     return unknown_type;
 }
@@ -595,8 +581,7 @@ int network_mysqld_proto_get_frm(network_packet *packet, network_mysqld_frm *frm
     if (packet->data->str[0] != '\xfe' ||
         packet->data->str[1] != '\x01') {
 
-        g_critical("%s: frm-header should be: %02x%02x, got %02x%02x",
-                G_STRLOC,
+        g_log_dbproxy(g_warning, "frm-header should be: %02x%02x, got %02x%02x",
                 '\xfe', '\x01',
                 packet->data->str[0],
                 packet->data->str[1]
@@ -1039,9 +1024,7 @@ void network_mysqld_myd_print(network_mysqld_frm G_GNUC_UNUSED *frm, const char 
 
     f = g_mapped_file_new(filename, FALSE, &gerr);
     if (!f) {
-        g_critical("%s: %s",
-                G_STRLOC,
-                gerr->message);
+        g_log_dbproxy(g_critical, "%s", gerr->message);
         g_error_free(gerr);
         return;
     }
@@ -1073,9 +1056,7 @@ int frm_dump_file(
 
     f = g_mapped_file_new(filename, FALSE, &gerr);
     if (!f) {
-        g_critical("%s: %s",
-                G_STRLOC,
-                gerr->message);
+        g_log_dbproxy(g_critical, "%s", gerr->message);
         g_error_free(gerr);
         return -1;
     }
@@ -1144,14 +1125,14 @@ int main(int argc, char **argv) {
     };
 
     if (!GLIB_CHECK_VERSION(2, 6, 0)) {
-        g_error("the glib header are too old, need at least 2.6.0, got: %d.%d.%d", 
+        g_log_dbproxy(g_error, "the glib header are too old, need at least 2.6.0, got: %d.%d.%d", 
                 GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
     }
 
     check_str = glib_check_version(GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
 
     if (check_str) {
-        g_error("%s, got: lib=%d.%d.%d, headers=%d.%d.%d", 
+        g_log_dbproxy(g_error, "%s, got: lib=%d.%d.%d, headers=%d.%d.%d", 
             check_str,
             glib_major_version, glib_minor_version, glib_micro_version,
             GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
@@ -1210,7 +1191,7 @@ int main(int argc, char **argv) {
      * leave the unknown options in the list
      */
     if (FALSE == g_option_context_parse(option_ctx, &argc, &argv, &gerr)) {
-        g_critical("%s", gerr->message);
+        g_log_dbproxy(g_critical, "%s", gerr->message);
         
         exit_code = EXIT_FAILURE;
         goto exit_nicely;
@@ -1221,7 +1202,7 @@ int main(int argc, char **argv) {
         g_key_file_set_list_separator(keyfile, ',');
 
         if (FALSE == g_key_file_load_from_file(keyfile, default_file, G_KEY_FILE_NONE, &gerr)) {
-            g_critical("loading configuration from %s failed: %s", 
+            g_log_dbproxy(g_critical, "loading configuration from %s failed: %s", 
                     default_file,
                     gerr->message);
 
@@ -1248,7 +1229,7 @@ int main(int argc, char **argv) {
      * leave the unknown options in the list
      */
     if (FALSE == g_option_context_parse(option_ctx, &argc, &argv, &gerr)) {
-        g_critical("%s", gerr->message);
+        g_log_dbproxy(g_critical, "%s", gerr->message);
 
         exit_code = EXIT_FAILURE;
         goto exit_nicely;
@@ -1263,7 +1244,7 @@ int main(int argc, char **argv) {
 
     if (log->log_filename) {
         if (0 == chassis_log_open(log)) {
-            g_critical("can't open log-file '%s': %s", log->log_filename, g_strerror(errno));
+            g_log_dbproxy(g_critical, "can't open log-file '%s': %s", log->log_filename, g_strerror(errno));
 
             exit_code = EXIT_FAILURE;
             goto exit_nicely;
@@ -1274,7 +1255,7 @@ int main(int argc, char **argv) {
     /* handle log-level after the config-file is read, just in case it is specified in the file */
     if (log_level) {
         if (0 != chassis_log_set_level(log, log_level)) {
-            g_critical("--log-level=... failed, level '%s' is unknown ", log_level);
+            g_log_dbproxy(g_critical, "--log-level=... failed, level '%s' is unknown ", log_level);
 
             exit_code = EXIT_FAILURE;
             goto exit_nicely;

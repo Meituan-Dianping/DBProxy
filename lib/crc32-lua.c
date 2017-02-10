@@ -7,14 +7,15 @@
 #include "lua-env.h"
 #include "crc32.h"
 #include "glib-ext.h"
+#include "chassis-log.h"
 
 int crc32_string(lua_State *L) {
     size_t str_len;
     const char *str = luaL_checklstring(L, 1, &str_len);
-    g_debug("string:%s, length:%d", str, str_len);
+    g_log_dbproxy(g_debug, "string:%s, length:%d", str, str_len);
     // crc32 hash
     unsigned int key = crc32(str, str_len);
-    g_debug("crc key:%ld", key);
+    g_log_dbproxy(g_debug, "crc key:%ld", key);
 
     // push crc number
     lua_pushnumber(L, key);

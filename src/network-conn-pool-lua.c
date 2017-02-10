@@ -96,7 +96,7 @@ static void network_mysqld_con_idle_handle(int event_fd, short events, void *use
          *        up to now we just ignore it
          */
         if (ioctlsocket(event_fd, FIONREAD, &b)) {
-            g_warning("S:%s(thread_id:%u) Usr:%s"
+            g_log_dbproxy(g_warning, "S:%s(thread_id:%u) Usr:%s"
                                         "ioctl(%d, FIONREAD, ...) failed: %s(%d)",
                                         NETWORK_SOCKET_DST_NAME(pool_entry->sock),
                                         NETWORK_SOCKET_THREADID(pool_entry->sock),
@@ -104,7 +104,7 @@ static void network_mysqld_con_idle_handle(int event_fd, short events, void *use
                                         event_fd, g_strerror(errno), errno);
 
         } else if (b != 0) {
-            g_warning("S:%s(thread_id:%u) Usr:%s "
+            g_log_dbproxy(g_warning, "S:%s(thread_id:%u) Usr:%s "
                                        "ioctl(%d, FIONREAD, ...) said there is something to read from backend, oops: %d",
                                        NETWORK_SOCKET_DST_NAME(pool_entry->sock),
                                        NETWORK_SOCKET_THREADID(pool_entry->sock),
@@ -141,9 +141,9 @@ int network_connection_pool_lua_add_connection(network_mysqld_con *con) {
     /* if response is null, conn has not been authed, use an invalid username. */
     if(!con->server->response)
     {
-        g_warning("%s: (remove) remove socket from pool, response is NULL, sock->src:%s, sock->dst:%s",
-                        G_STRLOC, NETWORK_SOCKET_SRC_NAME(con->server),
-                                    NETWORK_SOCKET_DST_NAME(con->server));
+        g_log_dbproxy(g_warning, "(remove) remove socket from pool, response is NULL, sock->src:%s, sock->dst:%s",
+                        NETWORK_SOCKET_SRC_NAME(con->server),
+                        NETWORK_SOCKET_DST_NAME(con->server));
 
         con->server->response = network_mysqld_auth_response_new();
         g_string_assign_len(con->server->response->username, C("mysql_proxy_invalid_user"));
@@ -212,8 +212,8 @@ network_socket *self_connect(network_mysqld_con *con, network_backend_t *backend
         network_socket_free(sock);
         if (!IS_BACKEND_OFFLINE(backend) && !IS_BACKEND_WAITING_EXIT(backend)) {
             SET_BACKEND_STATE(backend, BACKEND_STATE_DOWN);
-            g_warning("%s(%s): event_thread(%d) set backend (%s) state to DOWN",
-                                G_STRLOC, __func__, chassis_event_get_threadid(),
+            g_log_dbproxy(g_warning, "event_thread(%d) set backend (%s) state to DOWN",
+                                chassis_event_get_threadid(),
                                 backend->addr->name->str);
         }
         return NULL;
@@ -436,7 +436,7 @@ network_socket *network_connection_pool_lua_swap(network_mysqld_con *con, networ
      */
         
 #ifdef DEBUG_CONN_POOL
-    g_debug("%s: (swap) check if we have a connection for this user in the pool '%s'", G_STRLOC, con->client->response ? con->client->response->username->str: "empty_user");
+    g_log_dbproxy(g_debug, "(swap) check if we have a connection for this user in the pool '%s'", con->client->response ? con->client->response->username->str: "empty_user");
 #endif
     network_connection_pool* pool = chassis_event_thread_pool(backend);
     if (NULL == (send_sock = network_connection_pool_get(pool, con->client->response->username, con->client->response->capabilities, (void *)con))) {

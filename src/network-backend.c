@@ -363,7 +363,7 @@ int network_backends_addpwd(network_backends_t *bs, const gchar *user, const gch
     if (is_encrypt) {
         gchar *decrypt_pwd = decrypt(pwd);
         if (decrypt_pwd == NULL) {
-            g_warning("failed to decrypt %s\n", pwd);
+            g_log_dbproxy(g_critical, "failed to decrypt %s", pwd);
             return ERR_PWD_DECRYPT;
         }
         network_mysqld_proto_password_hash(hashed_password, decrypt_pwd, strlen(decrypt_pwd));
@@ -373,7 +373,7 @@ int network_backends_addpwd(network_backends_t *bs, const gchar *user, const gch
     } else {
         gchar *encrypt_pwd = encrypt(pwd);
         if (encrypt_pwd == NULL) {
-            g_warning("failed to encrypt %s\n", pwd);
+            g_log_dbproxy(g_critical, "failed to encrypt %s", pwd);
             return ERR_PWD_ENCRYPT;
         }
 
@@ -397,7 +397,7 @@ int network_backends_addpwd(network_backends_t *bs, const gchar *user, const gch
     }
     g_rw_lock_writer_unlock(&bs->user_mgr_lock);
 
-    g_critical("add %s pwd for %s success", is_encrypt ? "ENCRYPT" : "NOENCRYPT",  user);
+    g_log_dbproxy(g_message, "add %s pwd for %s success", is_encrypt ? "ENCRYPT" : "NOENCRYPT",  user);
 
     return PWD_SUCCESS;
 }
@@ -419,7 +419,7 @@ int network_backends_removepwd(network_backends_t *bs, const gchar *user) {
             g_hash_table_remove(bs->pwd_table, user);
             g_rw_lock_writer_unlock(&bs->user_mgr_lock);
 
-            g_critical("remove pwd  %s success", user);
+            g_log_dbproxy(g_message, "remove pwd  %s success", user);
 
             return PWD_SUCCESS;
         }
@@ -449,7 +449,7 @@ gint network_backends_set_monitor_pwd(network_backends_t *bs, const gchar *user,
     if (is_encrypt) {
         decrypt_pwd = decrypt(pwd);
         if (decrypt_pwd == NULL) {
-            g_warning("failed to decrypt %s\n", pwd);
+            g_log_dbproxy(g_critical, "failed to decrypt %s", pwd);
             return ERR_PWD_DECRYPT;
         }
 
@@ -457,7 +457,7 @@ gint network_backends_set_monitor_pwd(network_backends_t *bs, const gchar *user,
     } else {
         encrypt_pwd = encrypt(pwd);
         if (encrypt_pwd == NULL) {
-            g_warning("failed to encrypt %s\n", pwd);
+            g_log_dbproxy(g_critical, "failed to encrypt %s", pwd);
             return ERR_PWD_ENCRYPT;
         }
 
@@ -473,7 +473,7 @@ gint network_backends_set_monitor_pwd(network_backends_t *bs, const gchar *user,
     bs->monitor_encrypt_pwd = encrypt_pwd;
     g_rw_lock_writer_unlock(&bs->user_mgr_lock);
 
-    g_critical("set monitor pwd %s:%s success", user, pwd);
+    g_log_dbproxy(g_message, "set monitor pwd %s:%s success", user, pwd);
 
     return PWD_SUCCESS;
 }
@@ -552,7 +552,7 @@ int network_backends_add(network_backends_t *bs, /* const */ gchar *address, bac
 
     if (0 != network_address_set_address(new_backend->addr, address)) {
         network_backend_free(new_backend);
-        g_critical("add backend %s failed", address);
+        g_log_dbproxy(g_critical, "add backend %s failed", address);
         return -1;
     }
 
@@ -568,7 +568,7 @@ int network_backends_add(network_backends_t *bs, /* const */ gchar *address, bac
             network_backend_free(new_backend);
 
             g_rw_lock_writer_unlock(&bs->backends_lock);    /*remove lock*/
-            g_critical("backend %s is already known!", address);
+            g_log_dbproxy(g_warning, "backend %s is already known!", address);
             return -1;
         }
     }
@@ -583,12 +583,12 @@ int network_backends_add(network_backends_t *bs, /* const */ gchar *address, bac
     if (type == BACKEND_TYPE_RO) {
         if (new_backend->slave_tag != NULL) {
             tag_backends_insert(bs, new_backend->slave_tag->str, new_backend);
-            g_critical("add read-only backend %s to backends with tag:%s",
+            g_log_dbproxy(g_message, "add read-only backend %s to backends with tag:%s",
                                             address, new_backend->slave_tag->str);
         } else {
             g_ptr_array_add(bs->def_backend_tag->backends, new_backend);
             g_wrr_poll_update(bs, bs->def_backend_tag);
-            g_critical("add read-only backend %s to default backends", address);
+            g_log_dbproxy(g_message, "add read-only backend %s to default backends", address);
         }
     }
 
@@ -597,7 +597,7 @@ int network_backends_add(network_backends_t *bs, /* const */ gchar *address, bac
     if (pos_tag != NULL) *pos_tag = '$';
     if (pos_weight != NULL) *pos_weight = '@';
 
-    g_critical("add %s backend: %s success", (type == BACKEND_TYPE_RW) ? "read/write" : "read-only", address);
+    g_log_dbproxy(g_message, "add %s backend: %s success", (type == BACKEND_TYPE_RW) ? "read/write" : "read-only", address);
 
     return 0;
 }
@@ -647,8 +647,7 @@ ip_match(const void *s1, const void *s2) {
     if (cmp_size > 0) {
         res = g_ascii_strncasecmp(client_ip, host_ip, cmp_size);
     }
-    g_debug("%s:%s client_ip = %s host_ip = %s", G_STRLOC, __func__,
-                        client_ip, host_ip);
+    g_log_dbproxy(g_debug, "client_ip = %s host_ip = %s", client_ip, host_ip);
 
     return res;
 }
@@ -851,9 +850,7 @@ check_user_host(GHashTable *pwd_table, gchar *username, gchar *client_ip, GRWLoc
 end:
     g_rw_lock_reader_unlock(user_mgr_lock);
 
-    g_debug("%s:%s user %s@%s was %s", G_STRLOC, __func__,
-                                       username, client_ip,
-                                       res ? "accepted" : "forbidden");
+    g_log_dbproxy(g_debug, "user %s@%s was %s", username, client_ip, res ? "accepted" : "forbidden");
     return res;
 }
 
@@ -915,19 +912,17 @@ user_hosts_handle(network_backends_t *bs, const gchar *user, const gchar *raw_us
         gchar *real_ip = get_real_ip(g_strstrip(token));
         if (real_ip == NULL) continue;
         if (type == ADD_USER_HOST) {
-            g_debug("to add user host:%s@%s", user, real_ip);
+            g_log_dbproxy(g_debug, "to add user host:%s@%s", user, real_ip);
             ret = insert_sorted_array(hval->user_hosts, real_ip, ip_match); // should be ip_match
             if (ret != 0) {
-                g_critical("%s(%s): user host: %s@%s exists, added failed",
-                            G_STRLOC, __func__, user, real_ip);
+                g_log_dbproxy(g_warning, "user host: %s@%s exists, added failed", user, real_ip);
                 g_free(real_ip);
             }
         } else if (type == REMOVE_USER_HOST) {
-            g_debug("to delete user host:%s@%s", user, real_ip);
+            g_log_dbproxy(g_debug, "to delete user host:%s@%s", user, real_ip);
             ret = delete_sorted_array(hval->user_hosts, real_ip, strcmp_pp);  // should be ip_match
             if (ret != 0) {
-                g_critical("%s(%s): user host: %s@%s doesn't exist, removed failed",
-                            G_STRLOC, __func__, user, real_ip);
+                g_log_dbproxy(g_warning, "user host: %s@%s doesn't exist, removed failed", user, real_ip);
             }
             g_free(real_ip);
         }
@@ -978,7 +973,7 @@ user_backends_handle(network_backends_t *bs, const gchar *user,
                     (user_backends == NULL || strlen(user_backends) == 0)) {
         g_ptr_array_remove_range(hval->backends_tag, 0, hval->backends_tag->len);
         hval->user_tag_max_weight = 0;
-        g_critical("%s(%s): to delete all user backends:%s", G_STRLOC, __func__, user);
+        g_log_dbproxy(g_message, "to delete all user backends:%s", user);
         goto funcexit;
     }
 
@@ -989,24 +984,22 @@ user_backends_handle(network_backends_t *bs, const gchar *user,
         if (type == ADD_BACKENDS) {
             if(0 == strlen(token)) continue; //NULL will cause segfault
     
-            g_critical("%s(%s): to add user backend:%s@%s", G_STRLOC, __func__, user, token);
+            g_log_dbproxy(g_message, "to add user backend:%s@%s", user, token);
 
             new_token = g_strdup(token);
             ret = insert_sorted_array(hval->backends_tag, new_token, strcmp_pp);
             if (ret != 0) {
-                g_critical("%s(%s): user backend: %s@%s exists, added failed",
-                            G_STRLOC, __func__, user, token);
+                g_log_dbproxy(g_warning, "user backend: %s@%s exists, added failed", user, token);
                 g_free(new_token);
             }
         } else if (type == REMOVE_BACKENDS) {
             if(0 == strlen(token)) continue;
 
-            g_critical("%s(%s): to delete user backend:%s@%s", G_STRLOC, __func__, user, token);
+            g_log_dbproxy(g_message, "to delete user backend:%s@%s", user, token);
             ret = delete_sorted_array(hval->backends_tag, token, strcmp_pp);
             hval->user_tag_max_weight = 0;
             if (ret != 0) {
-                g_critical("%s(%s): user backend: %s@%s doesn't exist, removed failed",
-                            G_STRLOC, __func__, user, token);
+                g_log_dbproxy(g_warning, "user backend: %s@%s doesn't exist, removed failed", user, token);
             }
         }
     }
@@ -1022,8 +1015,7 @@ funcexit:
             if (g_strcmp0(rwi->username, user) == 0) {
                 concatenate_str_array(hval->backends_tag, &rwi->backends, BACKENDS_SEP);
                 hval->user_tag_max_weight = 0;
-                g_debug("%s(%s): user %s backend: %s",
-                            G_STRLOC, __func__, user, rwi->backends);
+                g_log_dbproxy(g_debug, "user %s backend: %s", user, rwi->backends);
                 break;
             }
         }
@@ -1042,7 +1034,7 @@ alter_slave_weight(network_backends_t *bs, gint idx, gint weight)
     gint ret = -1;
 
     if (0 >= weight) {
-        g_debug("%s(%s): current weight should > 0, now is %d ", G_STRLOC, __func__, weight);
+        g_log_dbproxy(g_critical, "current weight should > 0, now is %d ", weight);
         return ret;
     }
 
@@ -1050,7 +1042,7 @@ alter_slave_weight(network_backends_t *bs, gint idx, gint weight)
 
     backend = network_backends_get(bs,idx);
     if(NULL == backend) {
-        g_debug("%s(%s): current backend_ndx %d is not exist ", G_STRLOC, __func__, idx);
+        g_log_dbproxy(g_critical, "current backend_ndx %d is not exist ", idx);
         goto exit;
     }
 
@@ -1067,8 +1059,7 @@ alter_slave_weight(network_backends_t *bs, gint idx, gint weight)
         g_wrr_poll_update(bs, tag_backends);
         ret = 0;
     } else {
-        g_debug("%s(%s): backend_ndx %d is BACKEND_TYPE_RW, set weight failed",
-                 G_STRLOC, __func__, idx);
+        g_log_dbproxy(g_warning, "backend_ndx %d is BACKEND_TYPE_RW, set weight failed", idx);
     }
 
 exit:
@@ -1088,7 +1079,7 @@ add_slave_tag(network_backends_t *bs, gchar *tagname, gchar *idxs)
     gint ret = 1;
 
     if(NULL == idxs ||0 >= strlen(idxs)) {
-        g_critical("%s(%s):current backend_ndx is invalid ", G_STRLOC, __func__);
+        g_log_dbproxy(g_critical, "current backend_ndx is invalid");
         return ret;
     }
 
@@ -1167,7 +1158,7 @@ remove_slave_tag(network_backends_t *bs, gchar *tagname, gchar *idxs)
 
         tag_backends = g_hash_table_lookup(bs->tag_backends, tagname);
         if(NULL == tag_backends) {
-            g_debug("%s(%s) current tag %s is not exist", G_STRLOC, __func__, tagname);
+            g_log_dbproxy(g_warning, "current tag %s is not exist", tagname);
             ret = -1;
             goto exit;
         }
@@ -1189,7 +1180,7 @@ remove_slave_tag(network_backends_t *bs, gchar *tagname, gchar *idxs)
 
         tag_backends = g_hash_table_lookup(bs->tag_backends, tagname);
         if(NULL == tag_backends) {
-            g_debug("%s(%s) tag %s is not exist", G_STRLOC, __func__, tagname);
+            g_log_dbproxy(g_warning, "tag %s is not exist", tagname);
             ret = -1;
             goto exit;
         }

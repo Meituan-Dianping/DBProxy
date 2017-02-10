@@ -367,7 +367,7 @@ static int proxy_backends_users(network_backends_t *bs, gint type, const gchar *
     case ADD_PWD:
         if (is_user_exist) {
             ret = ERR_USER_EXIST;
-            g_critical("add pwd %s failed, user %s is already known!", user, user);
+            g_log_dbproxy(g_warning, "add pwd %s failed, user %s is already known", user, user);
         } else {
             ret = network_backends_addpwd(bs, user, user_info, FALSE);
         }
@@ -376,7 +376,7 @@ static int proxy_backends_users(network_backends_t *bs, gint type, const gchar *
     case ADD_ENPWD:
         if (is_user_exist) {
             ret = ERR_USER_EXIST;
-            g_critical("add enpwd %s:%s failed, user %s is already known!", user, user_info, user);
+            g_log_dbproxy(g_warning, "add enpwd %s:%s failed, user %s is already known", user, user_info, user);
         } else {
             ret = network_backends_addpwd(bs, user, user_info, TRUE);
         }
@@ -385,7 +385,7 @@ static int proxy_backends_users(network_backends_t *bs, gint type, const gchar *
     case REMOVE_PWD:
         if (!is_user_exist) {
             ret = ERR_USER_NOT_EXIST;
-            g_critical("remove pwd %s failed, user %s is not exist", user, user);
+            g_log_dbproxy(g_warning, "remove pwd %s failed, user %s is not exist", user, user);
         } else {
             ret = network_backends_removepwd(bs, user);
         }
@@ -393,43 +393,43 @@ static int proxy_backends_users(network_backends_t *bs, gint type, const gchar *
 
     case ADD_USER_HOST:
         if (!is_user_exist) {
-            g_critical("add user hosts %s failed, user %s is not exist", user_info, user);
+            g_log_dbproxy(g_warning, "add user hosts %s failed, user %s is not exist", user_info, user);
             ret = ERR_USER_NOT_EXIST;
         } else {
             user_hosts_handle(bs, user, user_info, ADD_USER_HOST);
-            g_critical("add user hosts %s for %s", user_info, user);
+            g_log_dbproxy(g_warning, "add user hosts %s for %s", user_info, user);
             ret = 0;
         }
         break;
 
     case REMOVE_USER_HOST:
         if (!is_user_exist) {
-            g_critical("remove user hosts %s failed, user %s is not exist", user_info, user);
+            g_log_dbproxy(g_warning, "remove user hosts %s failed, user %s is not exist", user_info, user);
             ret = ERR_USER_NOT_EXIST;
         } else {
             user_hosts_handle(bs, user, user_info, REMOVE_USER_HOST);
-            g_critical("remove user hosts %s from user %s", user_info, user);
+            g_log_dbproxy(g_warning, "remove user hosts %s from user %s", user_info, user);
             ret = 0;
         }
         break;
     case ADD_BACKENDS:
         if (!is_user_exist) {
-            g_critical("add backend %s failed, user %s is not exist", user_info, user);
+            g_log_dbproxy(g_warning, "add backend %s failed, user %s is not exist", user_info, user);
             ret = ERR_USER_NOT_EXIST;
         } else {
             user_backends_handle(bs, user, user_info, ADD_BACKENDS);
-            g_critical("add backend %s for %s", user_info, user);
+            g_log_dbproxy(g_warning, "add backend %s for %s", user_info, user);
             ret = 0;
         }
         break;
 
     case REMOVE_BACKENDS:
         if (!is_user_exist) {
-            g_critical("remove user backend %s failed, user %s is not exist", user_info, user);
+            g_log_dbproxy(g_warning, "remove user backend %s failed, user %s is not exist", user_info, user);
             ret = ERR_USER_NOT_EXIST;
         } else {
             user_backends_handle(bs, user, user_info, REMOVE_BACKENDS);
-            g_critical("remove user backend %s from user %s", user_info, user);
+            g_log_dbproxy(g_warning, "remove user backend %s from user %s", user_info, user);
             ret = 0;
         }
         break;
@@ -494,7 +494,7 @@ static int proxy_backend_state(network_backends_t *bs, guint timeout, guint inde
     network_backend_t* b = bs->backends->pdata[index];
 
     if (!b) {
-        g_critical("%s backend failed, backend %d is not exist",
+        g_log_dbproxy(g_warning, "%s backend failed, backend %d is not exist",
                             (state_type == BACKEND_STATE_REMOVING) ? "removing" :
                                 (state_type == BACKEND_STATE_OFFLINING ? "offlining" : "online" ),
                                 index);
@@ -529,7 +529,7 @@ static int proxy_backend_state(network_backends_t *bs, guint timeout, guint inde
     }
 
     SET_BACKEND_STATE(b, state_type);
-    g_message("%s backend %s success", (state_type == BACKEND_STATE_REMOVING) ? "removing" :
+    g_log_dbproxy(g_message, "%s backend %s success", (state_type == BACKEND_STATE_REMOVING) ? "removing" :
                                         (state_type == BACKEND_STATE_OFFLINING ? "offlining" : "online" ),
                                         b->addr->name->str);
 

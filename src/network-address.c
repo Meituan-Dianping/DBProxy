@@ -50,6 +50,7 @@
 
 #include "network-address.h"
 #include "glib-ext.h"
+#include "chassis-log.h"
 
 #define C(x) x, sizeof(x) - 1
 #define S(x) x->str, x->len
@@ -82,12 +83,10 @@ void network_address_free(network_address *addr) {
         if (name[0] == '/') {
             ret = g_remove(name);
             if (ret == 0) {
-                g_debug("%s: removing socket %s successful", 
-                    G_STRLOC, name);
+                g_log_dbproxy(g_debug, "removing socket %s successful", name);
             } else {
                 if (errno != EPERM && errno != EACCES) {
-                    g_critical("%s: removing socket %s failed: %s (%d)", 
-                        G_STRLOC, name, strerror(errno), errno);
+                    g_log_dbproxy(g_critical, "removing socket %s failed: %s (%d)", name, strerror(errno), errno);
                 }
             }
         }
@@ -107,8 +106,7 @@ static gint network_address_set_address_ip(network_address *addr, const gchar *a
     g_return_val_if_fail(addr, -1);
 
     if (port > 65535) {
-        g_critical("%s: illegal value %u for port, only 1 ... 65535 allowed",
-                G_STRLOC, port);
+        g_log_dbproxy(g_critical, "illegal value %u for port, only 1 ... 65535 allowed", port);
         return -1;
     }
 
@@ -132,7 +130,7 @@ static gint network_address_set_address_ip(network_address *addr, const gchar *a
          */
         hint.ai_family = PF_INET;
         if ((rc = getaddrinfo(address, NULL, &hint, &ai)) != 0) {
-            g_critical("getaddrinfo(%s) failed with %s", address, 
+            g_log_dbproxy(g_critical, "getaddrinfo(%s) failed with %s", address, 
                        gai_strerror(rc));
             return -1;
         }
@@ -173,7 +171,7 @@ static gint network_address_set_address_ip(network_address *addr, const gchar *a
 
         if (ai == NULL) {
             /* the family we print here is the *last* ai's */
-            g_critical("address %s doesn't resolve to a valid/supported "
+            g_log_dbproxy(g_critical, "address %s doesn't resolve to a valid/supported "
                        "address family: %d expected, last found %d", address,
                        PF_INET, family);
             freeaddrinfo(ai);
@@ -216,7 +214,7 @@ static gint network_address_set_address_un(network_address *addr, const gchar *a
 
 #ifdef HAVE_SYS_UN_H
     if (strlen(address) >= sizeof(addr->addr.un.sun_path) - 1) {
-        g_critical("unix-path is too long: %s", address);
+        g_log_dbproxy(g_critical, "unix-path is too long: %s", address);
         return -1;
     }
 
@@ -261,12 +259,11 @@ gint network_address_set_address(network_address *addr, const gchar *address) {
         guint port = strtoul(s + 1, &port_err, 10);
 
         if (*(s + 1) == '\0') {
-            g_critical("%s: IP-address has to be in the form [<ip>][:<port>], is '%s'. No port number",
-                    G_STRLOC, address);
+            g_log_dbproxy(g_critical, "IP-address has to be in the form [<ip>][:<port>], is '%s'. No port number", address);
             ret = -1;
         } else if (*port_err != '\0') {
-            g_critical("%s: IP-address has to be in the form [<ip>][:<port>], is '%s'. Failed to parse the port at '%s'",
-                    G_STRLOC, address, port_err);
+            g_log_dbproxy(g_critical, "IP-address has to be in the form [<ip>][:<port>], is '%s'. Failed to parse the port at '%s'",
+                    address, port_err);
             ret = -1;
         } else {
             ret = network_address_set_address_ip(addr, ip_address, port);
@@ -298,10 +295,9 @@ gint network_address_refresh_name(network_address *addr) {
 #endif
     default:
         if (addr->addr.common.sa_family > AF_MAX)
-            g_debug("%s.%d: ignoring invalid sa_family %d", __FILE__, __LINE__, addr->addr.common.sa_family);
+            g_log_dbproxy(g_debug, "ignoring invalid sa_family %d", addr->addr.common.sa_family);
         else
-            g_warning("%s.%d: can't convert addr-type %d into a string",
-                      __FILE__, __LINE__, 
+            g_log_dbproxy(g_critical, "can't convert addr-type %d into a string",
                       addr->addr.common.sa_family);
         return -1;
     }
@@ -325,8 +321,7 @@ gboolean network_address_is_local(network_address *dst_addr, network_address *sr
             return TRUE;
         }
 #endif
-        g_message("%s: is-local family %d != %d",
-                G_STRLOC,
+        g_log_dbproxy(g_message, "is-local family %d != %d",
                 src_addr->addr.common.sa_family,
                 dst_addr->addr.common.sa_family
                 );
@@ -338,13 +333,11 @@ gboolean network_address_is_local(network_address *dst_addr, network_address *sr
         /* inet_ntoa() returns a pointer to a static buffer
          * we can't call it twice in the same function-call */
 
-        g_debug("%s: is-local src: %s(:%d) =? ...",
-                G_STRLOC,
+        g_log_dbproxy(g_debug, "is-local src: %s(:%d) =? ...",
                 inet_ntoa(src_addr->addr.ipv4.sin_addr),
                 ntohs(src_addr->addr.ipv4.sin_port));
 
-        g_debug("%s: is-local dst: %s(:%d)",
-                G_STRLOC,
+        g_log_dbproxy(g_debug, "is-local dst: %s(:%d)",
                 inet_ntoa(dst_addr->addr.ipv4.sin_addr),
                 ntohs(dst_addr->addr.ipv4.sin_port)
                 );
@@ -356,7 +349,7 @@ gboolean network_address_is_local(network_address *dst_addr, network_address *sr
         return TRUE;
 #endif
     default:
-        g_critical("%s: sa_family = %d", G_STRLOC, src_addr->addr.common.sa_family);
+        g_log_dbproxy(g_critical, "sa_family = %d", src_addr->addr.common.sa_family);
         return FALSE;
     }
 }

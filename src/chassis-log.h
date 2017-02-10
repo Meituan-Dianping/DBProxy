@@ -125,6 +125,7 @@ CHASSIS_API void log_queue_free(log_queue *lq);
 CHASSIS_API gint log_queue_push(log_queue *lq, GString *data);
 CHASSIS_API GString* log_queue_pop();
 
+#define g_log_dbproxy(log_level, reason, ...) log_level("%s(%s)"reason ,G_STRLOC,  __func__, ##__VA_ARGS__)
 
 /*@}*/
 
