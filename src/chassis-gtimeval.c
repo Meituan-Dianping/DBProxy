@@ -21,6 +21,8 @@
 #include <glib.h>
 
 #include "chassis-gtimeval.h"
+#include "chassis-log.h"
+
 
 void chassis_gtime_testset_now(GTimeVal *gt, gint64 *delay)
 {
@@ -34,8 +36,7 @@ void chassis_gtime_testset_now(GTimeVal *gt, gint64 *delay)
     ge_gtimeval_diff(gt, &now, &tdiff);
 
     if (tdiff < 0) {
-        g_critical("%s: time went backwards (%"G_GINT64_FORMAT" usec)!",
-                G_STRLOC, tdiff);
+        g_log_dbproxy(g_critical, "time went backwards (%"G_GINT64_FORMAT" usec)!", tdiff);
         gt->tv_usec = gt->tv_sec = 0;
         goto out;
     }

@@ -21,6 +21,7 @@
 
 #include "chassis-path.h"
 #include "chassis-keyfile.h"
+#include "chassis-log.h"
 
 int chassis_keyfile_to_options(GKeyFile *keyfile, const gchar *ini_group_name, GOptionEntry *config_entries) {
     GError *gerr = NULL;
@@ -88,13 +89,13 @@ int chassis_keyfile_to_options(GKeyFile *keyfile, const gchar *ini_group_name, G
             break;
 #endif
         default:
-            g_error("%s: (keyfile) the option %d can't be handled", G_STRLOC, entry->arg);
+            g_log_dbproxy(g_error, "(keyfile) the option %d can't be handled", entry->arg);
             break;
         }
 
         if (gerr) {
             if (gerr->code != G_KEY_FILE_ERROR_KEY_NOT_FOUND) {
-                g_message("%s", gerr->message);
+                g_log_dbproxy(g_critical, "%s", gerr->message);
                 ret = -1;
             }
 

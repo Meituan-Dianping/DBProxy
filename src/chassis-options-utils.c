@@ -212,7 +212,7 @@ reset_thread_running(chassis *chas)
 
     g_rw_lock_reader_unlock(&bs->backends_lock);
 
-    g_message("[filter][reset thread running][success]");
+    g_log_dbproxy(g_message, "[filter][reset thread running][success]");
 
     return 0;
 }
@@ -834,7 +834,7 @@ assign_blacklist_file(const char *newval, void *ex_param)
 
     if (!access(newval, F_OK))
     {
-        g_warning("file %s doesn't exist:%s", newval, g_strerror(errno));
+        g_log_dbproxy(g_warning, "file %s doesn't exist:%s", newval, g_strerror(errno));
     }
     else
     {
@@ -1001,7 +1001,7 @@ save_config(chassis *chas) {
     GError *gerr = NULL;
 
     if (FALSE == g_key_file_load_from_file(keyfile, bs->default_file, G_KEY_FILE_KEEP_COMMENTS, &gerr)) {
-        g_critical("%s: g_key_file_load_from_file: %s", G_STRLOC, gerr->message);
+        g_log_dbproxy(g_critical, "g_key_file_load_from_file: %s", gerr->message);
         g_error_free(gerr);
         g_key_file_free(keyfile);
         return 1;
@@ -1127,14 +1127,14 @@ save_config(chassis *chas) {
     gsize file_size = 0;
     gchar *file_buf = g_key_file_to_data(keyfile, &file_size, NULL);
     if (FALSE == g_file_set_contents(bs->default_file, file_buf, file_size, &gerr)) {
-        g_critical("%s: g_file_set_contents: %s", G_STRLOC, gerr->message);
+        g_log_dbproxy(g_critical, "g_file_set_contents: %s", gerr->message);
         g_free(file_buf);
         g_error_free(gerr);
         g_key_file_free(keyfile);
         return 2;
     }
 
-    g_message("%s: saving config file succeed", G_STRLOC);
+    g_log_dbproxy(g_message, "saving config file succeed");
     g_free(file_buf);
     g_key_file_free(keyfile);
 

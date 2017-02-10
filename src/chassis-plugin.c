@@ -65,7 +65,7 @@ chassis_plugin *chassis_plugin_load(const gchar *name) {
     p->module = g_module_open(name, G_MODULE_BIND_LOCAL);
 
     if (!p->module) {
-        g_critical("loading module '%s' failed: %s", name, g_module_error());
+        g_log_dbproxy(g_critical, "loading module '%s' failed: %s", name, g_module_error());
 
         chassis_plugin_free(p);
 
@@ -74,19 +74,19 @@ chassis_plugin *chassis_plugin_load(const gchar *name) {
 
     /* each module has to have a plugin_init function */
     if (!g_module_symbol(p->module, "plugin_init", (gpointer) &plugin_init)) {
-        g_critical("module '%s' doesn't have a init-function: %s", name, g_module_error());
+        g_log_dbproxy(g_critical, "module '%s' doesn't have a init-function: %s", name, g_module_error());
         chassis_plugin_free(p);
         return NULL;
     }
 
     if (0 != plugin_init(p)) {
-        g_critical("init-function for module '%s' failed", name);
+        g_log_dbproxy(g_critical, "init-function for module '%s' failed", name);
         chassis_plugin_free(p);
         return NULL;
     }
 
     if (p->magic != CHASSIS_PLUGIN_MAGIC) {
-        g_critical("plugin '%s' doesn't match the current plugin interface (plugin is %lx, chassis is %lx)", name, p->magic, CHASSIS_PLUGIN_MAGIC);
+        g_log_dbproxy(g_critical, "plugin '%s' doesn't match the current plugin interface (plugin is %lx, chassis is %lx)", name, p->magic, CHASSIS_PLUGIN_MAGIC);
         chassis_plugin_free(p);
         return NULL;
     }
@@ -99,7 +99,7 @@ chassis_plugin *chassis_plugin_load(const gchar *name) {
     if (!p->name) p->name = g_strdup(name);
     /* set dummy version number if the plugin doesn't provide a real one */
     if (!p->version) {
-        g_critical("plugin '%s' doesn't set a version number, refusing to load this plugin", name);
+        g_log_dbproxy(g_critical, "plugin '%s' doesn't set a version number, refusing to load this plugin", name);
         chassis_plugin_free(p);
         return NULL;
     }
@@ -117,7 +117,7 @@ chassis_options_t *chassis_plugin_get_options(chassis_plugin *p) {
     if (!p->get_options) return NULL;
 
     if (NULL == (options = p->get_options(p->config))) {
-        g_critical("adding config options for module '%s' failed", p->name);
+        g_log_dbproxy(g_critical, "adding config options for module '%s' failed", p->name);
     }
 
     return options;

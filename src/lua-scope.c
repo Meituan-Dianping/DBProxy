@@ -40,6 +40,7 @@
 #include "lua-load-factory.h"
 #include "lua-scope.h"
 #include "chassis-stats.h"
+#include "chassis-log.h"
 
 static int proxy_lua_panic (lua_State *L);
 
@@ -78,9 +79,7 @@ void lua_scope_free(lua_scope *sc) {
      * we still have items on the stack
      */
     if (lua_gettop(sc->L) != 0) {
-        g_critical("%s: lua-scope has %d items on the stack", 
-                G_STRLOC,
-                lua_gettop(sc->L));
+        g_log_dbproxy(g_warning, "lua-scope has %d items on the stack", lua_gettop(sc->L));
     }
 
     /* FIXME: we might want to cleanup the cached-scripts in the registry */
@@ -93,9 +92,9 @@ void lua_scope_free(lua_scope *sc) {
 }
 
 void lua_scope_get(lua_scope *sc, const char G_GNUC_UNUSED* pos) {
-/*  g_warning("%s: === waiting for lua-scope", pos); */
+/*  g_log_dbproxy(g_warning, "%s: === waiting for lua-scope", pos); */
     g_mutex_lock(&sc->mutex);
-/*  g_warning("%s: +++ got lua-scope", pos); */
+/*  g_log_dbproxy(g_warning, "%s: +++ got lua-scope", pos); */
 #ifdef HAVE_LUA_H
     sc->L_top = lua_gettop(sc->L);
 #endif
@@ -106,12 +105,12 @@ void lua_scope_get(lua_scope *sc, const char G_GNUC_UNUSED* pos) {
 void lua_scope_release(lua_scope *sc, const char* pos) {
 #ifdef HAVE_LUA_H
     if (lua_gettop(sc->L) != sc->L_top) {
-        g_critical("%s: lua-stack out of sync: is %d, should be %d", pos, lua_gettop(sc->L), sc->L_top);
+        g_log_dbproxy(g_warning, "%s: lua-stack out of sync: is %d, should be %d", pos, lua_gettop(sc->L), sc->L_top);
     }
 #endif
 
     g_mutex_unlock(&sc->mutex);
-/*  g_warning("%s: --- released lua scope", pos); */
+/*  g_log_dbproxy(g_warning, "%s: --- released lua scope", pos); */
 
     return;
 }
@@ -204,7 +203,7 @@ lua_State *lua_scope_load_script(lua_scope *sc, const gchar *name) {
 
             if (0 != luaL_loadfile_factory(L, name)) {
                 /* log a warning and leave the error-msg on the stack */
-                g_warning("%s: reloading '%s' failed", G_STRLOC, name);
+                g_log_dbproxy(g_critical, "reloading '%s' failed", name);
 
                 /* cleanup a bit */
                 lua_remove(L, -2); /* remove the cachedscripts.<name> */
@@ -290,9 +289,9 @@ lua_State *lua_scope_load_script(lua_scope *sc, const gchar *name) {
 
     /* cachedscripts and <name> are still on the stack */
 #if 0
-    g_debug("(load) [-3] %s", lua_typename(L, lua_type(L, -3)));
-    g_debug("(load) [-2] %s", lua_typename(L, lua_type(L, -2)));
-    g_debug("(load) [-1] %s", lua_typename(L, lua_type(L, -1)));
+    g_log_dbproxy(g_debug, "(load) [-3] %s", lua_typename(L, lua_type(L, -3)));
+    g_log_dbproxy(g_debug, "(load) [-2] %s", lua_typename(L, lua_type(L, -2)));
+    g_log_dbproxy(g_debug, "(load) [-1] %s", lua_typename(L, lua_type(L, -1)));
 #endif
     lua_remove(L, -2); /* remove the reg.cachedscripts.<name> */
     lua_remove(L, -2); /* remove the reg.cachedscripts */
@@ -308,14 +307,14 @@ lua_State *lua_scope_load_script(lua_scope *sc, const gchar *name) {
      *
      * */
     if (0 != lua_pcall(L, 0, 1, 0)) {
-        g_warning("%s: lua_pcall(factory<%s>) failed", G_STRLOC, name);
+        g_log_dbproxy(g_critical, "lua_pcall(factory<%s>) failed", name);
 
         return L;
     }
 #else
     if (0 != luaL_loadfile(L, name)) {
         /* log a warning and leave the error-msg on the stack */
-        g_warning("%s: luaL_loadfile(%s) failed", G_STRLOC, name);
+        g_log_dbproxy(g_critical, "luaL_loadfile(%s) failed", name);
 
         return L;
     }
@@ -338,19 +337,18 @@ void proxy_lua_dumptable(lua_State *L) {
         
         switch (t) {
             case LUA_TSTRING:
-                g_message("[%d] (string) %s", 0, lua_tostring(L, -2));
+                g_log_dbproxy(g_message, "[%d] (string) %s", 0, lua_tostring(L, -2));
                 break;
             case LUA_TBOOLEAN:
-                g_message("[%d] (bool) %s", 0, lua_toboolean(L, -2) ? "true" : "false");
+                g_log_dbproxy(g_message, "[%d] (bool) %s", 0, lua_toboolean(L, -2) ? "true" : "false");
                 break;
             case LUA_TNUMBER:
-                g_message("[%d] (number) %g", 0, lua_tonumber(L, -2));
+                g_log_dbproxy(g_message, "[%d] (number) %g", 0, lua_tonumber(L, -2));
                 break;
             default:
-                g_message("[%d] (%s)", 0, lua_typename(L, lua_type(L, -2)));
+                g_log_dbproxy(g_message, "[%d] (%s)", 0, lua_typename(L, lua_type(L, -2)));
                 break;
         }
-        g_message("[%d] (%s)", 0, lua_typename(L, lua_type(L, -1)));
         
         lua_pop(L, 1);
     }
