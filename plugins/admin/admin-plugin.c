@@ -331,7 +331,7 @@ static network_mysqld_lua_stmt_ret admin_lua_read_query(network_mysqld_con *con)
             (g_strrstr (packet->str + NET_HEADER_SIZE + 1, "INFILE") ||
                    g_strrstr (packet->str + NET_HEADER_SIZE + 1, "infile")))
         {
-            g_critical("[admin][foribidden load]");
+            g_log_dbproxy(g_critical, "[admin][foribidden load]");
             return PROXY_SEND_QUERY;
         }
     }
@@ -384,7 +384,7 @@ static network_mysqld_lua_stmt_ret admin_lua_read_query(network_mysqld_con *con)
 
             if (lua_pcall(L, 1, 1, 0) != 0) {
                 /* hmm, the query failed */
-                g_critical("(read_query) %s", lua_tostring(L, -1));
+                g_log_dbproxy(g_critical, "(read_query) %s", lua_tostring(L, -1));
 
                 lua_pop(L, 2); /* fenv + errmsg */
 
@@ -471,7 +471,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(server_read_query) {
     chunk = recv_sock->recv_queue->chunks->head;
 
     if (recv_sock->recv_queue->chunks->length != 1) {
-        g_message("%s.%d: client-recv-queue-len = %d", __FILE__, __LINE__, recv_sock->recv_queue->chunks->length);
+        g_log_dbproxy(g_message, "client-recv-queue-len = %d", recv_sock->recv_queue->chunks->length);
     }
     
     packet = chunk->data;
@@ -592,18 +592,15 @@ static int network_mysqld_admin_plugin_apply_config(chassis *chas, chassis_plugi
     gint i = 0;
     //if (!config->address) config->address = g_strdup(":4041");
     if (!config->address) {
-        g_critical("%s: Failed to get bind address, please set by --admin-address=<host:port>",
-                G_STRLOC);
+        g_log_dbproxy(g_critical, "Failed to get bind address, please set by --admin-address=<host:port>");
         return -1;
     }
     if (!config->admin_username) {
-        g_critical("%s: --admin-username needs to be set",
-                G_STRLOC);
+        g_log_dbproxy(g_critical, "--admin-username needs to be set");
         return -1;
     }
     if (!config->admin_password) {
-        g_critical("%s: --admin-password needs to be set",
-                G_STRLOC);
+        g_log_dbproxy(g_critical, "--admin-password needs to be set");
         return -1;
     }
     if (!config->lua_script) {

@@ -183,7 +183,7 @@ static int network_mysqld_resultset_master_status(chassis *UNUSED_PARAM(chas), n
         }
 
         if (!err) {
-            g_message("reading binlog from: binlog-file: %s, binlog-pos: %d", 
+            g_log_dbproxy(g_message, "reading binlog from: binlog-file: %s, binlog-pos: %d", 
                     st->binlog_file, st->binlog_pos);
         }
     }
@@ -286,8 +286,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(repclient_read_auth_result) {
         err = err || network_mysqld_proto_get_err_packet(&packet, err_packet);
 
         if (!err) {
-            g_critical("%s: repclient_read_auth_result() failed: %s (errno = %d)", 
-                    G_STRLOC,
+            g_log_dbproxy(g_warning, "repclient_read_auth_result() failed: %s (errno = %d)", 
                     err_packet->errmsg->len ? err_packet->errmsg->str : "",
                     err_packet->errcode);
         }
@@ -298,8 +297,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(repclient_read_auth_result) {
     case MYSQLD_PACKET_OK: 
         break; 
     default:
-        g_critical("%s: packet should be (OK|ERR), got: 0x%02x",
-                G_STRLOC,
+        g_log_dbproxy(g_warning, "packet should be (OK|ERR), got: 0x%02x",
                 status);
 
         return NETWORK_SOCKET_ERROR;
@@ -355,8 +353,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(repclient_read_query_result) {
     packet.offset = 0;
 
 #if 0
-    g_message("%s.%d: packet-len: %08x, packet-id: %d, command: COM_(%02x)", 
-            __FILE__, __LINE__,
+    g_log_dbproxy(g_message, "packet-len: %08x, packet-id: %d, command: COM_(%02x)", 
             recv_sock->packet_len,
             recv_sock->packet_id,
             con->parse.command
@@ -578,8 +575,7 @@ int network_mysqld_binlog_event_print(network_mysqld_binlog_event *event) {
     guint i;
     int metadata_offset = 0;
 #if 1
-    g_message("%s: timestamp = %u, type = %u, server-id = %u, size = %u, pos = %u, flags = %04x",
-            G_STRLOC,
+    g_log_dbproxy(g_message, "timestamp = %u, type = %u, server-id = %u, size = %u, pos = %u, flags = %04x",
             event->timestamp,
             event->event_type,
             event->server_id,
@@ -591,8 +587,7 @@ int network_mysqld_binlog_event_print(network_mysqld_binlog_event *event) {
     switch (event->event_type) {
     case QUERY_EVENT: /* 2 */
 #if 1
-        g_message("%s: QUERY: thread_id = %d, exec_time = %d, error-code = %d\ndb = %s, query = %s",
-                G_STRLOC,
+        g_log_dbproxy(g_message, "QUERY: thread_id = %d, exec_time = %d, error-code = %d\ndb = %s, query = %s",
                 event->event.query_event.thread_id,
                 event->event.query_event.exec_time,
                 event->event.query_event.error_code,
@@ -604,15 +599,13 @@ int network_mysqld_binlog_event_print(network_mysqld_binlog_event *event) {
     case STOP_EVENT:
         break;
     case TABLE_MAP_EVENT:
-        g_message("%s: (table-definition) table-id = %"G_GUINT64_FORMAT", flags = %04x, db = %s, table = %s",
-                G_STRLOC,
+        g_log_dbproxy(g_message, "(table-definition) table-id = %"G_GUINT64_FORMAT", flags = %04x, db = %s, table = %s",
                 event->event.table_map_event.table_id,
                 event->event.table_map_event.flags,
                 event->event.table_map_event.db_name ? event->event.table_map_event.db_name : "(null)",
                 event->event.table_map_event.table_name ? event->event.table_map_event.table_name : "(null)"
              );
-        g_message("%s: (table-definition) columns = %"G_GUINT64_FORMAT,
-                G_STRLOC,
+        g_log_dbproxy(g_message, "(table-definition) columns = %"G_GUINT64_FORMAT,
                 event->event.table_map_event.columns_len
              );
 
@@ -681,8 +674,7 @@ int network_mysqld_binlog_event_print(network_mysqld_binlog_event *event) {
                 break;
             }
 
-            g_message("%s: (column-definition) [%d] type = %d, length = %lu",
-                    G_STRLOC,
+            g_log_dbproxy(g_message, "(column-definition) [%d] type = %d, length = %lu",
                     i,
                     field->type,
                     field->length
@@ -700,8 +692,7 @@ int network_mysqld_binlog_event_print(network_mysqld_binlog_event *event) {
     case ROTATE_EVENT: /* 4 */
         break;
     default:
-        g_message("%s: unknown event-type: %d",
-                G_STRLOC,
+        g_log_dbproxy(g_warning, "unknown event-type: %d",
                 event->event_type);
         return -1;
     }
@@ -716,8 +707,7 @@ int replicate_binlog_dump_file(const char *filename) {
     network_mysqld_binlog_event *event;
 
     if (-1 == (fd = g_open(filename, O_RDONLY, 0))) {
-        g_critical("%s: opening '%s' failed: %s",
-                G_STRLOC,
+        g_log_dbproxy(g_critical, "opening '%s' failed: %s",
                 filename,
                 g_strerror(errno));
         return -1;
@@ -732,8 +722,7 @@ int replicate_binlog_dump_file(const char *filename) {
         binlog_header[2] != 'i' ||
         binlog_header[3] != 'n') {
 
-        g_critical("%s: binlog-header should be: %02x%02x%02x%02x, got %02x%02x%02x%02x",
-                G_STRLOC,
+        g_log_dbproxy(g_critical, "binlog-header should be: %02x%02x%02x%02x, got %02x%02x%02x%02x",
                 '\xfe', 'b', 'i', 'n',
                 binlog_header[0],
                 binlog_header[1],
@@ -768,8 +757,7 @@ int replicate_binlog_dump_file(const char *filename) {
         len = read(fd, packet->data->str + 19, event->event_size - 19);
 
         if (-1 == len) {
-            g_critical("%s: lseek(..., %d, ...) failed: %s",
-                    G_STRLOC,
+            g_log_dbproxy(g_critical, "lseek(..., %d, ...) failed: %s",
                     event->event_size - 19,
                     g_strerror(errno));
             return -1;

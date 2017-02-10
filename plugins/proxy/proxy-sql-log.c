@@ -21,7 +21,7 @@ log_manager(void *user_data) {
     sql_log_t           *sql_log = (sql_log_t *)plugin_params->magic_value;
     gint64              end_time;
 
-    g_message("%s thread start", PROXY_SQL_LOG_THREAD);
+    g_log_dbproxy(g_message, "%s thread start", PROXY_SQL_LOG_THREAD);
 
     while (!chassis_is_shutdown()) {
         GString *message = NULL;
@@ -38,10 +38,10 @@ log_manager(void *user_data) {
             while (sql_log->sql_log_type == OFF) {
                 end_time =  g_get_monotonic_time() + CHECK_LOG_MANAGER_TIMEOUT * G_TIME_SPAN_SECOND;
                 if (!g_cond_wait_until(g_cond, g_mutex, end_time)) {
-                    g_debug("log manager waiting meet timeout");
+                    g_log_dbproxy(g_message, "log manager waiting meet timeout");
                 } else if (chassis_is_shutdown()) {
                     g_mutex_unlock(g_mutex);
-                    g_message("log manager thread get exit signal");
+                    g_log_dbproxy(g_message, "log manager thread get exit signal");
                     goto exit;
                 }
             }
@@ -53,7 +53,7 @@ log_manager(void *user_data) {
                 sql_log->sql_log_fp = fopen(sql_log->sql_log_filename, "a");
                 if (sql_log->sql_log_fp == NULL) {
                     sql_log->sql_log_type = OFF;
-                    g_message("open sql log failed");
+                    g_log_dbproxy(g_warning, "open sql log failed");
                     continue;
                 }
                 fstat(fileno(sql_log->sql_log_fp), &st);
@@ -81,7 +81,7 @@ log_manager(void *user_data) {
                                             message->len,
                                             (off_t)sql_log->sql_log_cur_size);
             if (write_data_len != message->len) {
-                g_message("write sql log file failed");
+                g_log_dbproxy(g_warning, "write sql log file failed");
             }
             if (sql_log->sql_log_type == REALTIME) fsync(fd);
             sql_log->sql_log_cur_size += message->len;
@@ -91,7 +91,7 @@ log_manager(void *user_data) {
     }
 
 exit:
-    g_message("log manager thread will exit");
+    g_log_dbproxy(g_message, "log manager thread will exit");
 
     g_thread_exit(0);
 }
@@ -135,18 +135,18 @@ sql_log_t_load_options(chassis *srv)
 
     /* gint options */
     if (sql_log->sql_log_max_size < 0) {
-        g_critical("--sql-log-file-size has to be >= 0, is %d", sql_log->sql_log_max_size);
+        g_log_dbproxy(g_critical, "--sql-log-file-size has to be >= 0, is %d", sql_log->sql_log_max_size);
         return 1;
     }
 
     if (sql_log->sql_log_file_num < 0) {
-        g_critical("--sql-log-file-num has to be >= 0, is %d", sql_log->sql_log_file_num);
+        g_log_dbproxy(g_critical, "--sql-log-file-num has to be >= 0, is %d", sql_log->sql_log_file_num);
         return 1;
     }
     load_sql_filenames(sql_log, srv);
 
     if (sql_log->sql_log_buffer_size < 0) {
-        g_critical("--sql-log-buffer-size has to be >= 0, is %d", sql_log->sql_log_buffer_size);
+        g_log_dbproxy(g_critical, "--sql-log-buffer-size has to be >= 0, is %d", sql_log->sql_log_buffer_size);
         return 1;
     }
     if (sql_log->sql_log_buffer_size == 0) {
@@ -157,8 +157,7 @@ sql_log_t_load_options(chassis *srv)
         struct stat st;
         sql_log->sql_log_fp = fopen(sql_log->sql_log_filename, "a");
         if (sql_log->sql_log_fp == NULL) {
-            g_critical("%s(%s): Failed to open sql log file %s",
-                            G_STRLOC, __func__, sql_log->sql_log_filename);
+            g_log_dbproxy(g_critical, "Failed to open sql log file %s", sql_log->sql_log_filename);
             return 1;
         }
 
@@ -230,7 +229,7 @@ register_logfilenames(gchar *new_log_filename, gint max_file_num, GQueue **log_f
         GList *tmp = g_queue_find_custom(*log_filenames_list, new_log_filename,
                                             (GCompareFunc)strcmp);
         if (tmp != NULL) {
-            g_debug("%s(%s) file %s is exist", G_STRLOC, __func__, new_log_filename);
+            g_log_dbproxy(g_debug, "file %s is exist", new_log_filename);
             return ;
         }
     }
@@ -246,9 +245,9 @@ register_logfilenames(gchar *new_log_filename, gint max_file_num, GQueue **log_f
             gchar *rm_logfile = (gchar *)g_queue_pop_head(*log_filenames_list);
             if (unlink(rm_logfile) != 0)
             {
-                g_warning("rm log file %s failed", rm_logfile);
+                g_log_dbproxy(g_warning, "rm log file %s failed", rm_logfile);
             } else {
-                g_debug("rm log file %s success %d %d %d", rm_logfile, i, max_file_num,
+                g_log_dbproxy(g_message, "rm log file %s success %d %d %d", rm_logfile, i, max_file_num,
                             g_queue_get_length(*log_filenames_list));
             }
             g_free(rm_logfile);
@@ -277,7 +276,7 @@ sql_log_rotate(sql_log_t *sql_log)
     rotatename = get_rotate_file_name(sql_log->sql_log_filename);
     if (sql_log->sql_log_fp != NULL) fclose(sql_log->sql_log_fp);
     if (rename(sql_log->sql_log_filename, rotatename) != 0) {
-        g_warning("rename log file name to %s failed", rotatename);
+        g_log_dbproxy(g_critical, "rename log file name to %s failed", rotatename);
     } else {
         register_logfilenames(rotatename, sql_log->sql_log_file_num,
                                             &sql_log->log_filenames_list);
@@ -320,7 +319,7 @@ assign_sql_log(const char *newval, void *ex_param)
         g_mutex_lock(&log_manager_thread->thr_mutex);
         g_cond_signal(&log_manager_thread->thr_cond);
         g_mutex_unlock(&log_manager_thread->thr_mutex);
-        g_message("wake up %s thread", PROXY_SQL_LOG_THREAD);
+        g_log_dbproxy(g_message, "wake up %s thread", PROXY_SQL_LOG_THREAD);
     }
 
     return 0;
@@ -481,10 +480,10 @@ load_sql_filenames(sql_log_t *sql_log, chassis *chas) {
 
     filename_prefix = g_strdup_printf("sql_%s.log_", chas->instance_name);
     dirname = g_strdup_printf("%s/%s", chas->log_path, SQL_LOG_DIR);
-    g_info("load_files_from_dir %s", dirname);
+    g_log_dbproxy(g_message, "load_files_from_dir %s", dirname);
 
     if ((rldir = g_dir_open(dirname, 0, NULL)) == NULL) {
-        g_warning("open dir %s failed", dirname);
+        g_log_dbproxy(g_critical, "open dir %s failed", dirname);
         goto funcexit;
     }
 
@@ -497,12 +496,12 @@ load_sql_filenames(sql_log_t *sql_log, chassis *chas) {
             gchar *abslogfilename = g_strdup_printf("%s/%s", dirname, rlde);
             g_queue_insert_sorted(sql_log->log_filenames_list, abslogfilename,
                                             (GCompareDataFunc)strcmp, NULL);
-            g_info("load file %s success", abslogfilename);
+            g_log_dbproxy(g_message, "load file %s success", abslogfilename);
         }
     }
 
     g_dir_close(rldir);
-    g_info("load_files_from_dir %s success", dirname);
+    g_log_dbproxy(g_message, "load_files_from_dir %s success", dirname);
 
 funcexit:
     g_free(filename_prefix);

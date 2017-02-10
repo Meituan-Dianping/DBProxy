@@ -152,8 +152,8 @@ network_socket *network_connection_pool_get(network_connection_pool *pool,
     if (!entry_list)
     {
         if (TRACE_CONNECTION_POOL(con->srv->log->log_trace_modules)) {
-        g_message("%s(%s): event_thread(%d) pool(%p Usr:%s) has no entry list for C:%s",
-                        G_STRLOC, __func__, chassis_event_get_threadid(), pool,
+        g_log_dbproxy(g_message, "event_thread(%d) pool(%p Usr:%s) has no entry list for C:%s",
+                        chassis_event_get_threadid(), pool,
                         user_name->str, NETWORK_SOCKET_SRC_NAME(con->client));
 
 
@@ -167,19 +167,12 @@ network_socket *network_connection_pool_get(network_connection_pool *pool,
     if (entry_list->length == 0)
     {
         if (TRACE_CONNECTION_POOL(con->srv->log->log_trace_modules)) {
-            g_message("%s(%s): event_thread(%d) after allocated connection(%s(thread_id:%u)) in pool(%p Usr:%s S:%s) remaining no connection",
-                        G_STRLOC, __func__, chassis_event_get_threadid(),
-                        NETWORK_SOCKET_DST_NAME(entry->sock), NETWORK_SOCKET_THREADID(entry->sock),
-                        pool, user_name->str, NETWORK_SOCKET_DST_NAME(entry->sock));
+            g_log_dbproxy(g_message, "event_thread(%d) after allocated connection(%s(thread_id:%u)) in pool(%p Usr:%s S:%s) remaining no connection", chassis_event_get_threadid(), NETWORK_SOCKET_DST_NAME(entry->sock), NETWORK_SOCKET_THREADID(entry->sock), pool, user_name->str, NETWORK_SOCKET_DST_NAME(entry->sock));
         }
         g_hash_table_remove(pool, hash_key);
     } else {
         if (TRACE_CONNECTION_POOL(con->srv->log->log_trace_modules)) {
-            g_message("%s(%s): event_thread(%d) after allocated connection(%s(thread_id:%u)) in pool(%p Usr:%s S:%s) remaining %d connections",
-                                            G_STRLOC, __func__, chassis_event_get_threadid(),
-                                            NETWORK_SOCKET_DST_NAME(entry->sock), NETWORK_SOCKET_THREADID(entry->sock),
-                                            pool, user_name->str, NETWORK_SOCKET_DST_NAME(entry->sock),
-                                            g_queue_get_length(entry_list));
+            g_log_dbproxy(g_message, "event_thread(%d) after allocated connection(%s(thread_id:%u)) in pool(%p Usr:%s S:%s) remaining %d connections", chassis_event_get_threadid(), NETWORK_SOCKET_DST_NAME(entry->sock), NETWORK_SOCKET_THREADID(entry->sock), pool, user_name->str, NETWORK_SOCKET_DST_NAME(entry->sock), g_queue_get_length(entry_list));
         }
     }
 
@@ -224,15 +217,7 @@ network_connection_pool_entry *network_connection_pool_add(network_connection_po
             }
 
             if (TRACE_CONNECTION_POOL(srv->log->log_trace_modules)) {
-                g_message("%s(%s): event_thread(%d) added connection(S:%s(thread_id:%u)) to pool(%p Usr:%s S:%s), the pool size is %d now",
-                                            G_STRLOC, __func__,
-                                            chassis_event_get_threadid(),
-                                            NETWORK_SOCKET_DST_NAME(sock),
-                                            NETWORK_SOCKET_THREADID(sock),
-                                            pool, 
-                                            NETWORK_SOCKET_USR_NAME(sock),
-                                            NETWORK_SOCKET_DST_NAME(sock),
-                                            g_queue_get_length(entry_list));
+                g_log_dbproxy(g_message, "event_thread(%d) added connection(S:%s(thread_id:%u)) to pool(%p Usr:%s S:%s), the pool size is %d now", chassis_event_get_threadid(), NETWORK_SOCKET_DST_NAME(sock), NETWORK_SOCKET_THREADID(sock), pool, NETWORK_SOCKET_USR_NAME(sock), NETWORK_SOCKET_DST_NAME(sock), g_queue_get_length(entry_list));
             }
 
             return entry;
@@ -251,9 +236,8 @@ void network_connection_pool_remove(network_connection_pool *pool, network_conne
     gchar *msg = NULL;
 
     if (sock->response == NULL) {
-        g_critical("%s(%s): remove backend from pool failed, "
+        g_log_dbproxy(g_warning, "remove backend from pool failed, "
                                     "response is NULL, src is %s, dst is %s",
-                        G_STRLOC, __func__,
                         NETWORK_SOCKET_SRC_NAME(sock),
                         NETWORK_SOCKET_DST_NAME(sock));
     }

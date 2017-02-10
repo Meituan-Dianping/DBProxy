@@ -82,8 +82,7 @@ static int proxy_socket_get(lua_State *L) {
             return 1;
         }
     }
-    g_critical("%s: sock->challenge: %p, sock->response: %p (looking for %s)", 
-            G_STRLOC,
+    g_log_dbproxy(g_message, "sock->challenge: %p, sock->response: %p (looking for %s)", 
             (void *)sock->challenge,
             (void *)sock->response,
             key

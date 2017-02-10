@@ -69,13 +69,11 @@ int chassis_check_version(const char *lib_version, const char *hdr_version) {
     int scanned_fields;
 
     if (3 != (scanned_fields = sscanf(lib_version, "%d.%d.%d%*s", &lib_maj, &lib_min, &lib_pat))) {
-        g_critical("%s: library version %s failed to parse: %d",
-                G_STRLOC, lib_version, scanned_fields);
+        g_log_dbproxy(g_critical, "library version %s failed to parse: %d", lib_version, scanned_fields);
         return -1;
     }
     if (3 != (scanned_fields = sscanf(hdr_version, "%d.%d.%d%*s", &hdr_maj, &hdr_min, &hdr_pat))) {
-        g_critical("%s: header version %s failed to parse: %d",
-                G_STRLOC, hdr_version, scanned_fields);
+        g_log_dbproxy(g_critical, "header version %s failed to parse: %d", hdr_version, scanned_fields);
         return -1;
     }
     
@@ -97,8 +95,7 @@ chassis *chassis_new() {
     gint ret = 0;
 
     if (0 != chassis_check_version(event_get_version(), _EVENT_VERSION)) {
-        g_critical("%s: chassis is build against libevent %s, but now runs against %s",
-                G_STRLOC, _EVENT_VERSION, event_get_version());
+        g_log_dbproxy(g_critical, "chassis is build against libevent %s, but now runs against %s", _EVENT_VERSION, event_get_version());
         return NULL;
     }
 
@@ -127,7 +124,7 @@ chassis *chassis_new() {
     chas->opts = NULL;//need to free
 
     if (0 != ret) {
-        g_critical("create thread exit semphore failed. %s", G_STRLOC);
+        g_log_dbproxy(g_critical, "create thread exit semphore failed");
         return NULL;
     }
 
@@ -214,7 +211,7 @@ void chassis_free(chassis *chas) {
 }
 
 void chassis_set_shutdown_location(const gchar* location, gint shutdown_mode) {
-    if (signal_shutdown == 0) g_message("Initiating shutdown, requested from %s", (location != NULL ? location : "signal handler"));
+    if (signal_shutdown == 0) g_log_dbproxy(g_message, "Initiating shutdown, requested from %s", (location != NULL ? location : "signal handler"));
     signal_shutdown = shutdown_mode;
 }
 
@@ -241,11 +238,11 @@ static void sigint_handler(int G_GNUC_UNUSED fd, short G_GNUC_UNUSED event_type,
 static void sighup_handler(int G_GNUC_UNUSED fd, short G_GNUC_UNUSED event_type, void *_data) {
     chassis *chas = _data;
 
-    g_message("received a SIGHUP, closing log file"); /* this should go into the old logfile */
+    g_log_dbproxy(g_message, "received a SIGHUP, closing log file"); /* this should go into the old logfile */
 
     chassis_log_set_logrotate(chas->log);
     
-    g_message("re-opened log file after SIGHUP"); /* ... and this into the new one */
+    g_log_dbproxy(g_message, "re-opened log file after SIGHUP"); /* ... and this into the new one */
 }
 
 
@@ -295,8 +292,7 @@ int chassis_mainloop(void *_chas) {
 
         g_assert(p->apply_config);
         if (0 != p->apply_config(chas, p->config)) {
-            g_critical("%s: applying config of plugin %s failed",
-                    G_STRLOC, p->name);
+            g_log_dbproxy(g_critical, "%s: applying config of plugin %s failed", p->name);
             return -1;
         }
     }
@@ -313,7 +309,7 @@ int chassis_mainloop(void *_chas) {
     signal_set(&ev_sighup, SIGHUP, sighup_handler, chas);
     event_base_set(chas->event_base, &ev_sighup);
     if (signal_add(&ev_sighup, NULL)) {
-        g_critical("%s: signal_add(SIGHUP) failed", G_STRLOC);
+        g_log_dbproxy(g_critical, "signal_add(SIGHUP) failed");
     }
 #endif
 

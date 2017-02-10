@@ -41,6 +41,7 @@
 #include <glib.h>
 
 #include "chassis-unix-daemon.h"
+#include "chassis-log.h"
 
 #define YY_EXIT_FAILURE 2
 
@@ -117,25 +118,17 @@ int chassis_unix_proc_keepalive(int *child_exit_status, const char *pid_file) {
 
             if (pid == 0) {
                 /* child */
-                
-                g_debug("%s: we are the child: %d",
-                        G_STRLOC,
-                        getpid());
+                g_log_dbproxy(g_debug, "we are the child: %d", getpid());
                 return 0;
             } else if (pid < 0) {
                 /* fork() failed */
 
-                g_critical("%s: fork() failed: %s (%d)",
-                    G_STRLOC,
-                    g_strerror(errno),
-                    errno);
+                g_log_dbproxy(g_critical, "fork() failed: %s (%d)", g_strerror(errno), errno);
 
                 return -1;
             } else {
                 /* we are the angel, let's see what the child did */
-                g_message("%s: [angel] we try to keep PID=%d alive",
-                        G_STRLOC,
-                        pid);
+                g_log_dbproxy(g_message, "[angel] we try to keep PID=%d alive", pid);
 
                 /* forward a few signals that are sent to us to the child instead */
                 signal(SIGINT, chassis_unix_signal_forward);
@@ -154,9 +147,7 @@ int chassis_unix_proc_keepalive(int *child_exit_status, const char *pid_file) {
             int exit_status;
             pid_t exit_pid;
 
-            g_debug("%s: waiting for %d",
-                    G_STRLOC,
-                    child_pid);
+            g_log_dbproxy(g_debug, "waiting for %d", child_pid);
 
 #ifdef HAVE_WAIT4
             exit_pid = wait4(child_pid, &exit_status, 0, &rusage);
@@ -164,10 +155,7 @@ int chassis_unix_proc_keepalive(int *child_exit_status, const char *pid_file) {
             memset(&rusage, 0, sizeof(rusage)); /* make sure everything is zero'ed out */
             exit_pid = waitpid(child_pid, &exit_status, 0);
 #endif
-            g_debug("%s: %d returned: %d",
-                    G_STRLOC,
-                    child_pid,
-                    exit_pid);
+            g_log_dbproxy(g_message, "%d returned: %d", child_pid, exit_pid);
 
             if (exit_pid == child_pid) {
 
@@ -181,14 +169,13 @@ int chassis_unix_proc_keepalive(int *child_exit_status, const char *pid_file) {
                     if (child_exit_status) *child_exit_status = WEXITSTATUS(exit_status);
 
                     if (*child_exit_status != YY_EXIT_FAILURE) {
-                        g_message("%s: [angel] PID=%d exited normally with exit-code = %d (it used %ld kBytes max)",
-                                G_STRLOC,
+                        g_log_dbproxy(g_message, "[angel] PID=%d exited normally with exit-code = %d (it used %ld kBytes max)",
                                 child_pid,
                                 WEXITSTATUS(exit_status),
                                 rusage.ru_maxrss / 1024);
                         return 1;
                     } else {
-                        g_critical("%s: [angel] PID=%d died on yy_fatal_error ... waiting 2sec before restart", G_STRLOC, child_pid);
+                        g_log_dbproxy(g_critical, "[angel] PID=%d died on yy_fatal_error ... waiting 2sec before restart", child_pid);
                         signal(SIGINT, SIG_DFL);
                         signal(SIGTERM, SIG_DFL);
                         signal(SIGHUP, SIG_DFL);
@@ -203,8 +190,7 @@ int chassis_unix_proc_keepalive(int *child_exit_status, const char *pid_file) {
                      *
                      * log it and restart */
 
-                    g_critical("%s: [angel] PID=%d died on signal=%d (it used %ld kBytes max) ... waiting 2sec before restart",
-                            G_STRLOC,
+                    g_log_dbproxy(g_critical, "[angel] PID=%d died on signal=%d (it used %ld kBytes max) ... waiting 2sec before restart",
                             child_pid,
                             WTERMSIG(exit_status),
                             rusage.ru_maxrss / 1024);
@@ -229,8 +215,7 @@ int chassis_unix_proc_keepalive(int *child_exit_status, const char *pid_file) {
                 /* EINTR is ok, all others bad */
                 if (EINTR != errno) {
                     /* how can this happen ? */
-                    g_critical("%s: wait4(%d, ...) failed: %s (%d)",
-                        G_STRLOC,
+                    g_log_dbproxy(g_critical, "wait4(%d, ...) failed: %s (%d)",
                         child_pid,
                         g_strerror(errno),
                         errno);
