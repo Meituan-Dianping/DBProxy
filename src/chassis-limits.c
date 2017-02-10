@@ -74,7 +74,7 @@ int chassis_fdlimit_set(gint64 max_files_number) {
     if (-1 == max_files_number_set) {
         return -1;
     } else if (max_files_number_set != max_files_number) {
-        g_critical("%s: failed to increase the maximum number of open files for stdio: %s (%d)", G_STRLOC, g_strerror(errno), errno);
+        g_log_dbproxy(g_critical, "failed to increase the maximum number of open files for stdio: %s (%d)", g_strerror(errno), errno);
         return -1;
     }
 

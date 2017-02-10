@@ -164,7 +164,7 @@ int chassis_log_rotate(chassis_log *log) {
                                                     cur_tm.tm_year + 1900, cur_tm.tm_mon + 1, cur_tm.tm_mday,
                                                     cur_tm.tm_hour, cur_tm.tm_min, cur_tm.tm_sec);
     if (rename(log->log_filename, rotatename) != 0)
-            g_warning("rename %s name to %s failed", log->log_filename, rotatename);
+            g_log_dbproxy(g_critical, "rename %s name to %s failed", log->log_filename, rotatename);
 
     g_free(rotatename);
     return 0;
@@ -178,7 +178,7 @@ void chassis_log_free(chassis_log *log) {
     if (log->event_source_handle) {
         if (!DeregisterEventSource(log->event_source_handle)) {
             int err = GetLastError();
-            g_critical("unhandled error-code (%d) for DeregisterEventSource()", err);
+            g_log_dbproxy(g_critical, "unhandled error-code (%d) for DeregisterEventSource()", err);
         }
     }
 #endif
@@ -424,8 +424,7 @@ int chassis_log_set_event_log(chassis_log *log, const char *app_name) {
     if (!log->event_source_handle) {
         int err = GetLastError();
 
-        g_critical("%s: RegisterEventSource(NULL, %s) failed: %s (%d)",
-                G_STRLOC,
+        g_log_dbproxy(g_critical, "RegisterEventSource failed: %s (%d)",
                 g_strerror(err),
                 err);
 

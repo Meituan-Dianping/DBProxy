@@ -1,5 +1,5 @@
 #include "sql-tokenizer.h"
-
+#include "chassis-log.h"
 #define S(x) { #x, sizeof(#x) - 1 }
 
 /**
@@ -291,7 +291,7 @@ const gchar *sql_token_get_name(sql_token_id token_id, size_t *name_len) {
     if (token_id >= TK_LAST_TOKEN) return NULL;
 
     if (sizeof(token_names)/sizeof(token_names[0]) != TK_LAST_TOKEN + 1) {
-        g_error("sql_token_get_name() is out of sync [%"G_GSIZE_FORMAT" != %d]", sizeof(token_names)/sizeof(token_names[0]), TK_LAST_TOKEN + 1);
+        g_log_dbproxy(g_error, "sql_token_get_name() is out of sync [%"G_GSIZE_FORMAT" != %d]", sizeof(token_names)/sizeof(token_names[0]), TK_LAST_TOKEN + 1);
     }
 
     if (name_len) {

@@ -6,6 +6,7 @@
 #include "lib/sql-tokenizer.h"
 #include "chassis-filter.h"
 #include "chassis-frontend.h"
+#include "chassis-log.h"
 
 #define C_S(x) x, strlen(x)
 
@@ -93,7 +94,7 @@ sql_filter_item_show(gpointer key, gpointer value, gpointer userdata)
     gchar *hkey = (gchar *) key;
     sql_filter_hval *hval = (sql_filter_hval *) value;
 
-    g_message("key = %s\tkval.flag = %d\tkval.hit_times = %dkval.sql_filter_item = %s",
+    g_log_dbproxy(g_message, "key = %s\tkval.flag = %d\tkval.hit_times = %dkval.sql_filter_item = %s",
                         hkey, hval->flag, hval->hit_times, hval->sql_filter_item);
 }
 
@@ -191,7 +192,7 @@ load_sql_filter_from_file(sql_filter *cur_filter)
     g_rw_lock_reader_lock(&cur_filter->sql_filter_lock);
     if (!(blacklist_config = chassis_frontend_open_config_file(cur_filter->blacklist_file, &gerr)))
     {
-        g_debug("[filter][load from file][failed][%s]", gerr->message);
+        g_log_dbproxy(g_warning, "[filter][load from file][failed][%s]", gerr->message);
         g_error_free(gerr);
         gerr = NULL;
         g_rw_lock_reader_unlock(&cur_filter->sql_filter_lock);
@@ -235,12 +236,12 @@ next:
 
         if (gerr != NULL)
         {
-            g_debug("[filter][load from file][failed][%s]", gerr->message);
+            g_log_dbproxy(g_warning, "[filter][load from file][failed][%s]", gerr->message);
             g_error_free(gerr);
             gerr = NULL;
         }
         else
-            g_message("[filter][load from file %s][success]", cur_filter->blacklist_file);
+            g_log_dbproxy(g_message, "[filter][load from file %s][success]", cur_filter->blacklist_file);
     }
     g_strfreev(groups);
 
@@ -388,7 +389,7 @@ sql_reserved_query_rebuild(sql_reserved_query *srq, gint max_query_num)
                }
             }
 #ifdef FILTER_DEBUG
-            g_debug("[reserved query][lru remove][%s]", rm_rqi->item_rewrite->str);
+            g_log_dbproxy(g_debug, "[reserved query][lru remove][%s]", rm_rqi->item_rewrite->str);
 #endif
             travel_list =  g_queue_pop_head_link(gq);
             g_hash_table_remove(srq->ht_reserved_query, rm_rqi->item_rewrite_md5->str);
@@ -458,12 +459,12 @@ g_queue_travel(GQueue *reserved_query)
      g_assert(reserved_query != NULL);
 
      len = reserved_query->length;
-     g_debug("travel GQueue, %d items", len);
+     g_log_dbproxy(g_debug, "travel GQueue, %d items", len);
      while (i < len)
      {
          reserved_query_item *rqi = g_queue_peek_nth (reserved_query, i);
 
-         g_debug("query = %s, first_time = %lu, last_time = %lu, status = %d",
+         g_log_dbproxy(g_debug, "query = %s, first_time = %lu, last_time = %lu, status = %d",
                              rqi->item_rewrite->str,
                              rqi->item_first_access_time,
                              rqi->item_last_access_time,

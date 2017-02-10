@@ -67,14 +67,13 @@ int test_prep_stmt(MYSQL *mysql) {
     int round;
 
     if (NULL == (stmt = mysql_stmt_init(mysql))) {
-            g_error("%s.%d: mysql_stmt_init() failed: %s", 
-                __FILE__, __LINE__, mysql_error(mysql));
+            g_log_dbproxy(g_error, "mysql_stmt_init() failed: %s", 
+                mysql_error(mysql));
     }
 
     START_TIMING("%s:%d", mysql->host, mysql->port);
     if (mysql_stmt_prepare(stmt, C(TEST_QUERY_SMALL_PS))) {
-           g_error("%s.%d: mysql_stmt_prepare(%s) failed: %s", 
-                __FILE__, __LINE__, 
+           g_log_dbproxy(g_error, "mysql_stmt_prepare(%s) failed: %s", 
                 TEST_QUERY_SMALL_PS,
                 mysql_stmt_error(stmt));
     }
@@ -92,8 +91,7 @@ int test_prep_stmt(MYSQL *mysql) {
     params[0].length = 0;
 
     if (mysql_stmt_bind_param(stmt, params)) {
-           g_error("%s.%d: mysql_stmt_bind_param() failed: %s", 
-                   __FILE__, __LINE__, mysql_stmt_error(stmt));
+           g_log_dbproxy(g_error, "mysql_stmt_bind_param() failed: %s", mysql_stmt_error(stmt));
     }
 
     for (round = 0; round < 2; round++) {
@@ -104,8 +102,7 @@ int test_prep_stmt(MYSQL *mysql) {
 
         START_TIMING("%s:%d", mysql->host, mysql->port);
         if (mysql_stmt_execute(stmt)) {
-                g_error("%s.%d: mysql_stmt_execute() failed: %s", 
-                    __FILE__, __LINE__, mysql_stmt_error(stmt));
+                g_log_dbproxy(g_error, "mysql_stmt_execute() failed: %s", mysql_stmt_error(stmt));
         }
         STOP_TIMING("  mysql_execute(%s)", "");
     
@@ -119,8 +116,7 @@ int test_prep_stmt(MYSQL *mysql) {
     
         START_TIMING("%s:%d", mysql->host, mysql->port);
         if (mysql_stmt_bind_result(stmt, result)) {
-                g_error("%s.%d: mysql_stmt_bind_result() failed: %s", 
-                    __FILE__, __LINE__, mysql_stmt_error(stmt));
+                g_log_dbproxy(g_error, "mysql_stmt_bind_result() failed: %s", mysql_stmt_error(stmt));
         }
         STOP_TIMING("  mysql_stmt_bind_result(%s)", "");
     
@@ -133,7 +129,7 @@ int test_prep_stmt(MYSQL *mysql) {
     mysql_free_result(res);
 
     if (mysql_stmt_close(stmt)) {
-            g_error("%s.%d: mysql_stmt_execute() failed: %s", __FILE__, __LINE__, mysql_stmt_error(stmt));
+            g_log_dbproxy(g_error, "mysql_stmt_execute() failed: %s", mysql_stmt_error(stmt));
     }
 
     return 0;
@@ -147,13 +143,12 @@ int test_prep_stmt_noparam(MYSQL *mysql) {
     int round;
 
     if (NULL == (stmt = mysql_stmt_init(mysql))) {
-            g_error("%s.%d: mysql_stmt_init() failed: %s", __FILE__, __LINE__, mysql_error(mysql));
+            g_log_dbproxy(g_error, "mysql_stmt_init() failed: %s", mysql_error(mysql));
     }
 
     START_TIMING("%s:%d", mysql->host, mysql->port);
     if (mysql_stmt_prepare(stmt, C(TEST_QUERY_SMALL))) {
-           g_error("%s.%d: mysql_stmt_prepare(%s) failed: %s", 
-                __FILE__, __LINE__, 
+           g_log_dbproxy(g_error, "mysql_stmt_prepare(%s) failed: %s", 
                 TEST_QUERY_SMALL,
                 mysql_stmt_error(stmt));
     }
@@ -171,7 +166,7 @@ int test_prep_stmt_noparam(MYSQL *mysql) {
     params[0].length = 0;
 
     if (mysql_stmt_bind_param(stmt, params)) {
-           g_error("%s.%d: mysql_stmt_bind_param() failed: %s", __FILE__, __LINE__, mysql_stmt_error(stmt));
+           g_log_dbproxy(g_error, "mysql_stmt_bind_param() failed: %s", mysql_stmt_error(stmt));
     }
 
     for (round = 0; round < 2; round++) {
@@ -182,7 +177,7 @@ int test_prep_stmt_noparam(MYSQL *mysql) {
 
         START_TIMING("%s:%d", mysql->host, mysql->port);
         if (mysql_stmt_execute(stmt)) {
-                g_error("%s.%d: mysql_stmt_execute() failed: %s", __FILE__, __LINE__, mysql_stmt_error(stmt));
+                g_log_dbproxy(g_error, "mysql_stmt_execute() failed: %s", mysql_stmt_error(stmt));
         }
         STOP_TIMING("  mysql_execute(%s)", "");
     
@@ -196,7 +191,7 @@ int test_prep_stmt_noparam(MYSQL *mysql) {
     
         START_TIMING("%s:%d", mysql->host, mysql->port);
         if (mysql_stmt_bind_result(stmt, result)) {
-                g_error("%s.%d: mysql_stmt_bind_result() failed: %s", __FILE__, __LINE__, mysql_stmt_error(stmt));
+                g_log_dbproxy(g_error, "mysql_stmt_bind_result() failed: %s", mysql_stmt_error(stmt));
         }
         STOP_TIMING("  mysql_stmt_bind_result(%s)", "");
     
@@ -209,7 +204,7 @@ int test_prep_stmt_noparam(MYSQL *mysql) {
     mysql_free_result(res);
 
     if (mysql_stmt_close(stmt)) {
-            g_error("%s.%d: mysql_stmt_execute() failed: %s", __FILE__, __LINE__, mysql_stmt_error(stmt));
+            g_log_dbproxy(g_error, "mysql_stmt_execute() failed: %s", mysql_stmt_error(stmt));
     }
 
     return 0;
@@ -223,8 +218,7 @@ int test_select(MYSQL *mysql) {
     for (round = 0; round < 5; round++) {
         START_TIMING("%s:%d", mysql->host, mysql->port);
         if (mysql_real_query(mysql, C(TEST_QUERY_SMALL))) {
-               g_error("%s.%d: mysql_real_query(%s) failed: %s", 
-                    __FILE__, __LINE__, 
+               g_log_dbproxy(g_error, "mysql_real_query(%s) failed: %s", 
                     TEST_QUERY_SMALL,
                     mysql_error(mysql));
         }
@@ -232,8 +226,7 @@ int test_select(MYSQL *mysql) {
     
         START_TIMING("%s:%d", mysql->host, mysql->port);
         if (NULL == (res = mysql_store_result(mysql))) {
-            g_error("%s.%d: mysql_store_result() failed: %s", 
-                    __FILE__, __LINE__, 
+            g_log_dbproxy(g_error, "mysql_store_result() failed: %s", 
                     mysql_error(mysql));
         }
         STOP_TIMING("  mysql_store_result(%s)", "small");
@@ -251,8 +244,7 @@ int test_select_large(MYSQL *mysql) {
     for (round = 0; round < 5; round++) {
         START_TIMING("%s:%d", mysql->host, mysql->port);
         if (mysql_real_query(mysql, C(TEST_QUERY_LARGE))) {
-               g_error("%s.%d: mysql_real_query(%s) failed: %s", 
-                    __FILE__, __LINE__, 
+               g_log_dbproxy(g_error, "mysql_real_query(%s) failed: %s", 
                     TEST_QUERY_LARGE,
                     mysql_error(mysql));
         }
@@ -260,8 +252,7 @@ int test_select_large(MYSQL *mysql) {
     
         START_TIMING("%s:%d", mysql->host, mysql->port);
         if (NULL == (res = mysql_store_result(mysql))) {
-            g_error("%s.%d: mysql_store_result() failed: %s", 
-                    __FILE__, __LINE__, 
+            g_log_dbproxy(g_error, "mysql_store_result() failed: %s", 
                     mysql_error(mysql));
         }
         STOP_TIMING("  mysql_store_result(%s)", "large");
@@ -280,7 +271,7 @@ int test_server(const gchar *host, guint port, const gchar *user, const gchar *p
 
     START_TIMING("%s:%d", host, port);
     if (!mysql_real_connect(mysql, host, user, password, db, port, NULL, 0)) {
-            g_error("%s.%d: mysql_real_connect() failed: %s", __FILE__, __LINE__, mysql_error(mysql));
+            g_log_dbproxy(g_error, "mysql_real_connect() failed: %s", mysql_error(mysql));
     }
     STOP_TIMING("%smysql_real_connect()", indent);
 

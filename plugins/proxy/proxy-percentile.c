@@ -335,9 +335,9 @@ check_percentile(void *user_data)
     pt_histc_t          data = {0};
     gint64              end_time = 0;
 
-    g_message("%s thread start", PROXY_PERCENTILE_THREAD);
+    g_log_dbproxy(g_message, "%s thread start", PROXY_PERCENTILE_THREAD);
     if (NULL == percentile_controller) {
-        g_critical("check_percentile thread get argument failed. %s", G_STRLOC);
+        g_log_dbproxy(g_critical, "check_percentile thread get argument failed");
         return ;
     }
 
@@ -346,10 +346,10 @@ check_percentile(void *user_data)
         while (percentile_controller->percentile_switch == pt_off) {
             end_time = g_get_monotonic_time () + SECONDS_PER_MIN * G_TIME_SPAN_SECOND;
             if (!g_cond_wait_until(g_cond, g_mutex, end_time)) {
-                g_debug("percentile waiting meet timeout");
+                g_log_dbproxy(g_message, "percentile waiting meet timeout");
             } else {
                 if (chassis_is_shutdown()) {
-                    g_message("check_percentile thread get exit signal");
+                    g_log_dbproxy(g_message, "check_percentile thread get exit signal");
                     g_mutex_unlock(g_mutex);
                     goto exit;
                 }
@@ -382,7 +382,7 @@ check_percentile(void *user_data)
 #endif
     }
 exit:
-    g_message("check_percentile thread will exit");
+    g_log_dbproxy(g_message, "check_percentile thread will exit");
 
     g_thread_exit(0);
 }
@@ -434,7 +434,7 @@ assign_percentile_switch(const char *newval, void *ex_param)
             g_mutex_lock(&percentile_thread->thr_mutex);
             g_cond_signal(&percentile_thread->thr_cond);
             g_mutex_unlock(&percentile_thread->thr_mutex);
-            g_message("wake up %s thread", PROXY_PERCENTILE_THREAD);
+            g_log_dbproxy(g_message, "wake up %s thread", PROXY_PERCENTILE_THREAD);
         }
     }
 
@@ -535,7 +535,7 @@ void data_generator() {
 
 #ifdef __MONITOR
 void histc_snap_shot(char* flag, pt_histc_t histc) {
-    g_message("%s$$#sum=%d#%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d#\n",flag,histc.number
+    g_log_dbproxy(g_message, "%s$$#sum=%d#%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d#\n",flag,histc.number
             ,histc.response_num[0],histc.response_num[1],histc.response_num[2],histc.response_num[3],histc.response_num[4],histc.response_num[5],histc.response_num[6],histc.response_num[7],histc.response_num[8],histc.response_num[9]
             ,histc.response_num[10],histc.response_num[11],histc.response_num[12],histc.response_num[13],histc.response_num[14],histc.response_num[15],histc.response_num[16],histc.response_num[17],histc.response_num[18],histc.response_num[19]
             ,histc.response_num[20],histc.response_num[21],histc.response_num[22]);
@@ -547,7 +547,7 @@ void data_snap_shot(char* flag) {
     pt_queue_pop_mb(percentile->min_statis,MAX_DATA_NUM_MIN,1,shot);
     pt_queue_pop_mb(percentile->hor_statis,MAX_DATA_NUM_HOUR,1 + MAX_DATA_NUM_MIN,shot);
 
-    g_message("%s@@#%d#%d-%d-%d-%d-%d-%d-%d-%d-%d-%d,%d-%d-%d-%d-%d-%d-%d-%d-%d-%d,%d-%d-%d-%d-%d-%d-%d-%d-%d-%d,%d-%d-%d-%d-%d-%d-%d-%d-%d-%d,%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-"
+    g_log_dbproxy(g_message, "%s@@#%d#%d-%d-%d-%d-%d-%d-%d-%d-%d-%d,%d-%d-%d-%d-%d-%d-%d-%d-%d-%d,%d-%d-%d-%d-%d-%d-%d-%d-%d-%d,%d-%d-%d-%d-%d-%d-%d-%d-%d-%d,%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-"
             "%d-%d-%d-%d-%d-%d-%d-%d-%d#%d-%d-%d-%d-%d-%d-%d-%d-%d-%d,%d-%d-%d-%d-%d-%d-%d-%d-%d-%d,%d-%d-%d#\n",flag,shot[0],
             shot[1],shot[2],shot[3],shot[4],shot[5],shot[6],shot[7],shot[8],shot[9],shot[10]
             ,shot[11],shot[12],shot[13],shot[14],shot[15],shot[16],shot[17],shot[18],shot[19],shot[20]

@@ -482,6 +482,7 @@ void network_mysqld_con_free(network_mysqld_con *con) {
     g_ptr_array_remove_fast(con->srv->priv->cons, con);
     g_mutex_unlock(&con_mutex);
 */
+
     if(con->conn_status_var.query_running)
     {
         thread_status_var_t *thread_status_var = chassis_event_thread_get_status(con->srv);
@@ -549,7 +550,7 @@ static void dump_str(const char *msg, const unsigned char *s, size_t len) {
 
     }
 
-    g_message("(%s): %s", msg, hex->str);
+    g_log_dbproxy(g_message, "(%s): %s", msg, hex->str);
 
     g_string_free(hex, TRUE);
 }
@@ -590,8 +591,8 @@ int network_mysqld_queue_append_raw(network_socket *sock, network_queue *queue, 
     /* check that the length header is valid */
     if (queue != sock->send_queue &&
         queue != sock->recv_queue) {
-        g_critical("%s(%s): queue = %p doesn't belong to sock %p(sock->src:%s sock->dst:%s)",
-                G_STRLOC, __func__, (void *)queue, (void *)sock,
+        g_log_dbproxy(g_warning, "queue = %p doesn't belong to sock %p(sock->src:%s sock->dst:%s)",
+                (void *)queue, (void *)sock,
                 NETWORK_SOCKET_SRC_NAME(sock), NETWORK_SOCKET_DST_NAME(sock));
         return -1;
     }
@@ -610,8 +611,7 @@ int network_mysqld_queue_append_raw(network_socket *sock, network_queue *queue, 
     } else if (packet_id != (guint8)(sock->last_packet_id + 1)) {
         sock->last_packet_id++;
 #if 0
-        g_critical("%s: packet-id %d doesn't match for socket's last packet %d, patching it",
-                G_STRLOC,
+        g_log_dbproxy(g_warning, "packet-id %d doesn't match for socket's last packet %d, patching it",
                 packet_id,
                 sock->last_packet_id);
 #endif
@@ -841,7 +841,7 @@ network_socket_retval_t network_mysqld_con_get_packet(chassis G_GNUC_UNUSED*chas
         } else if (packet_id != (guint8)(con->last_packet_id + 1)) {
             gchar *err_msg = g_strdup_printf("received packet-id %d from %s but expected %d",
                         packet_id, NETWORK_SOCKET_DST_NAME(con), con->last_packet_id + 1);
-            g_critical(err_msg);
+            g_log_dbproxy(g_warning, "%s", err_msg);
             g_free(err_msg);
             return NETWORK_SOCKET_ERROR;
         } else {
@@ -871,7 +871,7 @@ network_socket_retval_t network_mysqld_read(chassis G_GNUC_UNUSED*chas, network_
     case NETWORK_SOCKET_SUCCESS:
         break;
     case NETWORK_SOCKET_ERROR_RETRY:
-        g_error("sock->src:%s sock->dst:%s read data by sock return NETWORK_SOCKET_ERROR_RETRY which wasn't expected",
+        g_log_dbproxy(g_error, "sock->src:%s sock->dst:%s read data by sock return NETWORK_SOCKET_ERROR_RETRY which wasn't expected",
                     NETWORK_SOCKET_SRC_NAME(con), NETWORK_SOCKET_DST_NAME(con));
         break;
     }
@@ -987,7 +987,7 @@ network_socket_retval_t plugin_call(chassis *srv, network_mysqld_con *con, int s
              * but the user changed it
              */
 
-            g_message("%s(%s): (lua) read-auth-old-password failed as backend_ndx got reset.", G_STRLOC,  __func__);
+            g_log_dbproxy(g_warning, "(lua) read-auth-old-password failed as backend_ndx got reset.");
 
             network_mysqld_con_send_error(con->client, C("(lua) read-auth-old-password failed as backend_ndx got reset."));
             SEND_ERR_MSG_HANDLE(g_warning, "(lua) read-auth-old-password failed as backend_ndx got reset.", con->client);
@@ -1201,11 +1201,11 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                 break;
             default:
                 if (con->client && event_fd == con->client->fd) {
-                    g_critical("ioctl(%d, FIONREAD, ...) from Client(%s) failed: %s(%d)",
+                    g_log_dbproxy(g_warning, "ioctl(%d, FIONREAD, ...) from Client(%s) failed: %s(%d)",
                                 event_fd, NETWORK_SOCKET_SRC_NAME(con->client),
                                 g_strerror(errno), errno);
                 } else if (con->server && event_fd == con->server->fd) {
-                    g_critical("ioctl(%d, FIONREAD, ...) from Server:%s(thread_id:%u) failed: %s(%d)",
+                    g_log_dbproxy(g_warning, "ioctl(%d, FIONREAD, ...) from Server:%s(thread_id:%u) failed: %s(%d)",
                                 event_fd,
                                 NETWORK_SOCKET_DST_NAME(con->server),
                                 NETWORK_SOCKET_THREADID(con->server),
@@ -1227,8 +1227,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
             } else if (con->server && event_fd == con->server->fd) {
                 con->server->to_read = b;
             } else {
-                g_error("%s(%s): unexpected situation ioctl get data from "
-                       "neither client nor backend", G_STRLOC, __func__);
+                g_log_dbproxy(g_error, "unexpected situation ioctl get data from neither client nor backend");
             }
         } else if (!will_exit) { /* Linux */
             /*  no data, may be in idle transaction during exit process. */
@@ -1242,7 +1241,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                     /* the client closed the connection, let's keep the server side open */
                     gchar *msg = "close both sides because of client was closed unexpectedly.";
                     if (con->state <= CON_STATE_READ_AUTH) {
-                        CON_MSG_HANDLE(g_info, con, msg);
+                        CON_MSG_HANDLE(g_message, con, msg);
                     } else {
                         CON_MSG_HANDLE(g_critical, con, msg);
                     }
@@ -1250,12 +1249,12 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                 }
                 con->state = CON_STATE_CLOSE_CLIENT;
             } else if (con->server && event_fd == con->server->fd) {
-                CON_MSG_HANDLE(g_critical, con, "close both sides because of server has closed the connection.");
+                CON_MSG_HANDLE(g_warning, con, "close both sides because of server has closed the connection.");
                 g_atomic_int_add(&srv->proxy_aborted_clients, 1);
                 con->state = CON_STATE_CLOSE_SERVER;
             } else {
                 /* server side closed on use, oops, close both sides */
-                CON_MSG_HANDLE(g_critical, con, "close both sides because of unknown reasons");
+                CON_MSG_HANDLE(g_warning, con, "close both sides because of unknown reasons");
                 g_atomic_int_add(&srv->proxy_aborted_clients, 1);
                 con->state = CON_STATE_ERROR;
             }
@@ -1307,8 +1306,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
         ostate = con->state;
 #ifdef NETWORK_DEBUG_TRACE_STATE_CHANGES
         /* if you need the state-change information without dtrace, enable this */
-        g_debug("%s: [%d] %s",
-                G_STRLOC,
+        g_log_dbproxy(g_debug, "[%d] %s",
                 getpid(),
                 network_mysqld_con_state_get_name(con->state));
 #endif
@@ -1413,8 +1411,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                 if (!IS_BACKEND_OFFLINE(st->backend) &&
                         !IS_BACKEND_WAITING_EXIT(st->backend)) {
                     SET_BACKEND_STATE(st->backend, BACKEND_STATE_DOWN);
-                    g_warning("%s(%s): set backend (%s) state to DOWN",
-                              G_STRLOC, __func__, st->backend->addr->name->str);
+                    g_log_dbproxy(g_warning, "set backend (%s) state to DOWN", st->backend->addr->name->str);
                 }
                 network_socket_free(con->server);
                 con->server = NULL;
@@ -1466,9 +1463,9 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                     gchar *msg = "connect to dbproxy failed";
 
                     if (TRACE_CON_STATUS(con->srv->log->log_trace_modules)) {
-                        CON_MSG_HANDLE(g_message, con, msg);
+                        CON_MSG_HANDLE(g_warning, con, msg);
                     } else {
-                        CON_MSG_HANDLE(g_info, con, msg);
+                        CON_MSG_HANDLE(g_warning, con, msg);
                     }
 
                     g_atomic_int_add(&srv->proxy_aborted_connects, 1);
@@ -1477,8 +1474,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
             }
             default:
                 {
-                    g_critical("%s: hook for CON_STATE_CONNECT_SERVER return invalid return code: %d",
-                            G_STRLOC, retval);
+                    g_log_dbproxy(g_warning, "hook for CON_STATE_CONNECT_SERVER return invalid return code: %d", retval);
                     SEND_INTERNAL_ERR("hook for connect dbproxy return invalid value");
                     con->state = CON_STATE_SEND_ERROR;
 
@@ -1507,10 +1503,10 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                 return;
             case NETWORK_SOCKET_ERROR_RETRY:
             case NETWORK_SOCKET_ERROR:
-                CON_MSG_HANDLE(g_info, con, "read handshake from backend failed");
-                if (TRACE_CON_STATUS(con->srv->log->log_trace_modules)) {
-                    CON_MSG_HANDLE(g_message, con, "read handshake from backend failed");
-                }
+                CON_MSG_HANDLE(g_warning, con, "read handshake from backend failed");
+                //if (TRACE_CON_STATUS(con->srv->log->log_trace_modules)) {
+                //    CON_MSG_HANDLE(g_message, con, "read handshake from backend failed");
+                //}
 
                 g_atomic_int_add(&srv->proxy_aborted_connects, 1);
                 con->state = CON_STATE_ERROR;
@@ -1529,14 +1525,14 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                  * we have something in the queue and will send it to the client
                  * and close the connection afterwards
                  */
-                CON_MSG_HANDLE(g_info, con, "return ERROR when processing handshake from backend");
-                if (TRACE_CON_STATUS(con->srv->log->log_trace_modules)) {
-                    CON_MSG_HANDLE(g_message, con, "return ERROR when processing handshake from backend");
-                }
+                CON_MSG_HANDLE(g_warning, con, "return ERROR when processing handshake from backend");
+                //if (TRACE_CON_STATUS(con->srv->log->log_trace_modules)) {
+                //    CON_MSG_HANDLE(g_message, con, "return ERROR when processing handshake from backend");
+                //}
                 con->state = CON_STATE_SEND_ERROR;
                 break;
             default:
-                CON_MSG_HANDLE(g_info, con, "proxy read handshak return invalid value(neither SUCCESS nor ERROR)");
+                CON_MSG_HANDLE(g_message, con, "proxy read handshak return invalid value(neither SUCCESS nor ERROR)");
                 g_atomic_int_add(&srv->proxy_aborted_connects, 1);
                 con->state = CON_STATE_ERROR;
                 break;
@@ -1563,9 +1559,9 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                  * writing failed, closing connection
                  */
                 if (TRACE_CON_STATUS(con->srv->log->log_trace_modules)) {
-                    CON_MSG_HANDLE(g_message, con, "send handshake to client failed");
+                    CON_MSG_HANDLE(g_warning, con, "send handshake to client failed");
                 } else {
-                    CON_MSG_HANDLE(g_info, con, "send handshake to client failed");
+                    CON_MSG_HANDLE(g_warning, con, "send handshake to client failed");
                 }
                 g_atomic_int_add(&srv->proxy_aborted_connects, 1);
                 con->state = CON_STATE_ERROR;
@@ -1579,7 +1575,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                 break;
             default:
                 if (TRACE_CON_STATUS(con->srv->log->log_trace_modules)) {
-                    CON_MSG_HANDLE(g_info, con, "hook for sending handshake return invalid value");
+                    CON_MSG_HANDLE(g_message, con, "hook for sending handshake return invalid value");
                 }
                 SEND_INTERNAL_ERR("hook for sending handshake return invalid value");
                 con->state = CON_STATE_SEND_ERROR;
@@ -1614,9 +1610,9 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                 {
                     gchar *msg = "to read auth packet from client failed";
                     if (TRACE_CON_STATUS(con->srv->log->log_trace_modules)) {
-                        CON_MSG_HANDLE(g_message, con, msg);
+                        CON_MSG_HANDLE(g_warning, con, msg);
                     } else {
-                        CON_MSG_HANDLE(g_info, con, msg);
+                        CON_MSG_HANDLE(g_warning, con, msg);
                     }
                     con->state = CON_STATE_ERROR;
 
@@ -1662,7 +1658,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
             case NETWORK_SOCKET_ERROR_RETRY:
             case NETWORK_SOCKET_ERROR:
                 /* might be a connection close, we should just close the connection and be happy */
-                CON_MSG_HANDLE(g_critical, con, "send auth to backend failed");
+                CON_MSG_HANDLE(g_warning, con, "send auth to backend failed");
                 con->state = CON_STATE_ERROR;
                 break;
             }
@@ -1785,11 +1781,11 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                 return;
             case NETWORK_SOCKET_ERROR_RETRY:
             case NETWORK_SOCKET_ERROR:
-                CON_MSG_HANDLE(g_critical, con, "read auth old_password from client failed");
+                CON_MSG_HANDLE(g_warning, con, "read auth old_password from client failed");
 
-                if (TRACE_CON_STATUS(con->srv->log->log_trace_modules)) {
-                    CON_MSG_HANDLE(g_message, con, "read auth old_password from client failed");
-                }
+                //if (TRACE_CON_STATUS(con->srv->log->log_trace_modules)) {
+                //    CON_MSG_HANDLE(g_message, con, "read auth old_password from client failed");
+                //}
 
                 g_atomic_int_add(&srv->proxy_aborted_connects, 1);
                 con->state = CON_STATE_ERROR;
@@ -1822,10 +1818,10 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
             case NETWORK_SOCKET_ERROR_RETRY:
             case NETWORK_SOCKET_ERROR:
                 /* might be a connection close, we should just close the connection and be happy */
-                CON_MSG_HANDLE(g_critical, con, "send auth old password to backend failed");
-                if (TRACE_CON_STATUS(con->srv->log->log_trace_modules)) {
-                    CON_MSG_HANDLE(g_message, con, "send auth old password to backend failed");
-                }
+                CON_MSG_HANDLE(g_warning, con, "send auth old password to backend failed");
+                //if (TRACE_CON_STATUS(con->srv->log->log_trace_modules)) {
+                //    CON_MSG_HANDLE(g_message, con, "send auth old password to backend failed");
+                //}
                 g_atomic_int_add(&srv->proxy_aborted_connects, 1);
                 con->state = CON_STATE_ERROR;
                 break;
@@ -2149,7 +2145,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
 
             if (g_atomic_int_get(&con->conn_status.exit_phase) == CON_EXIT_KILL) {
                 con->state = CON_STATE_ERROR;
-                g_warning("connection close immediatly during shutdown immediate or kill session.");
+                g_log_dbproxy(g_warning, "connection close immediatly during shutdown immediate or kill session.");
             }
 
             if (TRACE_SQL(con->srv->log->log_trace_modules)) {
@@ -2690,8 +2686,8 @@ network_mysqld_con_get_1_int_from_result_set(network_mysqld_con *con, void* inj_
 
     if (parse_resultset_fields(res) != 0) {
         if (TRACE_SHARD(con->srv->log->log_trace_modules)) {
-            CON_MSG_HANDLE(g_message, con,
-                        "parse result fields failed during get 1 int valuee");
+            CON_MSG_HANDLE(g_warning, con,
+                        "parse result fields failed during get 1 int value");
         }
         return 0;
     }
@@ -2896,7 +2892,7 @@ register_logfilenames(gchar *new_log_filename, gint max_file_num, GQueue **log_f
         GList *tmp = g_queue_find_custom(*log_filenames_list, new_log_filename,
                                             (GCompareFunc)strcmp);
         if (tmp != NULL) {
-            g_debug("%s(%s) file %s is exist", G_STRLOC, __func__, new_log_filename);
+            g_log_dbproxy(g_debug, "file %s is exist", new_log_filename);
             return ;
         }
     }
@@ -2912,9 +2908,9 @@ register_logfilenames(gchar *new_log_filename, gint max_file_num, GQueue **log_f
             gchar *rm_logfile = (gchar *)g_queue_pop_head(*log_filenames_list);
             if (unlink(rm_logfile) != 0)
             {
-                g_warning("rm log file %s failed", rm_logfile);
+                g_log_dbproxy(g_warning, "rm log file %s failed", rm_logfile);
             } else {
-                g_debug("rm log file %s success %d %d %d", rm_logfile, i, max_file_num,
+                g_log_dbproxy(g_debug, "rm log file %s success %d %d %d", rm_logfile, i, max_file_num,
                             g_queue_get_length(*log_filenames_list));
             }
             g_free(rm_logfile);
@@ -2935,12 +2931,12 @@ kill_one_connection(chassis *chas, guint64 kill_con_id)
     guint32                     thread_id = GET_THEAD_ID(kill_con_id);
 
     if (thread_id < 0 || thread_id > chas->event_thread_count) {
-        g_debug("error thread id during kill connection");
+        g_log_dbproxy(g_warning, "error thread id during kill connection");
         return ret;
     }
 
     if ((GET_CON_IDX(kill_con_id) < CON_PRE_FIRST_ID || GET_CON_IDX(kill_con_id) > CON_IDX_MASK)) {
-        g_debug("error connection id during kill connection");
+        g_log_dbproxy(g_warning, "error connection id during kill connection");
         return ret;
     }
 
@@ -2961,10 +2957,10 @@ kill_one_connection(chassis *chas, guint64 kill_con_id)
         g_assert(conn != NULL);
 
         g_atomic_int_set(&conn->conn_status.exit_phase, CON_EXIT_KILL);
-        g_debug("set connection %u kill status.", kill_con_id);
+        g_log_dbproxy(g_debug, "set connection %u kill status.", kill_con_id);
         ret = 0;
     } else {
-        g_debug("connect id %u in event thread %d no found.", kill_con_id, thread->index);
+        g_log_dbproxy(g_debug, "connect id %u in event thread %d no found.", kill_con_id, thread->index);
     }
     g_rw_lock_reader_unlock(&thread->connection_lock);
 

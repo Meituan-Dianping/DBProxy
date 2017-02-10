@@ -82,7 +82,7 @@ void chassis_event_add(network_mysqld_con* client_con) {        //���߳�
 
     g_async_queue_push(thread->event_queue, client_con);
     g_atomic_pointer_add(&(thread->thread_status_var.thread_stat[THREAD_STAT_EVENT_WAITING]), 1);
-    if (write(thread->notify_send_fd, "", 1) != 1) g_error("pipes - write error: %s", g_strerror(errno));
+    if (write(thread->notify_send_fd, "", 1) != 1) g_log_dbproxy(g_error, "pipes - write error: %s", g_strerror(errno));
 }
 
 static GPrivate tls_index;
@@ -130,7 +130,7 @@ void chassis_event_handle(int G_GNUC_UNUSED event_fd, short G_GNUC_UNUSED events
     chassis_event_thread_t* thread = user_data;
 
     char ping[1];
-    if (read(thread->notify_receive_fd, ping, 1) != 1) g_error("pipes - read error");
+    if (read(thread->notify_receive_fd, ping, 1) != 1) g_log_dbproxy(g_error, "pipes - read error");
 
     network_mysqld_con* client_con = g_async_queue_try_pop(thread->event_queue);
     if (client_con != NULL) {
@@ -210,8 +210,7 @@ int chassis_event_threads_init_thread(chassis_event_thread_t *thread, chassis *c
     if (pipe(fds)) {
         int err;
         err = errno;
-        g_error("%s: evutil_socketpair() failed: %s (%d)", 
-                G_STRLOC,
+        g_log_dbproxy(g_error, "evutil_socketpair() failed: %s (%d)", 
                 g_strerror(err),
                 err);
     }
@@ -263,7 +262,7 @@ static void chassis_event_thread_update_conn_status(chassis_event_thread_t *thre
                  * 1 stands for the times of calling callback function after manual active event,
                  * this parameter has been obsoleted at libevent-2.0.
                  */
-                g_debug("pending %s's %d event", event_msg, pending);
+                g_log_dbproxy(g_debug, "pending %s's %d event", event_msg, pending);
                 event_active(ev, pending, 1);
             }
         }
@@ -292,7 +291,7 @@ void *chassis_event_thread_loop(chassis_event_thread_t *thread) {
         if (chassis_is_shutdown_normal()) {
             if (thread->connection_nums == 0) {
             has_no_active_con = TRUE;
-                g_debug("no connection in thread %d", thread->index);
+                g_log_dbproxy(g_debug, "no connection in thread %d", thread->index);
                 continue;
             }
         }
@@ -313,12 +312,12 @@ void *chassis_event_thread_loop(chassis_event_thread_t *thread) {
             errno = WSAGetLastError();
 #endif
             if (errno == EINTR) continue;
-            g_critical("%s: leaving chassis_event_thread_loop early, errno != EINTR was: %s (%d)", G_STRLOC, g_strerror(errno), errno);
+            g_log_dbproxy(g_critical, "leaving chassis_event_thread_loop early, errno != EINTR was: %s (%d)", g_strerror(errno), errno);
             break;
         }
     }
 
-    g_debug("work thread %d will exit", thread->index);
+    g_log_dbproxy(g_message, "work thread %d will exit", thread->index);
     g_atomic_int_set(&thread->exit_phase, EVENT_THREAD_EXITED);
 
     return NULL;
@@ -352,7 +351,7 @@ void *chassis_mainloop_thread_loop(chassis_event_thread_t *thread) {
             errno = WSAGetLastError();
 #endif
             if (errno == EINTR) continue;
-            g_critical("%s: leaving chassis_event_thread_loop early, errno != EINTR was: %s (%d)", G_STRLOC, g_strerror(errno), errno);
+            g_log_dbproxy(g_critical, "leaving chassis_event_thread_loop early, errno != EINTR was: %s (%d)", g_strerror(errno), errno);
             break;
         }
 
@@ -368,7 +367,7 @@ void *chassis_mainloop_thread_loop(chassis_event_thread_t *thread) {
             }
     }
 
-    g_debug("main loop thread will exit");
+    g_log_dbproxy(g_message, "main loop thread will exit");
 
     return NULL;
 }
@@ -383,7 +382,7 @@ void *chassis_mainloop_thread_loop(chassis_event_thread_t *thread) {
 void chassis_event_threads_start(GPtrArray *threads) {
     guint i;
 
-    g_message("%s: starting %d threads", G_STRLOC, threads->len - 1);
+    g_log_dbproxy(g_message, "starting %d threads", threads->len - 1);
 
     for (i = 1; i < threads->len; i++) { /* the 1st is the main-thread and already set up */
         chassis_event_thread_t *thread = threads->pdata[i];
@@ -391,7 +390,7 @@ void chassis_event_threads_start(GPtrArray *threads) {
 
         thread->thr = g_thread_try_new("event thread", (GThreadFunc)chassis_event_thread_loop, thread, &gerr);
         if (gerr) {
-            g_critical("%s: %s", G_STRLOC, gerr->message);
+            g_log_dbproxy(g_critical, "%s", gerr->message);
             g_error_free(gerr);
             gerr = NULL;
         }

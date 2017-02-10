@@ -24,6 +24,7 @@
 #include "glib-ext.h"
 #include "sys-pedantic.h"
 #include <string.h>
+#include "chassis-log.h"
 
 /** @file
  * helper functions for common glib operations
@@ -200,7 +201,7 @@ void g_debug_hexdump(const char *msg, const void *_s, size_t len) {
         }
     }
 
-    g_debug("(%s) %"G_GSIZE_FORMAT" bytes:\n  %s", 
+    g_log_dbproxy(g_debug, "(%s) %"G_GSIZE_FORMAT" bytes:\n  %s", 
             msg, 
             len,
             hex->str);
