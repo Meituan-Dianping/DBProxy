@@ -547,7 +547,7 @@ static int proxy_injection_get(lua_State *L) {
     
         proxy_resultset_lua_push(L, res);
     } else {
-        g_message("%s.%d: inj[%s] ... not found", __FILE__, __LINE__, key);
+        g_log_dbproxy(g_warning, "inj[%s] ... not found", key);
         
         lua_pushnil(L);
     }

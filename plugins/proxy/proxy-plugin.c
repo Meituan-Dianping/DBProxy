@@ -780,7 +780,7 @@ static network_mysqld_lua_stmt_ret proxy_lua_read_handshake(network_mysqld_con *
          *  */
 
         if (lua_pcall(L, 0, 1, 0) != 0) {
-            g_critical("(read_handshake) %s", lua_tostring(L, -1));
+            g_log_dbproxy(g_critical, "(read_handshake) %s", lua_tostring(L, -1));
 
             lua_pop(L, 1); /* errmsg */
 
@@ -796,9 +796,7 @@ static network_mysqld_lua_stmt_ret proxy_lua_read_handshake(network_mysqld_con *
         case PROXY_NO_DECISION:
             break;
         case PROXY_SEND_QUERY:
-            g_warning("%s.%d: (read_handshake) return proxy.PROXY_SEND_QUERY is deprecated, use PROXY_SEND_RESULT instead",
-                    __FILE__, __LINE__);
-
+            g_log_dbproxy(g_warning, "(read_handshake) return proxy.PROXY_SEND_QUERY is deprecated, use PROXY_SEND_RESULT instead");
             ret = PROXY_SEND_RESULT;
         case PROXY_SEND_RESULT:
             /**
@@ -823,7 +821,7 @@ static network_mysqld_lua_stmt_ret proxy_lua_read_handshake(network_mysqld_con *
     } else if (lua_isnil(L, -1)) {
         lua_pop(L, 1); /* pop the nil */
     } else {
-        g_message("%s.%d: %s", __FILE__, __LINE__, lua_typename(L, lua_type(L, -1)));
+        g_log_dbproxy(g_message, "%s", lua_typename(L, lua_type(L, -1)));
         lua_pop(L, 1); /* pop the ... */
     }
     lua_pop(L, 1); /* fenv */
@@ -857,14 +855,14 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_handshake) {
     err = err || network_mysqld_proto_skip_network_header(&packet);
     if (err)
     {
-        CON_MSG_HANDLE(g_info, con, "read hand shake's network header failed");
+        CON_MSG_HANDLE(g_warning, con, "read hand shake's network header failed");
         return NETWORK_SOCKET_ERROR;
     }
 
     err = err || network_mysqld_proto_peek_int8(&packet, &status);
     if (err)
     {
-        CON_MSG_HANDLE(g_info, con, "read hand shake's execute result failed");
+        CON_MSG_HANDLE(g_warning, con, "read hand shake's execute result failed");
         return NETWORK_SOCKET_ERROR;
     }
     /* handle ERR packets directly */
@@ -877,12 +875,12 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_handshake) {
         packet.offset += 1; // skip 0xff
         err = err || network_mysqld_proto_get_int16(&packet, &errcode);
         if (err) {
-            CON_MSG_HANDLE(g_info, con, "read hand shake get errcode failed");
+            CON_MSG_HANDLE(g_warning, con, "read hand shake get errcode failed");
         }
         if (packet.offset < packet.data->len) {
             err = err || network_mysqld_proto_get_string_len(&packet, &errmsg, packet.data->len - packet.offset);
             if (err) {
-                CON_MSG_HANDLE(g_info, con, "get handshake packets' errmsg failed ");
+                CON_MSG_HANDLE(g_warning, con, "get handshake packets' errmsg failed ");
             }
         }
         if (errmsg) g_free(errmsg);
@@ -892,8 +890,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_handshake) {
         network_mysqld_con_lua_t *st = con->plugin_con_state;
         if (!IS_BACKEND_OFFLINE(st->backend) && !IS_BACKEND_WAITING_EXIT(st->backend)) {
             SET_BACKEND_STATE(st->backend, BACKEND_STATE_DOWN);
-            g_warning("%s(%s): set backend (%s) state to DOWN",
-                            G_STRLOC, __func__, recv_sock->dst->name->str);
+            g_log_dbproxy(g_warning, "set backend (%s) state to DOWN", recv_sock->dst->name->str);
         }
     //  chassis_gtime_testset_now(&st->backend->state_since, NULL);
         network_socket_free(con->server);
@@ -926,7 +923,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_handshake) {
         g_string_free(g_queue_pop_tail(recv_sock->recv_queue->chunks), TRUE);
         return NETWORK_SOCKET_ERROR;
     default:
-        g_error("%s(%s): proxy_lua_read_handshake returns invalid value", G_STRLOC, __func__);
+        g_log_dbproxy(g_error, "proxy_lua_read_handshake returns invalid value");
         break;
     } 
 
@@ -975,7 +972,7 @@ static network_mysqld_lua_stmt_ret proxy_lua_read_auth(network_mysqld_con *con) 
          *  */
 
         if (lua_pcall(L, 0, 1, 0) != 0) {
-            g_critical("(read_auth) %s", lua_tostring(L, -1));
+            g_log_dbproxy(g_critical, "(read_auth) %s", lua_tostring(L, -1));
 
             lua_pop(L, 1); /* errmsg */
 
@@ -1024,7 +1021,7 @@ static network_mysqld_lua_stmt_ret proxy_lua_read_auth(network_mysqld_con *con) 
     } else if (lua_isnil(L, -1)) {
         lua_pop(L, 1); /* pop the nil */
     } else {
-        g_message("%s.%d: %s", __FILE__, __LINE__, lua_typename(L, lua_type(L, -1)));
+        g_log_dbproxy(g_message, "%s", lua_typename(L, lua_type(L, -1)));
         lua_pop(L, 1); /* pop the ... */
     }
     lua_pop(L, 1); /* fenv */
@@ -1242,7 +1239,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_auth_result) {
 
         break;
     default:
-        g_error("%s.%d: ... ", __FILE__, __LINE__);
+        g_log_dbproxy(g_error, "...");
         break;
     }
 */
@@ -1482,7 +1479,7 @@ static gboolean check_flags(GPtrArray* tokens, network_mysqld_con* con) {
             con->client->conn_attr.autocommit_status != AUTOCOMMIT_TRUE) {
         con->conn_status.is_in_transaction = TRUE;
 #ifdef PROXY_DEBUG
-        g_debug("set con in transaction because of con autocommit_status=false");
+        g_log_dbproxy(g_debug, "set con in transaction because of con autocommit_status=false");
 #endif
     }
 
@@ -2278,9 +2275,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_send_query_result) {
 
     if (!inj->resultset_is_needed && st->injected.sent_resultset > 0) {
         /* we already sent a resultset to the client and the next query wants to forward it's result-set too, that can't work */
-        g_critical("%s: proxy.queries:append() in %s can only have one injected query without { resultset_is_needed = true } set. We close the client connection now.",
-                G_STRLOC,
-                config->lua_script);
+        g_log_dbproxy(g_warning, "proxy.queries:append() in %s can only have one injected query without { resultset_is_needed = true } set. We close the client connection now", config->lua_script);
 
         return NETWORK_SOCKET_ERROR;
     }
@@ -2313,7 +2308,7 @@ void merge_rows(network_mysqld_con* con, injection* inj) {
 
     if (parse_resultset_fields(res) != 0) {
         if (TRACE_SHARD(con->srv->log->log_trace_modules)) {
-            CON_MSG_HANDLE(g_message, con, "parse result fields failed during merge_rows");
+            CON_MSG_HANDLE(g_warning, con, "parse result fields failed during merge_rows");
         }
     }
 
@@ -2897,7 +2892,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_disconnect_client) {
     case PROXY_IGNORE_RESULT:
         break;
     default:
-        g_error("%s.%d: ... ", __FILE__, __LINE__);
+        g_log_dbproxy(g_error, "...");
         break;
     }
 */
@@ -3296,9 +3291,7 @@ static void check_backend_thread_running(network_backend_t* backend, MYSQL *mysq
     MYSQL_RES *result = NULL;
 
     if (mysql_query(mysql, "show status like 'Threads_running'")) {
-        g_warning("%s(%s): get backend (%s) threads_running failed:%s",
-                            G_STRLOC, __func__, backend->addr->name->str,
-                            mysql_error(mysql));
+        g_log_dbproxy(g_warning, "get backend (%s) threads_running failed:%s", backend->addr->name->str, mysql_error(mysql));
         return;
     }
 
@@ -3308,16 +3301,11 @@ static void check_backend_thread_running(network_backend_t* backend, MYSQL *mysq
             MYSQL_ROW row = mysql_fetch_row(result);
             backend->thread_running = atoi(row[1]);
         } else {
-            g_warning("%s(%s): get backend (%s) threads_running failed, "
-                        "num_fields:%d, num_rows:%d",
-                              G_STRLOC, __func__, backend->addr->name->str,
-                              mysql_num_fields(result), mysql_num_rows(result));
+            g_log_dbproxy(g_warning, "get backend (%s) threads_running failed, num_fields:%d, num_rows:%d", backend->addr->name->str, mysql_num_fields(result), mysql_num_rows(result));
         }
         mysql_free_result(result);
     } else {
-        g_warning("%s(%s): get backend (%s) threads_running failed:%s",
-                            G_STRLOC, __func__, backend->addr->name->str,
-                            mysql_error(mysql));
+        g_log_dbproxy(g_warning, "get backend (%s) threads_running failed:%s", backend->addr->name->str, mysql_error(mysql));
     }
 }
 
@@ -3339,7 +3327,7 @@ check_state(void *user_data)
 
     sleep(1);
 
-    g_message("%s thread start", PROXY_CHECK_STATE_THREAD);
+    g_log_dbproxy(g_message, "%s thread start", PROXY_CHECK_STATE_THREAD);
 
     mysql_init(&mysql);
 
@@ -3363,10 +3351,10 @@ check_state(void *user_data)
                         g_atomic_int_get(&backend->connected_clients) == 0) {
                     SET_BACKEND_STATE(backend, BACKEND_STATE_OFFLINE);
                     backend->thread_running = 0;
-                    g_message("offline backend %s success", backend->addr->name->str);
+                    g_log_dbproxy(g_message, "offline backend %s success", backend->addr->name->str);
             } else if (IS_BACKEND_REMOVING(backend) &&
                             g_atomic_int_get(&backend->connected_clients) == 0) {
-                    g_message("remove backend %s success", backend->addr->name->str);
+                    g_log_dbproxy(g_message, "remove backend %s success", backend->addr->name->str);
                     network_backends_remove(bs, backend);
                     backend = NULL;
             }
@@ -3396,8 +3384,8 @@ check_state(void *user_data)
                     break;
                 } else if (mysql_errno(&mysql) == CR_SERVER_LOST) {
                     m++;
-                    g_warning("%s(%s): due to %s, retry %dth times to connect backend %s",
-                                          G_STRLOC, __func__, mysql_error(&mysql),
+                    g_log_dbproxy(g_warning, "due to %s, retry %dth times to connect backend %s",
+                                          mysql_error(&mysql),
                                           m, backend->addr->name->str);
                     sleep(config->check_state_sleep_delay);
                 } else {
@@ -3411,8 +3399,8 @@ check_state(void *user_data)
                 goto set_state;
             } else if (mysql_errno(&mysql) != 0) {
                 bt = BACKEND_STATE_DOWN;
-                g_warning("%s(%s): set backend(%s) state to DOWN for: %d(%s)",
-                              G_STRLOC, __func__, backend->addr->name->str,
+                g_log_dbproxy(g_critical, "set backend(%s) state to DOWN for: %d(%s)",
+                              backend->addr->name->str,
                               mysql_errno(&mysql), mysql_error(&mysql));
                 goto set_state;
             }
@@ -3426,8 +3414,8 @@ query :
                    break;
                 } else {
                     m++;
-                    g_warning("%s(%s): due to %s, retry %dth times to get thread_running from %s",
-                                          G_STRLOC, __func__, mysql_error(&mysql),
+                    g_log_dbproxy(g_warning, "due to %s, retry %dth times to get thread_running from %s",
+                                          mysql_error(&mysql),
                                           m, backend->addr->name->str);
                     sleep(config->check_state_sleep_delay);
                 }
@@ -3435,8 +3423,8 @@ query :
 
             if (mysql_errno(&mysql) != 0) {
                 bt = BACKEND_STATE_DOWN;
-                g_warning("%s(%s): set backend(%s) state to DOWN for: %d(%s)",
-                              G_STRLOC, __func__, backend->addr->name->str,
+                g_log_dbproxy(g_critical, "set backend(%s) state to DOWN for: %d(%s)",
+                              backend->addr->name->str,
                               mysql_errno(&mysql), mysql_error(&mysql));
                 goto set_state;
             }
@@ -3444,15 +3432,14 @@ query :
             result = mysql_store_result(&mysql);
             if (result == NULL) {
                 if (j++ < config->check_state_retry_times) {
-                    g_warning("%s(%s): due to invalid result, retry %dth times to get thread_running from %s",
-                                    G_STRLOC, __func__, j,
+                    g_log_dbproxy(g_warning, "due to invalid result, retry %dth times to get thread_running from %s",
+                                    j,
                                     backend->addr->name->str);
                     sleep(config->check_state_sleep_delay);
                     goto query;
                 } else {
                     bt = BACKEND_STATE_DOWN;
-                    g_warning("%s(%s): set backend(%) state to DOWN for retry %d times to get thread_running",
-                                        G_STRLOC, __func__,
+                    g_log_dbproxy(g_critical, "set backend(%s) state to DOWN for retry %d times to get thread_running",
                                         backend->addr->name->str, config->check_state_retry_times);
                     goto set_state;
             }
@@ -3470,8 +3457,7 @@ query :
                     bt = BACKEND_STATE_UP;
                 } else {
                     if (k++ < config->check_state_retry_times) {
-                        g_warning("%s(%s): due to %d over %d retry %d times to get thread_running from %s",
-                                        G_STRLOC, __func__,
+                        g_log_dbproxy(g_warning, "due to %d over %d retry %d times to get thread_running from %s",
                                         backend->thread_running,
                                         chas->max_backend_tr, k,
                                         backend->addr->name->str);
@@ -3479,8 +3465,7 @@ query :
                         goto query;
                     } else {
                         bt = BACKEND_STATE_PENDING;
-                        g_warning("%s(%s): set backend(%s) to PENDING due to thread running is %d",
-                                        G_STRLOC, __func__,
+                        g_log_dbproxy(g_critical, "set backend(%s) to PENDING due to thread running is %d",
                                         backend->addr->name->str, backend->thread_running);
                     }
                 }
@@ -3490,8 +3475,8 @@ set_state:
 
             if (backend->state != bt) {
                 SET_BACKEND_STATE(backend, bt);
-                g_message("%s(%s): set backend (%s) state to %s",
-                        G_STRLOC, __func__, backend->addr->name->str,
+                g_log_dbproxy(g_warning, "set backend (%s) state to %s",//重复
+                        backend->addr->name->str,
                         bt == BACKEND_STATE_UP ? "UP" : (bt == BACKEND_STATE_DOWN ? "DOWN" : "PENDING"));
             }
         }
@@ -3502,14 +3487,14 @@ set_state:
         g_mutex_lock(g_mutex);
         end_time = g_get_monotonic_time() + config->check_state_interval * G_TIME_SPAN_SECOND;
         if (!g_cond_wait_until(g_cond, g_mutex, end_time)) {
-            g_debug("check state waiting meet timeout");
+            g_log_dbproxy(g_message, "check state waiting meet timeout");
         } else {
-            g_message("check_state thread get exit signal");
+            g_log_dbproxy(g_message, "check_state thread get exit signal");
         }
         g_mutex_unlock(g_mutex);
     }
 exit:
-    g_message("check_state thread will exit");
+    g_log_dbproxy(g_message, "check_state thread will exit");
     g_thread_exit(0);
 }
 
@@ -3528,7 +3513,7 @@ int network_mysqld_proxy_plugin_apply_config(chassis *chas, chassis_plugin_confi
     }
 
     if (!config->address) {
-        g_critical("%s: Failed to get bind address, please set by --proxy-address=<host:port>", G_STRLOC);
+        g_log_dbproxy(g_critical, "Failed to get bind address, please set by --proxy-address=<host:port>");
         return -1;
     }
 
@@ -3559,7 +3544,7 @@ int network_mysqld_proxy_plugin_apply_config(chassis *chas, chassis_plugin_confi
     if (0 != network_socket_bind(listen_sock)) {
         return -1;
     }
-    g_message("proxy listening on port %s", config->address);
+    g_log_dbproxy(g_message, "proxy listening on port %s", config->address);
 
     for (i = 0; config->backend_addresses && config->backend_addresses[i]; i++) {
         if (-1 == network_backends_add(bs, config->backend_addresses[i], BACKEND_TYPE_RW)) {
@@ -3588,13 +3573,13 @@ int network_mysqld_proxy_plugin_apply_config(chassis *chas, chassis_plugin_confi
 
     /* sql log init */
     if (sql_log_t_load_options(chas)) {
-        g_critical("%s(%s): init proxy sql log failed", G_STRLOC);
+        g_log_dbproxy(g_critical, "init proxy sql log failed");
         return -1;
     }
 
     /* percentile init */
     if (config->percentile_controller == NULL) {
-        g_critical("%s(%s): get percentile controller failed", G_STRLOC, __func__);
+        g_log_dbproxy(g_critical, "get percentile controller failed");
         return -1;
     }
     if (config->percentile_switch && 0 == strcasecmp(config->percentile_switch, "on")) {
@@ -3604,14 +3589,14 @@ int network_mysqld_proxy_plugin_apply_config(chassis *chas, chassis_plugin_confi
     } else if (config->percentile_switch == NULL) {
         config->percentile_controller->percentile_switch = pt_off;
     } else {
-        g_critical("--percentile_switch has to be on or off, is %s", config->percentile_switch);
+        g_log_dbproxy(g_critical, "--percentile_switch has to be on or off, is %s", config->percentile_switch);
         return -1;
     }
 
         if (config->percentile_value > 0 && config->percentile_value <= 100) {
             config->percentile_controller->percentile_value = config->percentile_value;
         } else {
-            g_critical("--percentile-value has to be (1,100], is %d", config->percentile_value);
+            g_log_dbproxy(g_critical, "--percentile-value has to be (1,100], is %d", config->percentile_value);
             return -1;
         }
 
@@ -3646,12 +3631,12 @@ int network_mysqld_proxy_plugin_apply_config(chassis *chas, chassis_plugin_confi
                 g_free(tmp_for_free);
                 g_free(raw_pwd);
             } else {
-                g_critical("%s(%s):user %s' password decrypt failed", G_STRLOC, __func__, user);
+                g_log_dbproxy(g_critical, "user %s' password decrypt failed", user);
                 g_free(tmp_for_free);
                 return -1;
             }
         } else {
-            g_critical("%s(%s): incorrect password settings", G_STRLOC, __func__);
+            g_log_dbproxy(g_critical, "incorrect password settings");
             g_free(tmp_for_free);
             return -1;
         }
@@ -3678,8 +3663,7 @@ int network_mysqld_proxy_plugin_apply_config(chassis *chas, chassis_plugin_confi
 
         if (is_complete) {
             if (user_hosts_handle(bs, user, ips, ADD_USER_HOST) != 0) {
-                g_critical("%s(%s): add user hosts failed: user %s doesn't exist",
-                                                    G_STRLOC, __func__, user);
+                g_log_dbproxy(g_warning, "add user hosts failed: user %s doesn't exist", user);
             }
         }
 
@@ -3700,8 +3684,7 @@ int network_mysqld_proxy_plugin_apply_config(chassis *chas, chassis_plugin_confi
 
             if (is_complete) {
                 if (user_backends_handle(bs, user, backends, ADD_BACKENDS) != 0) {
-                    g_critical("%s(%s): add user backends failed: user %s doesn't exist",
-                                                    G_STRLOC, __func__, user);
+                    g_log_dbproxy(g_warning, "add user backends failed: user %s doesn't exist", user);
             }
         }
 
@@ -3739,8 +3722,7 @@ int network_mysqld_proxy_plugin_apply_config(chassis *chas, chassis_plugin_confi
                                                 (GThreadFunc)pti[i].thread_fn,
                                                 (gpointer)plugin_thread->thread_param, &gerr);
     if (gerr) {
-            g_critical("create %s thread failed. %s: %s",
-                            pti[i].plugin_thread_names, G_STRLOC, gerr->message);
+            g_log_dbproxy(g_message, "create %s thread failed. %s", pti[i].plugin_thread_names, gerr->message);
             g_error_free(gerr);
             gerr = NULL;
             plugin_thread_t_free(plugin_thread);
@@ -3796,8 +3778,8 @@ filter_pre(GPtrArray *tokens, network_mysqld_con* con, gchar *sql_raw)
     sql_rewrite = sql_filter_sql_rewrite(tokens);
     if (sql_rewrite == NULL)
     {
-         g_warning("%s(%s): event_thread(%d) C:%s filter rewrite %s:%s failed",
-                   G_STRLOC, __func__, chassis_event_get_threadid(),
+        g_log_dbproxy(g_warning, "event_thread(%d) C:%s filter rewrite %s:%s failed",
+                   chassis_event_get_threadid(),
                    NETWORK_SOCKET_SRC_NAME(con->client),
                    GET_COM_NAME(COM_QUERY), sql_raw);
 
@@ -3829,8 +3811,8 @@ filter_pre(GPtrArray *tokens, network_mysqld_con* con, gchar *sql_raw)
 
     if (query_status & RQ_FOBIDDEN_BY_FILTER)
     {
-        g_warning("%s(%s): event_thread(%d) C:%s %s:%s fobidden by filter:%s",
-               G_STRLOC, __func__, chassis_event_get_threadid(),
+        g_log_dbproxy(g_warning, "event_thread(%d) C:%s %s:%s fobidden by filter:%s",
+               chassis_event_get_threadid(),
                NETWORK_SOCKET_SRC_NAME(con->client),
                GET_COM_NAME(COM_QUERY), sql_raw, sql_rewrite->str);
         ret = 1;
@@ -3838,8 +3820,8 @@ filter_pre(GPtrArray *tokens, network_mysqld_con* con, gchar *sql_raw)
     else
     {
         if (query_status & RQ_HIT_BY_FILTER)
-            g_debug("%s(%s): event_thread(%d) C:%s %s:%s hitted by filter:%s",
-                    G_STRLOC, __func__, chassis_event_get_threadid(),
+            g_log_dbproxy(g_debug, "event_thread(%d) C:%s %s:%s hitted by filter:%s",
+                    chassis_event_get_threadid(),
                     NETWORK_SOCKET_SRC_NAME(con->client),
                     GET_COM_NAME(COM_QUERY), sql_raw, sql_rewrite->str);
 
@@ -3886,7 +3868,7 @@ filter_post(network_mysqld_con *con, injection *inj)
     if (g_atomic_int_get(&cur_rq->lastest_query_num) < 1)
     {
 #ifdef FILTER_DEBUG
-        g_debug("[reserved query] [skip by lastest_query_num = %d]",
+        g_log_dbproxy(g_debug, "[reserved query] [skip by lastest_query_num = %d]",
                                 g_atomic_int_get(&cur_rq->lastest_query_num));
 #endif
         goto exit;
@@ -3896,7 +3878,7 @@ filter_post(network_mysqld_con *con, injection *inj)
     if (g_atomic_int_get(&cur_rq->query_filter_time_threshold) < 0)
     {
 #ifdef FILTER_DEBUG
-        g_debug("[reserved query] [skip check for query_filter_time_threshold = %d",
+        g_log_dbproxy(g_debug, "[reserved query] [skip check for query_filter_time_threshold = %d",
                                 g_atomic_int_get(&cur_rq->query_filter_time_threshold));
 #endif
     }
@@ -3931,7 +3913,7 @@ filter_post(network_mysqld_con *con, injection *inj)
         if (g_atomic_int_get(&cur_rq->freq_time_window) == 0)
         {
 #ifdef FILTER_DEBUG
-            g_debug("[reserved query] [skip check for freq_time_window = %d]",
+            g_log_dbproxy(g_debug, "[reserved query] [skip check for freq_time_window = %d]",
                                 g_atomic_int_get(&cur_rq->freq_time_window));
 #endif
         }
@@ -3972,7 +3954,7 @@ filter_post(network_mysqld_con *con, injection *inj)
         {
             sql_filter_insert(cur_filter, sql_rewrite, sql_rewrite_md5,
                                 cur_filter->auto_filter_flag, AUTO_ADD_FILTER);
-            g_message("[filter][auto added][success][flag = %d] [filter: %s] [hashcode: %s]",
+            g_log_dbproxy(g_message, "[filter][auto added][success][flag = %d] [filter: %s] [hashcode: %s]",
                                                 cur_filter->auto_filter_flag,
                                                 sql_rewrite, sql_rewrite_md5);
         }
@@ -3991,7 +3973,7 @@ filter_post(network_mysqld_con *con, injection *inj)
             g_hash_table_insert(cur_rq->ht_reserved_query, g_strdup(sql_rewrite_md5), cur_rq_item);
             sql_reserved_query_insert(cur_rq, cur_rq_item);
 #ifdef FILTER_DEBUG
-            g_message("[filter][reserved query][added] %s", sql_rewrite);
+            g_log_dbproxy(g_debug, "[filter][reserved query][added] %s", sql_rewrite);
 #endif
         }
         g_rw_lock_writer_unlock(&cur_rq->rq_lock);
@@ -4091,7 +4073,7 @@ add_shard_tables(chassis_plugin_config *config, gchar **shard_tables)
             g_hash_table_insert(config->dt_table, key, dt);
             g_rw_lock_writer_unlock(&config->config_lock);
         } else {
-            g_critical("%s(%s):incorrect sub-table settings", G_STRLOC, __func__);
+            g_log_dbproxy(g_critical, "incorrect sub-table settings");
             dt_table_free(dt);
             return 1;
         }

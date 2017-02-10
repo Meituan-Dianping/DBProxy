@@ -64,7 +64,7 @@ int chassis_frontend_init_glib() {
 #endif
 
     if (!GLIB_CHECK_VERSION(2, 6, 0)) {
-        g_critical("the glib header are too old, need at least 2.6.0, got: %d.%d.%d", 
+        g_log_dbproxy(g_critical, "the glib header are too old, need at least 2.6.0, got: %d.%d.%d", 
                 GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
 
         return -1;
@@ -73,7 +73,7 @@ int chassis_frontend_init_glib() {
     check_str = glib_check_version(GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
 
     if (check_str) {
-        g_critical("%s, got: lib=%d.%d.%d, headers=%d.%d.%d", 
+        g_log_dbproxy(g_critical, "%s, got: lib=%d.%d.%d, headers=%d.%d.%d", 
             check_str,
             glib_major_version, glib_minor_version, glib_micro_version,
             GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
@@ -82,7 +82,7 @@ int chassis_frontend_init_glib() {
     }
 
     if (!g_module_supported()) {
-        g_critical("loading modules is not supported on this platform");
+        g_log_dbproxy(g_critical, "loading modules is not supported on this platform");
         return -1;
     }
 
@@ -99,8 +99,7 @@ int chassis_frontend_init_win32() {
     WSADATA wsaData;
 
     if (0 != WSAStartup(MAKEWORD( 2, 2 ), &wsaData)) {
-        g_critical("%s: WSAStartup(2, 2) failed to initialize the socket library",
-                G_STRLOC);
+        g_log_dbproxy(g_critical, "WSAStartup(2, 2) failed to initialize the socket library");
 
         return -1;
     }
@@ -116,8 +115,7 @@ int chassis_frontend_init_win32() {
  */
 int chassis_frontend_init_logdir(char *log_path) {
     if (!log_path) {
-        g_critical("%s: Failed to get log directory, please set by --log-path",
-                G_STRLOC);
+        g_log_dbproxy(g_critical, "Failed to get log directory, please set by --log-path");
         return -1;
     }
 
@@ -132,9 +130,7 @@ int chassis_frontend_init_basedir(const char *prg_name, char **_base_dir) {
 
     if (base_dir) { /* basedir is already known, check if it is absolute */
         if (!g_path_is_absolute(base_dir)) {
-            g_critical("%s: --basedir option must be an absolute path, but was %s",
-                    G_STRLOC,
-                    base_dir);
+            g_log_dbproxy(g_critical, "--basedir option must be an absolute path, but was %s", base_dir);
             return -1;
         } else {
             return 0;
@@ -146,8 +142,7 @@ int chassis_frontend_init_basedir(const char *prg_name, char **_base_dir) {
      */
     base_dir = chassis_get_basedir(prg_name);
     if (!base_dir) {
-        g_critical("%s: Failed to get base directory",
-                G_STRLOC);
+        g_log_dbproxy(g_critical, "Failed to get base directory");
         return -1;
     }
 
@@ -177,12 +172,9 @@ static int chassis_frontend_lua_setenv(const char *key, const char *value) {
         /* the setenv() succeeded, double-check it */
         if (!getenv(key)) {
             /* check that getenv() returns what we did set */
-            g_critical("%s: setting %s = %s failed: (getenv() == NULL)", G_STRLOC,
-                    key, value);
+            g_log_dbproxy(g_critical, "setting %s = %s failed: (getenv() == NULL)", key, value);
         } else if (0 != strcmp(getenv(key), value)) {
-            g_critical("%s: setting %s = %s failed: (getenv() == %s)", G_STRLOC,
-                    key, value,
-                    getenv(key));
+            g_log_dbproxy(g_critical, "setting %s = %s failed: (getenv() == %s)", key, value, getenv(key));
         }
     }
 
@@ -233,9 +225,7 @@ static int chassis_frontend_init_lua_paths(const char *set_path,
 
     if (set_path) {
         if (0 != chassis_frontend_lua_setenv(env_var, set_path)) {
-            g_critical("%s: setting %s = %s failed: %s", G_STRLOC,
-                    env_var, set_path,
-                    g_strerror(errno));
+            g_log_dbproxy(g_critical, "setting %s = %s failed: %s", env_var, set_path, g_strerror(errno));
             ret = -1;
         }
     } else if (!g_getenv(env_var)) {
@@ -273,9 +263,7 @@ static int chassis_frontend_init_lua_paths(const char *set_path,
 
         if (lua_path->len) {
             if (chassis_frontend_lua_setenv(env_var, lua_path->str)) {
-                g_critical("%s: setting %s = %s failed: %s", G_STRLOC,
-                        env_var, lua_path->str,
-                        g_strerror(errno));
+                g_log_dbproxy(g_critical, "setting %s = %s failed: %s", env_var, lua_path->str, g_strerror(errno));
                 ret = -1;
             }
         }
@@ -367,7 +355,7 @@ int chassis_frontend_load_plugins(GPtrArray *plugins, const gchar *plugin_dir, g
         g_free(plugin_filename);
 
         if (NULL == p) {
-            g_critical("setting --plugin-dir=<dir> might help");
+            g_log_dbproxy(g_critical, "setting --plugin-dir=<dir> might help");
             return -1;
         }
         p->option_grp_name = g_strdup(plugin_names[i]);

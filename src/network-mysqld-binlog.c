@@ -32,6 +32,7 @@
  */
 #include "glib-ext.h"
 #include "network-mysqld-binlog.h"
+#include "chassis-log.h"
 
 #define S(x) x->str, x->len
 
@@ -320,8 +321,7 @@ int network_mysqld_proto_get_binlog_event(network_packet *packet,
                 event->event.table_map_event.null_bits_len);
 
         if (packet->data->len != packet->offset) { /* this should be the full packet */
-            g_critical("%s: TABLE_MAP_EVENT at pos %u we still have %"G_GSIZE_FORMAT" left", 
-                    G_STRLOC,
+            g_log_dbproxy(g_critical, "TABLE_MAP_EVENT at pos %u we still have %"G_GSIZE_FORMAT" left", 
                     packet->offset,
                     packet->data->len - packet->offset);
             err = 1;
@@ -408,9 +408,7 @@ int network_mysqld_proto_get_binlog_event(network_packet *packet,
                 packet->data->len - packet->offset);
         break;
     default:
-        g_critical("%s: unhandled binlog-event: %d", 
-                G_STRLOC, 
-                event->event_type);
+        g_log_dbproxy(g_critical, "unhandled binlog-event: %d", event->event_type);
         return -1;
     }
 
@@ -424,8 +422,7 @@ int network_mysqld_proto_get_binlog_event(network_packet *packet,
 
     /* check if we have handled all bytes */
     if (packet->offset != packet->data->len) {
-        g_debug("%s: event_type %d: offset = %d, length = %"G_GSIZE_FORMAT,
-                G_STRLOC,
+        g_log_dbproxy(g_debug, "event_type %d: offset = %d, length = %"G_GSIZE_FORMAT,
                 event->event_type,
                 packet->offset,
                 packet->data->len);
@@ -707,10 +704,7 @@ int network_mysqld_binlog_event_tablemap_get(
             field->type = col_type;
             break;
         default:
-            g_error("%s: field-type %d isn't handled",
-                    G_STRLOC,
-                    col_type
-                    );
+            g_log_dbproxy(g_error, "field-type %d isn't handled", col_type);
             break;
         }
 
@@ -722,8 +716,7 @@ int network_mysqld_binlog_event_tablemap_get(
         g_debug_hexdump(G_STRLOC, event->event.table_map_event.metadata, event->event.table_map_event.metadata_len);
     }
     if (metadata_packet.offset != metadata_packet.data->len) {
-        g_critical("%s: ",
-                G_STRLOC);
+        g_log_dbproxy(g_critical, "metadata_packet.offset != metadata_packet.data->len");
         err = 1;
     }
 

@@ -116,8 +116,7 @@ void network_mysqld_com_query_result_free(network_mysqld_com_query_result_t *uda
  * @see network_mysqld_proto_get_com_query_result
  */
 int network_mysqld_com_query_result_track_state(network_packet G_GNUC_UNUSED *packet, network_mysqld_com_query_result_t G_GNUC_UNUSED *udata) {
-    g_error("%s: this function is deprecated and network_mysqld_proto_get_com_query_result() should be used instead",
-            G_STRLOC);
+    g_log_dbproxy(g_error, "this function is deprecated and network_mysqld_proto_get_com_query_result() should be used instead");
 }
 
 static void
@@ -481,9 +480,7 @@ int network_mysqld_proto_get_com_stmt_prepare_result(
         return -1;
     }
 
-    g_debug("%s(%s): %s execute result is %02x",
-                        G_STRLOC, __func__,
-                        GET_COM_NAME(COM_STMT_PREPARE), status);
+    g_log_dbproxy(g_debug, "%s execute result is %02x", GET_COM_NAME(COM_STMT_PREPARE), status);
 
     if (udata->first_packet == 1) {
         udata->first_packet = 0;
@@ -515,8 +512,7 @@ int network_mysqld_proto_get_com_stmt_prepare_result(
             is_finished = 1;
             break;
         default:
-            g_critical("%s(%s): %s get invalid status: %02x",  G_STRLOC, __func__,
-                                    GET_COM_NAME(COM_STMT_PREPARE), status);
+            g_log_dbproxy(g_warning, "%s get invalid status: %02x", GET_COM_NAME(COM_STMT_PREPARE), status);
             break;
         }
     } else {
@@ -524,9 +520,7 @@ int network_mysqld_proto_get_com_stmt_prepare_result(
         case MYSQLD_PACKET_OK:
         case MYSQLD_PACKET_NULL:
         case MYSQLD_PACKET_ERR:
-            g_error("%s(%s): %s should not be (OK|ERR|NULL), got: %02x",
-                    __FILE__, __func__, GET_COM_NAME(COM_STMT_PREPARE),
-                    status);
+            g_log_dbproxy(g_error, "%s should not be (OK|ERR|NULL), got: %02x", GET_COM_NAME(COM_STMT_PREPARE), status);
             break;
         case MYSQLD_PACKET_EOF:
             if (--udata->want_eofs == 0) {
@@ -1195,9 +1189,7 @@ int network_mysqld_proto_get_ok_packet(network_packet *packet, network_mysqld_ok
     }
 
     if (field_count != 0) {
-        g_critical("%s: expected the first byte to be 0, got %d",
-                    G_STRLOC,
-                field_count);
+        g_log_dbproxy(g_warning, "expected the first byte to be 0, got %d", field_count);
         return -1;
     }
 
@@ -1301,9 +1293,7 @@ int network_mysqld_proto_get_err_packet(network_packet *packet, network_mysqld_e
     }
 
     if (field_count != MYSQLD_PACKET_ERR) {
-        g_critical("%s: expected the first byte to be 0xff, got %d",
-                G_STRLOC,
-                field_count);
+        g_log_dbproxy(g_warning, "expected the first byte to be 0xff, got %d", field_count);
         return -1;
     }
 
@@ -1425,9 +1415,7 @@ int network_mysqld_proto_get_eof_packet(network_packet *packet, network_mysqld_e
     }
 
     if (field_count != MYSQLD_PACKET_EOF) {
-        g_critical("%s: expected the first byte to be 0xfe, got %d",
-                G_STRLOC,
-                field_count);
+        g_log_dbproxy(g_warning, "expected the first byte to be 0xfe, got %d", field_count);
         return -1;
     }
 
@@ -1532,10 +1520,7 @@ int network_mysqld_proto_get_auth_challenge(network_packet *packet, network_mysq
     case 0x0a:
         break;
     default:
-        g_debug("%s: unknown protocol %d", 
-                G_STRLOC,
-                status
-                );
+        g_log_dbproxy(g_warning, "unknown protocol %d", status);
         msg = "get auth challenge's is returnning neither OK nor ERR";
         err = -1;
         goto funcexit;
@@ -2207,7 +2192,7 @@ int network_mysqld_proto_get_stmt_execute_packet(network_packet *packet,
 
                 param = network_mysqld_type_new(param_type & 0xff);
                 if (NULL == param) {
-                    g_critical("%s: couldn't create type = %d", G_STRLOC, param_type & 0xff);
+                    g_log_dbproxy(g_warning, "couldn't create type = %d", param_type & 0xff);
 
                     err = -1;
                     break;
@@ -2338,9 +2323,7 @@ int network_mysqld_proto_get_binary_row(network_packet *packet, network_mysqld_p
 
         param = network_mysqld_type_new(coldef->type);
         if (NULL == param) {
-            g_debug("%s: coulnd't create type = %d",
-                    G_STRLOC, coldef->type);
-
+            g_log_dbproxy(g_warning, "coulnd't create type = %d", coldef->type);
             err = -1;
             break;
         }

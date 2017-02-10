@@ -103,12 +103,12 @@ gint chown_recursion(const gchar *path, uid_t owner, gid_t group) {
     gint ret = 0;
     ret = chown(path, owner, group);
     if(ret == -1) {
-        g_critical("%s(%s): chown(%s) failed: %s", G_STRLOC, __func__, path, g_strerror(errno) );
+        g_log_dbproxy(g_critical, "chown(%s) failed: %s", path, g_strerror(errno) );
         goto exit;
     }
     dir = g_dir_open(path, 0, &error);
     if(dir == NULL) {
-        g_critical("%s(%s): g_dir_open(%s) failed: %s", G_STRLOC, __func__, path, error->message );
+        g_log_dbproxy(g_critical, "g_dir_open(%s) failed: %s", path, error->message );
         goto exit;
     }
     while((filename = g_dir_read_name(dir)) != NULL) {
@@ -120,7 +120,7 @@ gint chown_recursion(const gchar *path, uid_t owner, gid_t group) {
         }
         g_free(pathPlusFilename);
         if(ret == -1) {
-            g_critical("%s(%s): chown(%s) failed: %s", G_STRLOC, __func__, pathPlusFilename, g_strerror(errno));
+            g_log_dbproxy(g_critical, "chown(%s) failed: %s", pathPlusFilename, g_strerror(errno));
             goto exit;
         }
     }
@@ -423,14 +423,14 @@ int main_cmdline(int argc, char **argv) {
      * leave the unknown options in the list
      */
     if (chassis_frontend_init_base_options(option_ctx, &argc, &argv, &(frontend->print_version), &(frontend->default_file), &gerr)) {
-        g_critical("%s: %s", G_STRLOC, gerr->message);
+        g_log_dbproxy(g_critical, "%s", gerr->message);
         g_clear_error(&gerr);
         GOTO_EXIT(EXIT_FAILURE);
     }
 
     if (frontend->default_file) {
         if (!(frontend->keyfile = chassis_frontend_open_config_file(frontend->default_file, &gerr))) {
-            g_critical("%s: loading config from '%s' failed: %s", G_STRLOC, frontend->default_file, gerr->message);
+            g_log_dbproxy(g_critical, "loading config from '%s' failed: %s", frontend->default_file, gerr->message);
             g_clear_error(&gerr);
             GOTO_EXIT(EXIT_FAILURE);
         }
@@ -463,7 +463,7 @@ int main_cmdline(int argc, char **argv) {
 
     g_option_context_set_help_enabled(option_ctx, TRUE);
     if (FALSE == g_option_context_parse(option_ctx, &argc, &argv, &gerr)) {
-        g_critical("%s", gerr->message);
+        g_log_dbproxy(g_critical, "%s", gerr->message);
         GOTO_EXIT(EXIT_FAILURE);
     }
 
@@ -492,31 +492,31 @@ int main_cmdline(int argc, char **argv) {
 
     /* make sure that he max-thread-count isn't negative */
     if (frontend->event_thread_count < 1) {
-        g_critical("--event-threads has to be >= 1, is %d", frontend->event_thread_count);
+        g_log_dbproxy(g_critical, "--event-threads has to be >= 1, is %d", frontend->event_thread_count);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->event_thread_count = frontend->event_thread_count;
 
     if (frontend->wait_timeout < 0) {
-        g_critical("--wait-timeout has to be >= 0, is %d", frontend->wait_timeout);
+        g_log_dbproxy(g_critical, "--wait-timeout has to be >= 0, is %d", frontend->wait_timeout);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->wait_timeout = frontend->wait_timeout;
 
     if (frontend->shutdown_timeout < 1) {
-        g_critical("--shutdown-timeout has to be >= 1, is %d", frontend->shutdown_timeout);
+        g_log_dbproxy(g_critical, "--shutdown-timeout has to be >= 1, is %d", frontend->shutdown_timeout);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->shutdown_timeout = frontend->shutdown_timeout;
 
     if (frontend->db_connection_idle_timeout < 0) {
-        g_critical("--db-connection-idle-timeout has to be >= 0, is %d", frontend->db_connection_idle_timeout);
+        g_log_dbproxy(g_critical, "--db-connection-idle-timeout has to be >= 0, is %d", frontend->db_connection_idle_timeout);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->db_connection_idle_timeout = frontend->db_connection_idle_timeout;
 
     if (frontend->db_connection_max_age < 0) {
-        g_critical("--db-connection-max-age has to be >= 0, is %d", frontend->db_connection_max_age);
+        g_log_dbproxy(g_critical, "--db-connection-max-age has to be >= 0, is %d", frontend->db_connection_max_age);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->db_connection_max_age = frontend->db_connection_max_age;
@@ -528,61 +528,61 @@ int main_cmdline(int argc, char **argv) {
             || strcmp(frontend->mysql_version, "5.6") == 0) {
         srv->my_version = MYSQL_56;
     } else {
-        g_critical("--mysql-version has to be 5.6 or 5.5, is %s", frontend->mysql_version);
+        g_log_dbproxy(g_critical, "--mysql-version has to be 5.6 or 5.5, is %s", frontend->mysql_version);
         GOTO_EXIT(EXIT_FAILURE);
     }
 
     if (frontend->max_connections < 0) {
-        g_critical("--max-connections has to be >= 0, is %d", frontend->max_connections);
+        g_log_dbproxy(g_critical, "--max-connections has to be >= 0, is %d", frontend->max_connections);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->proxy_max_connections = frontend->max_connections;
 
     if (frontend->long_wait_time < 0) {
-        g_critical("--long-wait-time has to be >= 0, is %d", frontend->long_wait_time);
+        g_log_dbproxy(g_critical, "--long-wait-time has to be >= 0, is %d", frontend->long_wait_time);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->long_wait_time = frontend->long_wait_time;
 
     if (frontend->long_query_time < 0) {
-        g_critical("--long-query-time has to be >= 0, is %d", frontend->long_query_time);
+        g_log_dbproxy(g_critical, "--long-query-time has to be >= 0, is %d", frontend->long_query_time);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->long_query_time = frontend->long_query_time;
 
 
     if (frontend->query_response_time_stats < 0) {
-        g_critical("--query-response-time-stats has to be >= 0, is %d", frontend->query_response_time_stats);
+        g_log_dbproxy(g_critical, "--query-response-time-stats has to be >= 0, is %d", frontend->query_response_time_stats);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->query_response_time_stats = frontend->query_response_time_stats;
 
     if (frontend->query_response_time_stats > 1 && frontend->query_response_time_range_base < 2) {
-        g_critical("--query-response-time-range-base has to be >= 2, is %d", frontend->query_response_time_range_base);
+        g_log_dbproxy(g_critical, "--query-response-time-range-base has to be >= 2, is %d", frontend->query_response_time_range_base);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->query_response_time_range_base = frontend->query_response_time_range_base;
 
     if (frontend->lastest_query_num < 0) {
-        g_critical("--lastest-query-num has to be >= 0, is %d", frontend->lastest_query_num);
+        g_log_dbproxy(g_critical, "--lastest-query-num has to be >= 0, is %d", frontend->lastest_query_num);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->proxy_reserved->lastest_query_num = frontend->lastest_query_num;
 
     if (frontend->query_filter_time_threshold < -1) {
-        g_critical("--query-filter-time-threshold has to be >= -1, is %d", frontend->query_filter_time_threshold);
+        g_log_dbproxy(g_critical, "--query-filter-time-threshold has to be >= -1, is %d", frontend->query_filter_time_threshold);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->proxy_reserved->query_filter_time_threshold = frontend->query_filter_time_threshold;
 
     if (frontend->query_filter_frequent_threshold < 0) {
-        g_critical("--query-filter-frequent-threshold has to be >= 0, is %f", frontend->query_filter_frequent_threshold);
+        g_log_dbproxy(g_critical, "--query-filter-frequent-threshold has to be >= 0, is %f", frontend->query_filter_frequent_threshold);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->proxy_reserved->query_filter_frequent_threshold = frontend->query_filter_frequent_threshold;
 
     if (frontend->access_num_per_time_window < 1) {
-        g_critical("--freq-access-num-threshold has to be >= 1, is %d", frontend->access_num_per_time_window);
+        g_log_dbproxy(g_critical, "--freq-access-num-threshold has to be >= 1, is %d", frontend->access_num_per_time_window);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->proxy_reserved->access_num_per_time_window = frontend->access_num_per_time_window;
@@ -594,7 +594,7 @@ int main_cmdline(int argc, char **argv) {
         flag = 1;
     else
     {
-        g_critical("--auto-filter-flag has to be on or off, is %s", frontend->auto_filter_flag);
+        g_log_dbproxy(g_critical, "--auto-filter-flag has to be on or off, is %s", frontend->auto_filter_flag);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->proxy_filter->auto_filter_flag = flag;
@@ -605,25 +605,25 @@ int main_cmdline(int argc, char **argv) {
         flag = 1;
     else
     {
-        g_critical("--manual-filter-flag has to be on or off, is %s", frontend->manual_filter_flag);
+        g_log_dbproxy(g_critical, "--manual-filter-flag has to be on or off, is %s", frontend->manual_filter_flag);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->proxy_filter->manual_filter_flag = flag;
 
     if (frontend->max_backend_tr < 0) {
-        g_critical("--backend-max-thread-running has to be >= 0, is %d", frontend->max_backend_tr);
+        g_log_dbproxy(g_critical, "--backend-max-thread-running has to be >= 0, is %d", frontend->max_backend_tr);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->max_backend_tr = frontend->max_backend_tr;
 
     if (frontend->thread_running_sleep_delay < 1) {
-        g_critical("--thread-running-sleep-delay has to be >= 1, is %d", frontend->thread_running_sleep_delay);
+        g_log_dbproxy(g_critical, "--thread-running-sleep-delay has to be >= 1, is %d", frontend->thread_running_sleep_delay);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->thread_running_sleep_delay = frontend->thread_running_sleep_delay;
 
     if (frontend->remove_backend_timeout < 0) {
-        g_critical("--remove-backend-timeout has to be >= 0, is %d", frontend->remove_backend_timeout);
+        g_log_dbproxy(g_critical, "--remove-backend-timeout has to be >= 0, is %d", frontend->remove_backend_timeout);
         GOTO_EXIT(EXIT_FAILURE);
     }
 
@@ -684,7 +684,7 @@ int main_cmdline(int argc, char **argv) {
     log->use_syslog = frontend->use_syslog;
 
     if (log->log_filename && log->use_syslog) {
-        g_critical("%s: log-file and log-use-syslog were given, but only one is allowed", G_STRLOC);
+        g_log_dbproxy(g_critical, "log-file and log-use-syslog were given, but only one is allowed");
         GOTO_EXIT(EXIT_FAILURE);
     }
 
@@ -701,7 +701,7 @@ int main_cmdline(int argc, char **argv) {
      */
     gchar *sql_path = g_strdup_printf("%s/%s", srv->log_path, SQL_LOG_DIR);
     if(g_mkdir_with_parents(sql_path, S_IRWXU|S_IRWXG|S_IRWXO) != 0) {
-        g_critical("%s(%s): g_mkdir_with_parents(%s) failed: %s", G_STRLOC, __func__, sql_path, g_strerror(errno));
+        g_log_dbproxy(g_critical, "g_mkdir_with_parents(%s) failed: %s", sql_path, g_strerror(errno));
         g_free(sql_path);
         GOTO_EXIT(EXIT_FAILURE);
     }
@@ -716,22 +716,22 @@ int main_cmdline(int argc, char **argv) {
         uid_t user_id= geteuid();
         /* Don't bother if we aren't superuser */
         if (user_id) {
-            g_warning("current user is not root, --user is ignored");
+            g_log_dbproxy(g_warning, "current user is not root, --user is ignored");
         } else {
             if (NULL == (user_info = getpwnam(srv->user))) {
-                g_critical("unknown user: %s", srv->user);
+                g_log_dbproxy(g_critical, "unknown user: %s", srv->user);
                 return -1;
             }
 
             /* chown log-path */
             if (-1 == chown_recursion(srv->log_path, user_info->pw_uid, user_info->pw_gid)) {
-                g_critical("%s(%s): chown_recursion(%s) failed: %s", G_STRLOC, __func__, srv->log_path, g_strerror(errno));
+                g_log_dbproxy(g_critical, "chown_recursion(%s) failed: %s", srv->log_path, g_strerror(errno));
                 GOTO_EXIT(EXIT_FAILURE);
             }
 
             setgid(user_info->pw_gid);
             setuid(user_info->pw_uid);
-            g_debug("running as user: %s (%d/%d)", srv->user, user_info->pw_uid, user_info->pw_gid);
+            g_log_dbproxy(g_debug, "running as user: %s (%d/%d)", srv->user, user_info->pw_uid, user_info->pw_gid);
 
             /*check the config file can read or write, and the config file dir can execute*/
             gchar *config_file = frontend->default_file;
@@ -748,25 +748,26 @@ int main_cmdline(int argc, char **argv) {
             if (-1 == faccessat(0, config_file, R_OK | W_OK, AT_EACCESS)
                     || -1 == faccessat(0, config_dir, X_OK | W_OK, AT_EACCESS)) {
                 g_free(config_dir);
-                g_critical("%s(%s): %s don't have correct privilege for the user %s set in the config file, config file should have read write privileges and the config file dir should have execute and write privilege.", G_STRLOC, __func__, config_file, srv->user);
+                g_log_dbproxy(g_critical, "%s don't have correct privilege for the user %s set in the config file, config file should have read write privileges and the config file dir should have execute and write privilege.", config_file, srv->user);
                 GOTO_EXIT(EXIT_FAILURE);
             }
 
             g_free(config_dir);
 
+            g_log_dbproxy(g_message, "running as user: %s (%s/%s)", srv->user, user_info->pw_uid, user_info->pw_gid);
         } 
     }
 #endif  
 
     if (log->log_filename && FALSE == chassis_log_open(log)) {
-        g_critical("can't open log-file '%s': %s", log->log_filename, g_strerror(errno));
+        g_log_dbproxy(g_critical, "can't open log-file '%s': %s", log->log_filename, g_strerror(errno));
         GOTO_EXIT(EXIT_FAILURE);
     }
 
     /* handle log-level after the config-file is read, just in case it is specified in the file */
     if (frontend->log_level) {
         if (0 != chassis_log_set_level(log, frontend->log_level)) {
-            g_critical("--log-level=... failed, level '%s' is unknown ", frontend->log_level);
+            g_log_dbproxy(g_critical, "--log-level=... failed, level '%s' is unknown ", frontend->log_level);
             GOTO_EXIT(EXIT_FAILURE);
         }
     } else {
@@ -775,11 +776,10 @@ int main_cmdline(int argc, char **argv) {
     }
 
     if (frontend->log_trace_modules < 0) {
-        g_critical("%s: log-trace-modules has to be >= 0, is %d", frontend->log_trace_modules);
+        g_log_dbproxy(g_critical, "log-trace-modules has to be >= 0, is %d", frontend->log_trace_modules);
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->log->log_trace_modules = frontend->log_trace_modules;
-
 
     /*
      * the MySQL Proxy should load 'admin' and 'proxy' plugins
@@ -803,16 +803,16 @@ int main_cmdline(int argc, char **argv) {
 
         if ((user = strsep(&cur_pwd_info, ":")) != NULL && (pwd = strsep(&cur_pwd_info, ":")) != NULL) {
             if (network_backends_set_monitor_pwd(srv->backends, user, pwd, TRUE) != 0) {
-                g_critical("%s(%s): set monitor pwd failed", G_STRLOC, __func__);
+                g_log_dbproxy(g_critical, "set monitor pwd failed");
             }
          } else {
-                g_critical("%s(%s): set monitor pwd failed: invalid value %s", G_STRLOC, __func__, frontend->backend_pwds);
+                g_log_dbproxy(g_critical, "set monitor pwd failed: invalid value %s", frontend->backend_pwds);
          }
          g_free(tmp_for_free);
      }
 /*
     if (chassis_frontend_init_plugins(srv->modules, option_ctx, &argc, &argv, frontend->keyfile, "mysql-proxy", srv->base_dir, &gerr)) {
-        g_critical("%s: %s", G_STRLOC, gerr->message);
+        g_log_dbproxy(g_critical, "%s", gerr->message);
         g_clear_error(&gerr);
         GOTO_EXIT(EXIT_FAILURE);
     }
@@ -830,9 +830,9 @@ int main_cmdline(int argc, char **argv) {
     /* handle unknown options */
     if (FALSE == g_option_context_parse(option_ctx, &argc, &argv, &gerr)) {
         if (gerr->domain == G_OPTION_ERROR && gerr->code == G_OPTION_ERROR_UNKNOWN_OPTION) {
-            g_critical("%s: %s (use --help to show all options)", G_STRLOC, gerr->message);
+            g_log_dbproxy(g_critical, "%s (use --help to show all options)", gerr->message);
         } else {
-            g_critical("%s: %s (code = %d, domain = %s)", G_STRLOC, gerr->message, gerr->code, g_quark_to_string(gerr->domain));
+            g_log_dbproxy(g_critical, "%s (code = %d, domain = %s)", gerr->message, gerr->code, g_quark_to_string(gerr->domain));
         }
         
         GOTO_EXIT(EXIT_FAILURE);
@@ -843,7 +843,7 @@ int main_cmdline(int argc, char **argv) {
 */
     /* after parsing the options we should only have the program name left */
     if (argc > 1) {
-        g_critical("unknown option: %s", argv[1]);
+        g_log_dbproxy(g_critical, "unknown option: %s", argv[1]);
         GOTO_EXIT(EXIT_FAILURE);
     }
     
@@ -879,13 +879,13 @@ int main_cmdline(int argc, char **argv) {
     }
     if (frontend->default_file) {
         if (!(frontend->keyfile = chassis_frontend_open_config_file(frontend->default_file, &gerr))) {
-            g_critical("%s: loading config from '%s' failed: %s", G_STRLOC, frontend->default_file, gerr->message);
+            g_log_dbproxy(g_critical, "loading config from '%s' failed: %s", frontend->default_file, gerr->message);
             g_clear_error(&gerr);
             GOTO_EXIT(EXIT_FAILURE);
         }
     }
     if (chassis_frontend_init_plugins(srv->modules, option_ctx, &argc, &argv, frontend->keyfile, "mysql-proxy", srv->base_dir, &gerr)) {
-        g_critical("%s: %s", G_STRLOC, gerr->message);
+        g_log_dbproxy(g_critical, "%s", gerr->message);
         g_clear_error(&gerr);
         GOTO_EXIT(EXIT_FAILURE);
     }
@@ -894,7 +894,7 @@ int main_cmdline(int argc, char **argv) {
 
     if (frontend->pid_file) {
         if (0 != chassis_frontend_write_pidfile(frontend->pid_file, &gerr)) {
-            g_critical("%s", gerr->message);
+            g_log_dbproxy(g_critical, "%s", gerr->message);
             g_clear_error(&gerr);
 
             GOTO_EXIT(EXIT_FAILURE);
@@ -907,7 +907,7 @@ int main_cmdline(int argc, char **argv) {
     /* the message has to be _after_ the g_option_content_parse() to 
      * hide from the output if the --help is asked for
      */
-    g_message("%s started - instance: %s", PACKAGE_STRING, srv->instance_name); /* add tag to the logfile (after we opened the logfile) */
+    g_log_dbproxy(g_message, "%s started - instance: %s", PACKAGE_STRING, srv->instance_name); /* add tag to the logfile (after we opened the logfile) */
 
 #ifdef _WIN32
     if (chassis_win32_is_service()) chassis_win32_service_set_state(SERVICE_RUNNING, 0);
@@ -921,14 +921,14 @@ int main_cmdline(int argc, char **argv) {
 
     if (frontend->max_files_number) {
         if (0 != chassis_fdlimit_set(frontend->max_files_number)) {
-            g_critical("%s: setting fdlimit = %d failed: %s (%d)", G_STRLOC, frontend->max_files_number, g_strerror(errno), errno);
+            g_log_dbproxy(g_critical, "setting fdlimit = %d failed: %s (%d)", frontend->max_files_number, g_strerror(errno), errno);
             GOTO_EXIT(EXIT_FAILURE);
         }
         srv->max_files_number = frontend->max_files_number;
     } else {
         srv->max_files_number = chassis_fdlimit_get();
     }
-    g_debug("max open file-descriptors = %"G_GINT64_FORMAT, chassis_fdlimit_get());
+    g_log_dbproxy(g_debug, "max open file-descriptors = %"G_GINT64_FORMAT, chassis_fdlimit_get());
 
     if (frontend->blacklist_file)
     {
@@ -955,11 +955,11 @@ int main_cmdline(int argc, char **argv) {
 
     if ( -1 == faccessat(0, blacklist_file_dir, F_OK | X_OK | W_OK, AT_EACCESS)) {
         if (ENOENT == errno) {//black file dir is not exit.
-            g_warning("%s(%s): dir of %s don't exit ,the blacklist file dir should exit, otherwise save blacklist should be fail.", G_STRLOC, __func__, blacklist_file);
+            g_log_dbproxy(g_warning, "dir of %s don't exit ,the blacklist file dir should exit, otherwise save blacklist should be fail", blacklist_file);
 
         }
         else if (EACCES == errno) {//black file dir don't have correct privilges.
-            g_warning("%s(%s): %s don't have correct privilege for the user %s set in the blacklist file, blacklist file dir should have execute and write privilege, otherwise save blacklist should be fail.", G_STRLOC, __func__, blacklist_file, srv->user);
+            g_log_dbproxy(g_warning, "%s don't have correct privilege for the user %s set in the blacklist file, blacklist file dir should have execute and write privilege, otherwise save blacklist should be fail", blacklist_file, srv->user);
         }
     }
     g_free(blacklist_file_dir);
@@ -977,7 +977,7 @@ int main_cmdline(int argc, char **argv) {
 
     if (chassis_mainloop(srv)) {
         /* looks like we failed */
-        g_critical("%s: Failure from chassis_mainloop. Shutting down.", G_STRLOC);
+        g_log_dbproxy(g_critical, "Failure from chassis_mainloop. Shutting down");
         GOTO_EXIT(EXIT_FAILURE);
     }
 
