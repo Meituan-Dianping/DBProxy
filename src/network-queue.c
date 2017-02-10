@@ -75,7 +75,7 @@ GString *network_queue_peek_string(network_queue *queue, gsize peek_len, GString
     GList *node;
 
 /* TODO: convert to DTrace probe
-    g_debug("[%s] looking for %d bytes, queue has %d", G_STRLOC, peek_len, queue->len); */
+    g_log_dbproxy(g_debug, "looking for %d bytes, queue has %d", peek_len, queue->len); */
     if (queue->len < peek_len) {
         return NULL;
     }

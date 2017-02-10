@@ -102,8 +102,7 @@ void network_mysqld_proto_field_free(network_mysqld_proto_field *field) {
         if (field->data.s) g_free(field->data.s);
         break;
     default:
-        g_message("%s: unknown field_type '%s' (%d) to free()",
-                G_STRLOC,
+        g_log_dbproxy(g_warning, "unknown field_type '%s' (%d) to free()",
                 network_mysqld_proto_field_get_typestring(field->fielddef->type),
                 field->fielddef->type);
         break;
@@ -217,9 +216,7 @@ int network_mysqld_proto_field_get(network_packet *packet,
             if (!err) field->data.i = i16;
             break;
         default:
-            g_error("%s: enum-length = %lu", 
-                    G_STRLOC,
-                    field->fielddef->max_length);
+            g_log_dbproxy(g_error, "enum-length = %lu", field->fielddef->max_length);
             break;
         }
         break;
@@ -248,9 +245,7 @@ int network_mysqld_proto_field_get(network_packet *packet,
         default:
             /* unknown blob-length */
             g_debug_hexdump(G_STRLOC, S(packet->data));
-            g_error("%s: blob-length = %lu", 
-                    G_STRLOC,
-                    field->fielddef->max_length);
+            g_log_dbproxy(g_error, "blob-length = %lu", field->fielddef->max_length);
             break;
         }
         err = err || network_mysqld_proto_get_string_len(packet, &field->data.s, length);
@@ -290,8 +285,7 @@ int network_mysqld_proto_field_get(network_packet *packet,
         g_debug_hexdump(G_STRLOC " (NEWDECIMAL)", packet->data->str, packet->data->len);
 #endif
 #if 0
-        g_critical("%s: don't know how to decode NEWDECIMAL(%lu, %u) at offset %u (%d)",
-                G_STRLOC,
+        g_log_dbproxy(g_critical, "don't know how to decode NEWDECIMAL(%lu, %u) at offset %u (%d)",
                 field->fielddef->max_length,
                 field->fielddef->decimals,
                 packet->offset,
@@ -302,8 +296,7 @@ int network_mysqld_proto_field_get(network_packet *packet,
         break; }
     default:
         g_debug_hexdump(G_STRLOC, packet->data->str, packet->data->len);
-        g_error("%s: unknown field-type '%d' to fetch from offset = %04x",
-                G_STRLOC,
+        g_log_dbproxy(g_error, "unknown field-type '%d' to fetch from offset = %04x",
                 field->fielddef->type,
                 packet->offset);
         break;
@@ -346,10 +339,7 @@ GPtrArray *network_mysqld_proto_fields_new_full(
             /* the field is defined as NOT NULL, so the null-bit shouldn't be set */
             if ((fielddef->flags & NOT_NULL_FLAG) != 0) {
                 if (field->is_null) {
-                    g_critical("%s: field [%d] is defined as NOT NULL, but nul-bit is set",
-                            G_STRLOC,
-                            col);
-
+                    g_log_dbproxy(g_critical, "field [%d] is defined as NOT NULL, but nul-bit is set", col);
                     return NULL;
                 }
             }
@@ -435,9 +425,7 @@ const char *network_mysqld_binlog_get_eventname(enum Log_event_type type) {
         if ((guchar)event_type_name[i].type == (guchar)type) return event_type_name[i].name;
     }
 
-    g_critical("%s: event-type %d isn't known yet", 
-            G_STRLOC,
-            type);
+    g_log_dbproxy(g_warning, "event-type %d isn't known yet", type);
 
     return unknown_type;
 }
@@ -491,9 +479,7 @@ const char *network_mysqld_proto_field_get_typestring(enum enum_field_types type
         if ((guchar)field_type_name[i].type == (guchar)type) return field_type_name[i].name;
     }
 
-    g_critical("%s: field-type %d isn't known yet", 
-            G_STRLOC,
-            type);
+    g_log_dbproxy(g_critical, "field-type %d isn't known yet", type);
 
     return unknown_type;
 }
@@ -606,8 +592,7 @@ static int network_mysqld_proto_field_append_to_string(GString *out, network_mys
         g_string_append_printf(out, "'...(decimal)'");
         break;
     default:
-        g_error("%s: field-type '%s' (%d) isn't known",
-                G_STRLOC,
+        g_log_dbproxy(g_error, "field-type '%s' (%d) isn't known",
                 network_mysqld_proto_field_get_typestring(field->fielddef->type),
                 field->fielddef->type);
         break;
@@ -625,8 +610,7 @@ int network_mysqld_binlog_event_print(network_mysqld_binlog *binlog,
     network_mysqld_table *tbl;
     int err = 0;
 #if 0
-    g_message("%s: timestamp = %u, type = %u, server-id = %u, size = %u, pos = %u, flags = %04x",
-            G_STRLOC,
+    g_log_dbproxy(g_message, "timestamp = %u, type = %u, server-id = %u, size = %u, pos = %u, flags = %04x",
             event->timestamp,
             event->event_type,
             event->server_id,
@@ -638,8 +622,7 @@ int network_mysqld_binlog_event_print(network_mysqld_binlog *binlog,
     switch (event->event_type) {
     case QUERY_EVENT: /* 2 */
 #if 0
-        g_message("%s: QUERY: thread_id = %d, exec_time = %d, error-code = %d\ndb = %s, query = %s",
-                G_STRLOC,
+        g_log_dbproxy(g_message, "QUERY: thread_id = %d, exec_time = %d, error-code = %d\ndb = %s, query = %s",
                 event->event.query_event.thread_id,
                 event->event.query_event.exec_time,
                 event->event.query_event.error_code,
@@ -689,8 +672,7 @@ int network_mysqld_binlog_event_print(network_mysqld_binlog *binlog,
         tbl = g_hash_table_lookup(binlog->rbr_tables, &(event->event.row_event.table_id));
 
         if (!tbl) {
-            g_critical("%s: table-id: %"G_GUINT64_FORMAT" isn't known, needed for a %d event",
-                    G_STRLOC,
+            g_log_dbproxy(g_critical, "table-id: %"G_GUINT64_FORMAT" isn't known, needed for a %d event",
                     event->event.row_event.table_id,
                     event->event_type
                     );
@@ -882,8 +864,7 @@ int network_mysqld_binlog_event_print(network_mysqld_binlog *binlog,
 
         if (0 == err) {
             if (row_packet.offset != row_packet.data->len) {
-                g_debug("%s: event_type %d: offset = %d, length = %"G_GSIZE_FORMAT,
-                        G_STRLOC,
+                g_log_dbproxy(g_debug, "event_type %d: offset = %d, length = %"G_GSIZE_FORMAT,
                         event->event_type,
                         row_packet.offset,
                         row_packet.data->len);
@@ -896,9 +877,7 @@ int network_mysqld_binlog_event_print(network_mysqld_binlog *binlog,
         break;
 
     default:
-        g_message("%s: unknown event-type: %d",
-                G_STRLOC,
-                event->event_type);
+        g_log_dbproxy(g_warning, "unknown event-type: %d", event->event_type);
         return -1;
     }
     return err ? -1 : 0;
@@ -923,8 +902,7 @@ int replicate_binlog_dump_file(
     int ret = 0;
 
     if (-1 == (fd = g_open(filename, O_RDONLY, 0))) {
-        g_critical("%s: opening '%s' failed: %s",
-                G_STRLOC,
+        g_log_dbproxy(g_critical, "opening '%s' failed: %s",
                 filename,
                 g_strerror(errno));
         return -1;
@@ -939,8 +917,7 @@ int replicate_binlog_dump_file(
         binlog_header[2] != 'i' ||
         binlog_header[3] != 'n') {
 
-        g_critical("%s: binlog-header should be: %02x%02x%02x%02x, got %02x%02x%02x%02x",
-                G_STRLOC,
+        g_log_dbproxy(g_critical, "binlog-header should be: %02x%02x%02x%02x, got %02x%02x%02x%02x",
                 '\xfe', 'b', 'i', 'n',
                 binlog_header[0],
                 binlog_header[1],
@@ -960,11 +937,7 @@ int replicate_binlog_dump_file(
 
     if (startpos) {
         if (-1 == lseek(fd, startpos, SEEK_SET)) {
-            g_critical("%s: lseek(%d) failed: %s", 
-                    G_STRLOC,
-                    startpos,
-                    g_strerror(errno)
-                    );
+            g_log_dbproxy(g_critical, "lseek(%d) failed: %s", startpos, g_strerror(errno));
             g_return_val_if_reached(-1);
         }
 
@@ -988,28 +961,19 @@ int replicate_binlog_dump_file(
             if (event->event_size < 19 ||
                 binlog_pos + event->event_size != event->log_pos) {
                 if (-1 == lseek(fd, -18, SEEK_CUR)) {
-                    g_critical("%s: lseek(%d) failed: %s", 
-                            G_STRLOC,
-                            -18,
-                            g_strerror(errno)
-                            );
+                    g_log_dbproxy(g_critical, "lseek(%d) failed: %s", -18, g_strerror(errno));
                     g_return_val_if_reached(-1);
                 }
 
                 binlog_pos += 1;
 
-                g_message("%s: --binlog-start-pos isn't valid, trying to sync at %ld (attempt: %d)", 
-                        G_STRLOC,
+                g_log_dbproxy(g_warning, "--binlog-start-pos isn't valid, trying to sync at %ld (attempt: %d)", 
                         binlog_pos,
                         round++
                         );
             } else {
                 if (-1 == lseek(fd, -19, SEEK_CUR)) {
-                    g_critical("%s: lseek(%d) failed: %s", 
-                            G_STRLOC,
-                            -18,
-                            g_strerror(errno)
-                            );
+                    g_log_dbproxy(g_critical, "lseek(%d) failed: %s", -18, g_strerror(errno));
                     g_return_val_if_reached(-1);
                 }
 
@@ -1035,10 +999,7 @@ int replicate_binlog_dump_file(
 
         if (event->event_size < 19 ||
             binlog_pos + event->event_size != event->log_pos) {
-            g_critical("%s: binlog-pos=%ld is invalid, you may want to start with --binlog-find-start-pos",
-                G_STRLOC,
-                binlog_pos
-                   );
+            g_log_dbproxy(g_critical, "binlog-pos=%ld is invalid, you may want to start with --binlog-find-start-pos", binlog_pos);
             ret = -1;
             break;
         }
@@ -1058,10 +1019,7 @@ int replicate_binlog_dump_file(
         len = read(fd, packet->data->str + 19, event->event_size - 19);
 
         if (-1 == len) {
-            g_critical("%s: lseek(..., %d, ...) failed: %s",
-                    G_STRLOC,
-                    event->event_size - 19,
-                    g_strerror(errno));
+            g_log_dbproxy(g_critical, "lseek(..., %d, ...) failed: %s", event->event_size - 19, g_strerror(errno));
             return -1;
         }
         g_assert_cmpint(len, ==, event->event_size - 19); /* read error */
@@ -1139,14 +1097,14 @@ int main(int argc, char **argv) {
     };
 
     if (!GLIB_CHECK_VERSION(2, 6, 0)) {
-        g_error("the glib header are too old, need at least 2.6.0, got: %d.%d.%d", 
+        g_log_dbproxy(g_error, "the glib header are too old, need at least 2.6.0, got: %d.%d.%d", 
                 GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
     }
 
     check_str = glib_check_version(GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
 
     if (check_str) {
-        g_error("%s, got: lib=%d.%d.%d, headers=%d.%d.%d", 
+        g_log_dbproxy(g_error, "%s, got: lib=%d.%d.%d, headers=%d.%d.%d", 
             check_str,
             glib_major_version, glib_minor_version, glib_micro_version,
             GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
@@ -1207,7 +1165,7 @@ int main(int argc, char **argv) {
      * leave the unknown options in the list
      */
     if (FALSE == g_option_context_parse(option_ctx, &argc, &argv, &gerr)) {
-        g_critical("%s", gerr->message);
+        g_log_dbproxy(g_critical, "%s", gerr->message);
         
         exit_code = EXIT_FAILURE;
         goto exit_nicely;
@@ -1218,9 +1176,7 @@ int main(int argc, char **argv) {
         g_key_file_set_list_separator(keyfile, ',');
 
         if (FALSE == g_key_file_load_from_file(keyfile, default_file, G_KEY_FILE_NONE, &gerr)) {
-            g_critical("loading configuration from %s failed: %s", 
-                    default_file,
-                    gerr->message);
+            g_log_dbproxy(g_critical, "loading configuration from %s failed: %s", default_file, gerr->message);
 
             exit_code = EXIT_FAILURE;
             goto exit_nicely;
@@ -1245,7 +1201,7 @@ int main(int argc, char **argv) {
      * leave the unknown options in the list
      */
     if (FALSE == g_option_context_parse(option_ctx, &argc, &argv, &gerr)) {
-        g_critical("%s", gerr->message);
+        g_log_dbproxy(g_critical, "%s", gerr->message);
 
         exit_code = EXIT_FAILURE;
         goto exit_nicely;
@@ -1260,7 +1216,7 @@ int main(int argc, char **argv) {
 
     if (log->log_filename) {
         if (0 == chassis_log_open(log)) {
-            g_critical("can't open log-file '%s': %s", log->log_filename, g_strerror(errno));
+            g_log_dbproxy(g_critical, "can't open log-file '%s': %s", log->log_filename, g_strerror(errno));
 
             exit_code = EXIT_FAILURE;
             goto exit_nicely;
@@ -1271,7 +1227,7 @@ int main(int argc, char **argv) {
     /* handle log-level after the config-file is read, just in case it is specified in the file */
     if (log_level) {
         if (0 != chassis_log_set_level(log, log_level)) {
-            g_critical("--log-level=... failed, level '%s' is unknown ", log_level);
+            g_log_dbproxy(g_critical, "--log-level=... failed, level '%s' is unknown ", log_level);
 
             exit_code = EXIT_FAILURE;
             goto exit_nicely;

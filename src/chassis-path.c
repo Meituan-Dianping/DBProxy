@@ -29,6 +29,7 @@
 #include <stdlib.h> /* for realpath */
 #endif
 #include "chassis-path.h"
+#include "chassis-log.h"
 
 gchar *chassis_get_basedir(const gchar *prgname) {
     gchar *absolute_path;
@@ -49,7 +50,7 @@ gchar *chassis_get_basedir(const gchar *prgname) {
 
         absolute_path = g_find_program_in_path(prgname);
         if (absolute_path == NULL) {
-            g_critical("can't find myself (%s) in PATH", prgname);
+            g_log_dbproxy(g_critical, "can't find myself (%s) in PATH", prgname);
 
             return NULL;
         }
@@ -71,8 +72,7 @@ gchar *chassis_get_basedir(const gchar *prgname) {
      */
 #ifdef WIN32
     if (0 == GetFullPathNameA(absolute_path, PATH_MAX, r_path, NULL)) {
-        g_critical("%s: GetFullPathNameA(%s) failed: %s",
-                G_STRLOC,
+        g_log_dbproxy(g_critical, "GetFullPathNameA(%s) failed: %s",
                 absolute_path,
                 g_strerror(errno));
 
@@ -80,8 +80,7 @@ gchar *chassis_get_basedir(const gchar *prgname) {
     }
 #else
     if (NULL == realpath(absolute_path, r_path)) {
-        g_critical("%s: realpath(%s) failed: %s",
-                G_STRLOC,
+        g_log_dbproxy(g_critical, "realpath(%s) failed: %s",
                 absolute_path,
                 g_strerror(errno));
 
@@ -118,7 +117,7 @@ gboolean chassis_resolve_path(const char *base_dir, gchar **filename) {
     
     new_path = g_build_filename(base_dir, G_DIR_SEPARATOR_S, *filename, NULL);
     
-    g_debug("%s.%d: adjusting relative path (%s) to base_dir (%s). New path: %s", __FILE__, __LINE__, *filename, base_dir, new_path);
+    g_log_dbproxy(g_debug, "adjusting relative path (%s) to base_dir (%s). New path: %s", *filename, base_dir, new_path);
 
     g_free(*filename);
     *filename = new_path;

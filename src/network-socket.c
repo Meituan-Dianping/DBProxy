@@ -474,7 +474,7 @@ network_socket_retval_t network_socket_read(network_socket *sock) {
             case EAGAIN:     
                 return NETWORK_SOCKET_WAIT_FOR_EVENT;
             default:
-                SOCK_MSG_HANDLE(g_warning, sock, "recv() failed"); 
+                SOCK_MSG_HANDLE(g_critical, sock, "recv() failed"); 
                 return NETWORK_SOCKET_ERROR;
             }
         } else if (len == 0) {
