@@ -478,12 +478,18 @@ gint network_backends_set_monitor_pwd(network_backends_t *bs, const gchar *user,
     return PWD_SUCCESS;
 }
 
-void network_backends_remove(network_backends_t *bs, network_backend_t *backend) {
+int network_backends_remove(network_backends_t *bs, network_backend_t *backend) {
     network_backends_tag *tag_backends = NULL;
 
     g_assert(bs != NULL && backend != NULL);
 
-    g_rw_lock_writer_lock(&bs->backends_lock);
+    if (FALSE == g_rw_lock_writer_trylock(&bs->backends_lock)) {
+        return 0;
+    }
+    if (g_atomic_int_get(&backend->connected_clients) != 0) {
+        g_rw_lock_writer_unlock(&bs->backends_lock);
+        return 0;
+    }
 
     if (backend->slave_tag != NULL) {
         tag_backends = g_hash_table_lookup(bs->tag_backends, backend->slave_tag->str);
@@ -509,7 +515,7 @@ void network_backends_remove(network_backends_t *bs, network_backend_t *backend)
 
     g_rw_lock_writer_unlock(&bs->backends_lock);
 
-    return;
+    return 1;
 }
 
 /*
