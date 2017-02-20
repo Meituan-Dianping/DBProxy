@@ -153,7 +153,7 @@ typedef struct {
 NETWORK_API network_backends_t *network_backends_new(guint event_thread_count, gchar *default_file);
 NETWORK_API void network_backends_free(network_backends_t *);
 NETWORK_API int network_backends_add(network_backends_t *backends, gchar *address, backend_type_t type);
-NETWORK_API void network_backends_remove(network_backends_t *bs, network_backend_t *backend);
+NETWORK_API int network_backends_remove(network_backends_t *bs, network_backend_t *backend);
 NETWORK_API int network_backends_addclient(network_backends_t *backends, gchar *address);
 NETWORK_API int network_backends_removeclient(network_backends_t *backends, gchar *address);
 NETWORK_API int network_backends_addpwd(network_backends_t *backends, const gchar *user, const gchar *pwd, gboolean is_encrypt);

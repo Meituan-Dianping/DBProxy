@@ -3349,14 +3349,22 @@ check_state(void *user_data)
 
             if (IS_BACKEND_OFFLINING(backend) &&
                         g_atomic_int_get(&backend->connected_clients) == 0) {
-                    SET_BACKEND_STATE(backend, BACKEND_STATE_OFFLINE);
-                    backend->thread_running = 0;
-                    g_log_dbproxy(g_message, "offline backend %s success", backend->addr->name->str);
+                if (g_rw_lock_writer_trylock(&bs->backends_lock)) {
+                    if (g_atomic_int_get(&backend->connected_clients) == 0) {
+                        SET_BACKEND_STATE(backend, BACKEND_STATE_OFFLINE);
+                        backend->thread_running = 0;
+                        g_log_dbproxy(g_message, "offline backend %s success", backend->addr->name->str);
+                    }
+                    g_rw_lock_writer_unlock(&bs->backends_lock);
+                }
             } else if (IS_BACKEND_REMOVING(backend) &&
                             g_atomic_int_get(&backend->connected_clients) == 0) {
-                    g_log_dbproxy(g_message, "remove backend %s success", backend->addr->name->str);
-                    network_backends_remove(bs, backend);
+                GString *name = g_string_new(backend->addr->name->str);
+                if (network_backends_remove(bs, backend)) {
+                    g_log_dbproxy(g_message, "remove backend %s success", name->str);
                     backend = NULL;
+                }
+                g_string_free(name, TRUE);
             }
 
             if (backend == NULL ||
