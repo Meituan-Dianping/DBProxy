@@ -1460,11 +1460,63 @@ static guint skip_comment_token(GPtrArray* tokens, guint start_token)
     return start_token;
 }
 
+static inline gint parse_commit_rollback(sql_token** ts, GPtrArray* tokens, gint idx) {
+    gint type = INVALID_TYPE;
+    gint len = tokens->len;
+
+    idx = skip_comment_token(tokens, idx);
+    if (0 >= len - idx)
+        return DEFAULT_TYPE;
+
+    if (0 < len - idx && strcasecmp(ts[idx]->text->str, "work") == 0) {
+        type |= WORK_TYPE;
+        idx++;
+    }
+
+    idx = skip_comment_token(tokens, idx);
+    if (0 < len - idx && strcasecmp(ts[idx]->text->str, "to") == 0)
+        return INVALID_TYPE;
+
+    if (0 < len - idx && ts[idx]->token_id == TK_SQL_AND) {
+        idx = skip_comment_token(tokens, ++idx);
+        if (0 < len - idx && strcasecmp(ts[idx]->text->str, "no") == 0) {
+            type |= NO_CHAIN_TYPE;
+            idx = skip_comment_token(tokens, ++idx);
+        } else
+            type |= CHAIN_TYPE;
+        if (0 >= len - idx || strcasecmp(ts[idx]->text->str, "chain") != 0)
+            return INVALID_TYPE;
+        else
+            idx = skip_comment_token(tokens, ++idx);
+    }
+
+    if (0 < len - idx && strcasecmp(ts[idx]->text->str, "no") == 0) {
+        type |= NO_RELEASE_TYPE;
+        idx = skip_comment_token(tokens, ++idx);
+        if (0 >= len - idx || strcasecmp(ts[idx]->text->str, "release") != 0)
+            return INVALID_TYPE;
+        idx = skip_comment_token(tokens, ++idx);
+    }
+
+    if (0 < len - idx && strcasecmp(ts[idx]->text->str, "release") == 0) {
+        type |= RELEASE_TYPE;
+        idx = skip_comment_token(tokens, ++idx);
+    }
+
+    if (0 < len - idx)
+        type = INVALID_TYPE;
+
+    return type;
+}
+
 static gboolean check_flags(GPtrArray* tokens, network_mysqld_con* con) {
 
     con->conn_status.is_in_select_calc_found_rows = FALSE;
     con->conn_status.is_set_autocommit = FALSE;
+    con->conn_status.is_savepoint = FALSE;
     con->conn_status.lock_stmt_type = LOCK_TYPE_NONE;
+    con->conn_status.is_commit = INVALID_TYPE;
+    con->conn_status.is_rollback = INVALID_TYPE;    
     g_string_truncate(con->conn_status.lock_key, 0);
     g_string_truncate(con->conn_status.use_db, 0);
     g_string_truncate(con->conn_status.set_charset_client, 0);
@@ -1567,6 +1619,16 @@ static gboolean check_flags(GPtrArray* tokens, network_mysqld_con* con) {
         if (len - i > 0) {
             g_string_assign(con->conn_status.use_db, ts[i]->text->str);
         }
+    }
+
+    i = skip_comment_token(tokens, 1);
+    if (0 < len - i && ts[i]->token_id == TK_LITERAL) {
+        if (strcasecmp(ts[i]->text->str, "commit") == 0) {
+            con->conn_status.is_commit = parse_commit_rollback(ts, tokens, ++i);
+        } else if (strcasecmp(ts[i]->text->str, "rollback") == 0) { 
+            con->conn_status.is_rollback = parse_commit_rollback(ts, tokens, ++i);
+        } else if (2 == len - i && strcasecmp(ts[i]->text->str, "savepoint") == 0)
+            con->conn_status.is_savepoint = TRUE;
     }
 
     i = skip_comment_token(tokens, 1);
@@ -2422,9 +2484,21 @@ static void proxy_update_conn_attribute(network_mysqld_con *con, injection *inj)
             if (con->conn_status.is_set_autocommit || con->client->conn_attr.autocommit_status == AUTOCOMMIT_UNKNOWN) {
                 if ((inj->qstat.server_status & SERVER_STATUS_AUTOCOMMIT) > 0) {
                     con->client->conn_attr.autocommit_status = con->server->conn_attr.autocommit_status = AUTOCOMMIT_TRUE;
+                    con->client->conn_attr.savepoint_flag = FALSE;
                 } else {
                     con->client->conn_attr.autocommit_status = con->server->conn_attr.autocommit_status = AUTOCOMMIT_FALSE;
                 }
+            }
+
+            if (con->conn_status.is_savepoint) {
+                if (con->client->conn_attr.autocommit_status != AUTOCOMMIT_TRUE)
+                    con->client->conn_attr.savepoint_flag = TRUE;
+                else
+                    con->client->conn_attr.savepoint_flag = FALSE;
+            }
+
+            if (con->conn_status.is_rollback != INVALID_TYPE ||con->conn_status.is_commit != INVALID_TYPE) {
+                con->client->conn_attr.savepoint_flag = FALSE;
             }
 
             if (inj->id == INJECTION_EXPLICIT_SINGLE_READ_QUERY) {
@@ -2440,7 +2514,10 @@ static void proxy_update_conn_attribute(network_mysqld_con *con, injection *inj)
 
         if (con->parse.command == COM_QUERY) {
                 if (inj->qstat.query_status == MYSQLD_PACKET_OK) {
-                    con->conn_status.is_in_transaction = inj->qstat.server_status & SERVER_STATUS_IN_TRANS;
+                    if (inj->qstat.server_status & SERVER_STATUS_IN_TRANS)
+                        con->client->conn_attr.savepoint_flag = FALSE;
+                    con->conn_status.is_in_transaction = ((inj->qstat.server_status & SERVER_STATUS_IN_TRANS)
+                                                            || con->client->conn_attr.savepoint_flag);
                 }
 
             if (TRACE_SQL(con->srv->log->log_trace_modules)) {
