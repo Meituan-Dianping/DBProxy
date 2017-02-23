@@ -7,12 +7,8 @@ dbproxy_test	8XjhBQKd			proxy
 show databases;
 Database
 information_schema
-XY
 benchmarksql
-d1
 mysql
-mysqltest1
-mysqltest2
 performance_schema
 test
 select * from pwds;
