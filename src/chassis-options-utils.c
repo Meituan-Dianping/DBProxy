@@ -24,6 +24,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "chassis-mainloop.h"
 #include "chassis-options-utils.h"
@@ -832,12 +833,10 @@ assign_blacklist_file(const char *newval, void *ex_param)
 
     g_assert(newval != NULL);
 
-    if (!access(newval, F_OK))
-    {
-        g_log_dbproxy(g_warning, "file %s doesn't exist:%s", newval, g_strerror(errno));
-    }
-    else
-    {
+    gchar *blacklist_file_dir = g_path_get_dirname(newval);
+    if (-1 == faccessat(0, blacklist_file_dir, F_OK | X_OK | W_OK, AT_EACCESS)) {
+        g_log_dbproxy(g_warning, "error happened on file %s: %s", newval, g_strerror(errno));
+    } else {
         g_rw_lock_writer_lock(&srv->proxy_filter->sql_filter_lock);
         gchar *tmp_str = srv->proxy_filter->blacklist_file;
         srv->proxy_filter->blacklist_file = g_strdup(newval);
@@ -851,8 +850,12 @@ assign_blacklist_file(const char *newval, void *ex_param)
             g_free(srv->proxy_filter->blacklist_file);
             srv->proxy_filter->blacklist_file = tmp_str;
             g_rw_lock_writer_unlock(&srv->proxy_filter->sql_filter_lock);
-        }
+        } else 
+            g_free(tmp_str);
     }
+
+    if (blacklist_file_dir)
+        g_free(blacklist_file_dir);
 
     return ret;
 }
