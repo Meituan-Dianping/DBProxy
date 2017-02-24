@@ -194,7 +194,7 @@ NETWORK_API gboolean check_user_host(GHashTable *pwd_table, gchar *username, gch
 NETWORK_API int user_hosts_handle(network_backends_t *bs, const gchar *user, const gchar *raw_user_hosts, gint type);
 NETWORK_API int user_backends_handle(network_backends_t *bs, const gchar *user, const gchar *user_backends, gint type);
 
-NETWORK_API network_backends_tag * get_user_backends(network_backends_t *bs, GHashTable *pwd_table, gchar *username, gchar *backend_tag, GRWLock *user_mgr_lock);
+NETWORK_API network_backends_tag * get_user_backends(network_backends_t *bs, GHashTable *pwd_table, gchar *username, gchar *backend_tag, GRWLock *user_mgr_lock, gboolean *b_tag);
 NETWORK_API gint alter_slave_weight(network_backends_t *bs, gint idx, gint weight);
 NETWORK_API gint add_slave_tag(network_backends_t *bs, gchar *tagname,gchar *idxs );
 NETWORK_API gint remove_slave_tag(network_backends_t *bs, gchar *tagname,gchar *idxs );

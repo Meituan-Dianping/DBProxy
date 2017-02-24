@@ -713,7 +713,7 @@ get_hash_passwd(GHashTable *pwd_table, gchar *username, GRWLock *user_mgr_lock) 
 network_backends_tag *
 get_user_backends(network_backends_t *bs, GHashTable *pwd_table,
                                 gchar *username, gchar *backend_tag,
-                                GRWLock *user_mgr_lock)
+                                GRWLock *user_mgr_lock, gboolean *b_tag)
 {
     user_info_hval *hval = NULL;
     network_backends_tag    *res = NULL, *tag_backends = NULL;
@@ -732,6 +732,7 @@ get_user_backends(network_backends_t *bs, GHashTable *pwd_table,
      */
     /* 1st : by force */
     if (backend_tag != NULL) {
+        *b_tag = TRUE;
         tag_backends = g_hash_table_lookup(bs->tag_backends, backend_tag);
         if (tag_backends != NULL) {
             g_assert(tag_backends->backends->len > 0);
@@ -747,6 +748,7 @@ get_user_backends(network_backends_t *bs, GHashTable *pwd_table,
     g_rw_lock_reader_lock(user_mgr_lock);
     hval = g_hash_table_lookup(pwd_table, username);
     if (hval != NULL && hval->backends_tag->len > 0) {
+        *b_tag = TRUE;
         hval->user_tag_max_weight = 0;
         for(i = 0; i < hval->backends_tag->len; ++i) {
             gchar* user_backends_tag = (gchar *)g_ptr_array_index(hval->backends_tag, i);
@@ -762,12 +764,14 @@ get_user_backends(network_backends_t *bs, GHashTable *pwd_table,
                 }
             }
         }
-    }
-    g_rw_lock_reader_unlock(user_mgr_lock);
-
-    /* 3rd by default */
-    if (tag_backends == NULL && bs->def_backend_tag->backends->len > 0) {
-        tag_backends = bs->def_backend_tag;
+        g_rw_lock_reader_unlock(user_mgr_lock);
+    } else if (!*b_tag){
+        g_rw_lock_reader_unlock(user_mgr_lock);
+        if (tag_backends == NULL && bs->def_backend_tag->backends->len > 0) {
+            tag_backends = bs->def_backend_tag;
+        }
+    } else {
+        g_rw_lock_reader_unlock(user_mgr_lock);
     }
 
 exit:

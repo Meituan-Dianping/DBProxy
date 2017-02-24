@@ -682,7 +682,7 @@ network_backend_t* idle_rw(network_mysqld_con* con, gint *backend_ndx) {
     return ret;
 }
 
-network_backend_t* wrr_ro(network_mysqld_con *con, gint *backend_ndx, gchar *backend_tag) {
+network_backend_t* wrr_ro(network_mysqld_con *con, gint *backend_ndx, gchar *backend_tag, gboolean *b_tag) {
     network_backends_t* bs = con->srv->backends;
     network_backends_tag    *tag_backends = NULL;
     g_wrr_poll* rwsplit = NULL;
@@ -691,7 +691,7 @@ network_backend_t* wrr_ro(network_mysqld_con *con, gint *backend_ndx, gchar *bac
     guint ndx_num = 0;
     guint i;
 
-    tag_backends = get_user_backends(bs, bs->pwd_table, user, backend_tag, &bs->user_mgr_lock);
+    tag_backends = get_user_backends(bs, bs->pwd_table, user, backend_tag, &bs->user_mgr_lock, b_tag);
     if (tag_backends == NULL || tag_backends->backends->len == 0) return NULL;
 
         rwsplit = tag_backends->wrr_poll;
@@ -1813,6 +1813,7 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
     network_backend_t *backend = NULL;
     gchar *backend_tag = NULL;
     gint backend_ndx = -1;
+    gboolean b_tag = FALSE;
 
     if (con->client->conn_attr.autocommit_status == AUTOCOMMIT_FALSE
         || con->conn_status.is_set_autocommit
@@ -1887,7 +1888,7 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
     {
         backend_ndx = -1;
         g_rw_lock_reader_lock(&con->srv->backends->backends_lock);
-        backend = wrr_ro(con, &backend_ndx, backend_tag);
+        backend = wrr_ro(con, &backend_ndx, backend_tag, &b_tag);
         if (backend != NULL) {
             g_atomic_int_inc(&backend->connected_clients);
         }
@@ -1906,7 +1907,7 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
         }
     }
 
-    if (con->server == NULL) {
+    if (con->server == NULL && !b_tag) {
         backend_ndx = -1;
         g_rw_lock_reader_lock(&con->srv->backends->backends_lock);
         backend = idle_rw(con, &backend_ndx);
