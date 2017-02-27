@@ -491,6 +491,7 @@ static int proxy_backends_users(network_backends_t *bs, gint type, const gchar *
 static int proxy_backend_state(network_backends_t *bs, guint timeout, guint index, guint state_type)
 {
     guint ret = 0;
+    gchar *bk_name = NULL;
     network_backend_t* b = bs->backends->pdata[index];
 
     if (!b) {
@@ -505,33 +506,98 @@ static int proxy_backend_state(network_backends_t *bs, guint timeout, guint inde
         return 0;
     } else if (IS_BACKEND_OFFLINING(b) && state_type < BACKEND_STATE_OFFLINING) {
         return 0;
-    } else if (IS_BACKEND_OFFLINE(b) && (state_type != BACKEND_STATE_REMOVING &&
-                                         state_type != BACKEND_STATE_UNKNOWN)) {
-        return 0;
+    } else if (IS_BACKEND_OFFLINE(b)) {
+         gint idx = 0;
+         if (state_type != BACKEND_STATE_REMOVING && state_type != BACKEND_STATE_UNKNOWN) {
+             g_log_dbproxy(g_warning, "failed to reset backend-status(current status is offline), \
+                                                             only remove&online backend is allowed.");
+             return 0;
+         }
+         
+         if (state_type == BACKEND_STATE_UNKNOWN && b->type == BACKEND_TYPE_RW) {
+             //g_rw_lock_writer_lock(&bs->backends_lock);
+             for (idx = 0; idx < bs->backends->len; idx++) {
+                 network_backend_t *old_backend = bs->backends->pdata[idx];
+                 if (old_backend == b || old_backend->type != BACKEND_TYPE_RW)
+                     continue;
+                 if (old_backend->state != BACKEND_STATE_OFFLINE) {
+                     g_log_dbproxy(g_warning,"online backend %d failed,"
+                                       "there is already one RW backend with status no-offline", index);
+                     return 1;
+                 }
+             }
+             //g_rw_lock_writer_unlock(&bs->backends_lock);
+         }
     } else if (IS_BACKEND_REMOVING(b) && state_type < BACKEND_STATE_REMOVING) {
         return 0;
     }
 
+    bk_name = g_strdup(b->addr->name->str);
     if (state_type == BACKEND_STATE_REMOVING ||
                 state_type == BACKEND_STATE_OFFLINING) {
-        gint64 offline_timeout = 0;
+        //gint64 offline_timeout = 0;
 
-        if (timeout == 0) {
+        /*if (timeout == 0) {
             offline_timeout = g_atomic_int_get(&bs->remove_backend_timeout);
         } else {
             offline_timeout = timeout;
-        }
+        }*/
 
+        gboolean success = TRUE;
+        gint try = 0;
         g_rw_lock_writer_lock(&b->backend_lock);
         b->state_since = time(NULL);
-        b->offline_timeout = offline_timeout;
+        b->offline_timeout = 0; //offline_timeout;
+        SET_BACKEND_STATE(b, state_type);
+        g_rw_lock_writer_unlock(&b->backend_lock);
+
+        while (TRUE) {
+            if (0 == g_atomic_int_get(&b->connected_clients)) {
+                if(state_type == BACKEND_STATE_REMOVING && network_backends_remove(bs, b)) {
+                    break;
+                } else if (state_type == BACKEND_STATE_OFFLINING) {
+                    g_rw_lock_writer_lock(&bs->backends_lock);
+                    if (0 == g_atomic_int_get(&b->connected_clients)) {
+                        SET_BACKEND_STATE(b, BACKEND_STATE_OFFLINE);
+                        g_rw_lock_writer_unlock(&bs->backends_lock);
+                        break;
+                    }
+                    g_rw_lock_writer_unlock(&bs->backends_lock);
+                }
+            } 
+            if (try >= 10) {
+                success = FALSE;
+                break;
+            }
+            try++;
+            usleep(30000);
+        }
+
+        if (FALSE == success) {
+            if (state_type == BACKEND_STATE_OFFLINING) {
+                g_log_dbproxy(g_warning, "force to offline backend: %d,"
+                                       "connection count: %u", index, g_atomic_int_get(&b->connected_clients));
+                g_rw_lock_writer_lock(&b->backend_lock);
+                SET_BACKEND_STATE(b, BACKEND_STATE_OFFLINE);
+                g_rw_lock_writer_unlock(&b->backend_lock);
+            } else if (state_type == BACKEND_STATE_REMOVING) { 
+                g_log_dbproxy(g_warning, "force to remove backend: %d,"
+                                       "connection count: %u", index, g_atomic_int_get(&b->connected_clients));
+                g_rw_lock_writer_lock(&bs->backends_lock);
+                //Don't release memory, although causing memory leak.
+                g_ptr_array_remove_index(bs->backends, index);
+                g_rw_lock_writer_unlock(&bs->backends_lock);
+            }
+        }
+    } else {
+        g_rw_lock_writer_lock(&b->backend_lock);
+        SET_BACKEND_STATE(b, state_type);
         g_rw_lock_writer_unlock(&b->backend_lock);
     }
-
-    SET_BACKEND_STATE(b, state_type);
-    g_log_dbproxy(g_message, "%s backend %s success", (state_type == BACKEND_STATE_REMOVING) ? "removing" :
-                                        (state_type == BACKEND_STATE_OFFLINING ? "offlining" : "online" ),
-                                        b->addr->name->str);
+    g_log_dbproxy(g_message, "%s backend %s success", (state_type == BACKEND_STATE_REMOVING) ? "remove" :
+                                        (state_type == BACKEND_STATE_OFFLINING ? "offline" : "online" ),
+                                        (bk_name ? bk_name : ""));
+    if (bk_name) g_free(bk_name);
 
     return ret;
 }
