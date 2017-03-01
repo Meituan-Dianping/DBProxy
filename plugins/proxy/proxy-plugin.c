@@ -1961,7 +1961,19 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
                 CON_MSG_HANDLE(g_message, con, msg);
                 g_free(msg);
             }
-            network_connection_pool_lua_add_connection(con);
+            //network_connection_pool_lua_add_connection(con);
+            network_socket_free(con->server);
+            con->server = NULL;
+            if (st->backend) {
+                g_atomic_int_dec_and_test(&st->backend->connected_clients);
+                st->backend = NULL;
+                st->backend_ndx = -1;
+            } else {
+                g_log_dbproxy(g_critical, "unexpected case encountered");
+            }
+            if (backend_tag != NULL) { g_free(backend_tag); }
+            g_log_dbproxy(g_warning, "candidate master-backend is not the original, close both connections");
+            return;
         }
     }
 
@@ -3491,7 +3503,7 @@ check_state(void *user_data)
                                                      bk_info->name, mysql_error(&mysql), monitor_user);
                     mysql_close(&mysql);
                     break;
-                } else if (err_no == ER_CON_COUNT_ERROR) {
+                } else if (err_no == ER_CON_COUNT_ERROR || err_no == ER_TOO_MANY_USER_CONNECTIONS) {
                     g_log_dbproxy(g_critical, "connecting backend(%s) failed: %s. user name: %s",
                                                      bk_info->name, mysql_error(&mysql), (monitor_user ? monitor_user : "is null"));
                     mysql_close(&mysql);
@@ -3505,7 +3517,8 @@ check_state(void *user_data)
                 }
             }
 
-            if (err_no == ER_ACCESS_DENIED_ERROR || err_no == 0 || err_no == ER_CON_COUNT_ERROR) {
+            if (err_no == ER_ACCESS_DENIED_ERROR || err_no == 0 || err_no == ER_CON_COUNT_ERROR
+                                                          || err_no == ER_TOO_MANY_USER_CONNECTIONS) {
                 bt = BACKEND_STATE_UP;
             } else if (err_no != 0) {
                 bt = BACKEND_STATE_DOWN;
