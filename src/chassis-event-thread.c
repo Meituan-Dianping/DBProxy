@@ -244,8 +244,8 @@ static void chassis_event_thread_update_conn_status(chassis_event_thread_t *thre
         }
 
         if (g_atomic_int_get(&conn->conn_status.exit_phase) == CON_EXIT_KILL ||
-                g_atomic_int_get(&conn->conn_status.exit_phase) == CON_EXIT_TX ||
-                (st != NULL && st->backend != NULL && IS_BACKEND_WAITING_EXIT(st->backend))) {
+                g_atomic_int_get(&conn->conn_status.exit_phase) == CON_EXIT_TX) {
+                /*|| (st != NULL && st->backend != NULL && IS_BACKEND_WAITING_EXIT(st->backend)))*/
             struct event *ev = NULL;
             gchar *event_msg = NULL;
             int pending = event_pending(&conn->client->event, EV_READ|EV_WRITE|EV_TIMEOUT, NULL);

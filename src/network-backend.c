@@ -41,6 +41,7 @@ static gint delete_backend_tagname(network_backends_t *bs, network_backends_tag 
                                     network_backend_t *backend, GString *tag_string);
 static gint g_wrr_poll_update(network_backends_t *bs, network_backends_tag *tag_backends);
 
+static guint64 next_backend_id = 0;
 
 network_backend_t *network_backend_new(guint event_thread_count) {
     network_backend_t *b = g_new0(network_backend_t, 1);
@@ -52,6 +53,7 @@ network_backend_t *network_backend_new(guint event_thread_count) {
         g_ptr_array_add(b->pools, pool);
     }
 
+    b->backend_id = next_backend_id++;
     b->uuid = g_string_new(NULL);
     b->slave_tag = NULL;
     b->addr = network_address_new();
@@ -553,6 +555,8 @@ int network_backends_add(network_backends_t *bs, /* const */ gchar *address, bac
             }
         }
         new_backend->weight = weight;
+    } else if (type == BACKEND_TYPE_RW) {
+        new_backend->state = BACKEND_STATE_UP;
     }
 
     if (0 != network_address_set_address(new_backend->addr, address)) {
