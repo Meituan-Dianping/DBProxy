@@ -122,6 +122,7 @@ network_socket *network_socket_new(network_socket_dir_t socket_dir) {
     s->conn_attr.set_vars = g_queue_new();
 
     s->conn_attr.autocommit_status = AUTOCOMMIT_UNKNOWN;
+    s->conn_attr.savepoint_flag = FALSE;
     s->socket_dir = socket_dir;
     s->srv = NULL;
 

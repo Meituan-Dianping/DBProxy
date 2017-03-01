@@ -285,6 +285,14 @@ typedef struct {
 #define MAKE_THEAD_ID(X) (((guint64)X)<<48)
 #define MAKE_CON_ID(X, Y)  (MAKE_THEAD_ID(X) | GET_CON_IDX(Y))
 
+#define INVALID_TYPE        0x00
+#define DEFAULT_TYPE        0x01
+#define WORK_TYPE           0x02
+#define CHAIN_TYPE          0x04
+#define NO_CHAIN_TYPE       0x08
+#define RELEASE_TYPE        0x10
+#define NO_RELEASE_TYPE     0x20
+
 typedef enum INFO_FUNC_ID {
     INFO_FUNC_FOUND_ROWS = 0,
     INFO_FUNC_LAST_INSERT_ID,
@@ -302,6 +310,9 @@ typedef struct info_func {
 typedef struct{
     gboolean is_in_transaction;                     // 当前是否在事务中
     gboolean is_set_autocommit;                     // 当前是否是set autocommit语句
+    gboolean is_savepoint;
+    gint is_commit;
+    gint is_rollback;
     guint lock_stmt_type;                           // 当前是否是get_lock或者release_lock语句
     volatile gint  exit_phase;                       // 当前connnection的退出状态，使用在kill或者dbproxy shutdown过程
     volatile guint exit_begin_time;

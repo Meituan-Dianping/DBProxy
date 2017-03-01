@@ -1,0 +1,125 @@
+#
+# Problem caused by Savepoint
+#
+
+#Initialize environment
+connect (conn0, 127.0.0.1, dbproxy_test, '123456', 'test', 6003);
+connect (conn1, 127.0.0.1, dbproxy_test, '123456', 'test', 6003);
+connect (conn2, 127.0.0.1, dbproxy_test, '123456', 'test', 6003);
+
+#disable_warnings
+Set autocommit = 1;
+DROP TABLE if exists sp1;
+DROP TABLE if exists sp2;
+#enable_warnings
+
+CREATE TABLE sp1 (
+  col1 int, col2 int
+);
+INSERT INTO sp1 VALUES (1,1);
+
+connection conn0;
+begin;
+select * from sp1;
+
+connection conn1;
+begin;
+select * from sp1;
+
+connection conn2;
+begin;
+select * from sp1;
+
+connection conn0;
+commit work;
+
+connection conn1;
+commit and no chain;
+
+connection conn2;
+commit work and chain;
+
+#
+# Test One
+#
+
+Set autocommit = 0;
+savepoint a1;
+rollback to savepoint a1;
+release savepoint a1;
+rollback work;
+--error 1305
+rollback to savepoint a1;
+Set autocommit = 1;
+
+
+#
+# Test Two
+#
+
+Set autocommit = 0;
+use mysql;
+savepoint a1;
+use test;
+rollback to savepoint a1;
+release savepoint a1;
+rollback and chain;
+savepoint a2;
+release savepoint a2;
+--error 1305
+release savepoint a1;
+Set autocommit = 1;
+
+
+#
+# Test Three
+#
+
+Set autocommit = 0;
+use mysql;
+use test;
+select * from sp1;
+savepoint a1;
+select * from sp1;
+rollback to savepoint a1;
+release savepoint a1;
+commit no release;
+Set autocommit = 1;
+
+
+#
+# Test Four
+#
+
+Set autocommit = 0;
+use mysql;
+use test;
+savepoint a1;
+insert into sp1 values(2,2);
+create table sp2(col1 int, col2 int);
+--error 1305
+rollback to savepoint a1;
+--error 1305
+release savepoint a1;
+commit and no chain;
+Set autocommit = 1;
+
+
+#
+# Test Five
+#
+
+Set autocommit = 0;
+use mysql;
+use test;
+savepoint a1;
+update sp1 set col2 = -1 where col1 = 1;
+#create table sp2(col1 int, col2 int);
+rollback to savepoint a1;
+release savepoint a1;
+commit release;
+Set autocommit = 1;
+
+DROP TABLE if exists sp1;
+DROP TABLE if exists sp2;
+

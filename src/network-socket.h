@@ -84,6 +84,7 @@ typedef enum {
 typedef struct{
     GString *default_db;
     network_socket_autocommit_t autocommit_status;
+    gboolean savepoint_flag;                  
     GQueue* set_vars;                        // 当前设置的系统变量列表
     GString* charset_client;
     GString* charset_results;
