@@ -12,4 +12,4 @@ show variables like 'mysql-version';
 show variables; 
 
 #case4 show processlist
-show processlist;
+#show processlist;

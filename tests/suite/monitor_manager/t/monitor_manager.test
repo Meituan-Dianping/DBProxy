@@ -9,7 +9,7 @@ show variables like 'admin-address';
 show variables like 'admin-password';
 show variables like 'admin-username';
 show variables like 'auto-filter-flag';
-show variables like 'backend-max-thread-running';
+#show variables like 'backend-max-thread-running';
 show variables like 'backend-monitor-pwds';
 show variables like 'basedir';
 show variables like 'blacklist-file';

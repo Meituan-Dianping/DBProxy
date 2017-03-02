@@ -1954,6 +1954,7 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
 
         if (backend != st->backend)
         {
+            network_backend_t *old_backend = st->backend;
             if (TRACE_SQL(con->srv->log->log_trace_modules)) {
                 gchar *msg = g_strdup_printf("current backend(%d) isn't the master node(%d), "
                                             "altas will push it back to connnection pool, then get a new master backend.",
@@ -1971,9 +1972,12 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
             } else {
                 g_log_dbproxy(g_critical, "unexpected case encountered");
             }
-            if (backend_tag != NULL) { g_free(backend_tag); }
-            g_log_dbproxy(g_warning, "candidate master-backend is not the original, close both connections");
-            return;
+            if (old_backend != NULL && old_backend->type == BACKEND_TYPE_RW) {
+                //if old backend is RW, the err-message is still 'I have no server backend', fix it later.
+                if (backend_tag != NULL) { g_free(backend_tag); }
+                g_log_dbproxy(g_warning, "candidate master-backend is not the original, close both connections");
+                return;
+            }
         }
     }
 

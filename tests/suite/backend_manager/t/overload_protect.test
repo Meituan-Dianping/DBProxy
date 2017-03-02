@@ -3,9 +3,9 @@ connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
 
 #case1: 过载保护
 connection conn0;   
-show variables like 'backend-max-thread-running';
-set backend-max-thread-running = 3;
-show variables like 'backend-max-thread-running';
+#show variables like 'backend-max-thread-running';
+#set backend-max-thread-running = 3;
+#show variables like 'backend-max-thread-running';
 
 show variables like 'thread-running-sleep-delay';
 set thread-running-sleep-delay = 20;

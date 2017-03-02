@@ -1274,6 +1274,7 @@ drop table t1;
 #
 SET NAMES utf8mb4;
 SHOW VARIABLES LIKE 'character\_set\_%';
+DROP DATABASE IF EXISTS crashtest;
 CREATE DATABASE crashtest DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 eval CREATE TABLE crashtest (crash char(10)) DEFAULT CHARSET=utf8mb4 ENGINE $engine;
 INSERT INTO crashtest VALUES ('35'), ('36'), ('37');
