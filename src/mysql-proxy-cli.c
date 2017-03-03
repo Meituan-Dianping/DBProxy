@@ -754,7 +754,7 @@ int main_cmdline(int argc, char **argv) {
 
             g_free(config_dir);
 
-            g_log_dbproxy(g_message, "running as user: %s (%s/%s)", srv->user, user_info->pw_uid, user_info->pw_gid);
+            g_log_dbproxy(g_message, "running as user: %s (%d/%d)", srv->user, user_info->pw_uid, user_info->pw_gid);
         } 
     }
 #endif  
@@ -930,7 +930,7 @@ int main_cmdline(int argc, char **argv) {
     }
     g_log_dbproxy(g_debug, "max open file-descriptors = %"G_GINT64_FORMAT, chassis_fdlimit_get());
 
-    if (frontend->blacklist_file)
+    if (frontend->blacklist_file && strlen(frontend->blacklist_file) > 0)
     {
         chassis_resolve_path(srv->base_dir, &frontend->blacklist_file);
         srv->proxy_filter->blacklist_file = g_strdup(frontend->blacklist_file);
