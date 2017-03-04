@@ -7,7 +7,7 @@ yum install -y libevent-devel lua-devel openssl-devel flex Percona-Server-devel-
 
 ### install dbproxy
 cd $basedir
-./configure --prefix=/usr/local/mysql-proxy CFLAGS="-g -O0" && make -j 4 && make install
+./configure --prefix=/usr/local/mysql-proxy CFLAGS="-s -O0" && make -j 4 && make install
 
 ###mv source.cnf 
 cd $basedir
