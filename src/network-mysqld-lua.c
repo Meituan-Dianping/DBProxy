@@ -1869,6 +1869,7 @@ send_options_to_lua(chassis_options_t *opts, const char *group_name, lua_State *
 
             if (strlen(var_name) != 0) {
                 if (!opt_match(opt->long_name, var_name)) {
+                    g_free(opt_param);
                     continue;
                 }
             }
