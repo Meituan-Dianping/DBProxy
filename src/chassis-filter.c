@@ -418,7 +418,6 @@ sql_reserved_query_move_to_tail(sql_reserved_query *srq, reserved_query_item *rq
 {
     GList   *to_tail = rqi->list_pos;
     GQueue  *gq = NULL;
-    reserved_query_item *rm_rqi = NULL;
     int     ret = 0;
 
     if (srq == NULL || to_tail == NULL) return;

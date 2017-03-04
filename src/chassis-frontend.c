@@ -554,7 +554,7 @@ int chassis_frontend_write_pidfile(const char *pid_file, GError **gerr) {
     int my_pid = 0, other_pid = 0;
     int len = 0;
     gchar buffer[128];
-    gchar *pid_str;
+    gchar *pid_str = NULL;
 
     my_pid = getpid();
 
@@ -592,6 +592,7 @@ int chassis_frontend_write_pidfile(const char *pid_file, GError **gerr) {
         }
         }
  
+    pid_str = g_strdup_printf("%d", my_pid);
     if (ftruncate(fd, 0) < 0) {
         g_set_error(gerr,
                 G_FILE_ERROR,
@@ -602,11 +603,10 @@ int chassis_frontend_write_pidfile(const char *pid_file, GError **gerr) {
                 pid_str,
                 g_strerror(errno));
 
-                close(fd);
-                return -1;
+        g_free(pid_str);
+        close(fd);
+        return -1;
     }
-
-    pid_str = g_strdup_printf("%d", my_pid);
 
     if (write(fd, pid_str, strlen(pid_str)) < 0) {
         g_set_error(gerr,

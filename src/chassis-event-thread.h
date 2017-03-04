@@ -38,7 +38,7 @@ CHASSIS_API void chassis_event_add_local(chassis *chas, struct event *ev);
 #define EVENT_THREAD_NORMAL 0
 #define EVENT_THREAD_EXITED 1
 
-extern __thread cur_thid;
+extern __thread gint cur_thid;
 
 /**
  * a event-thread
@@ -92,4 +92,5 @@ CHASSIS_API guint chassis_event_get_threadid();
 
 CHASSIS_API void chassis_event_thread_wait_start(chassis *chas, network_mysqld_wait_event_t event_type);
 CHASSIS_API guint64 chassis_event_thread_wait_end(chassis *chas, network_mysqld_wait_event_t event_type);
+CHASSIS_API void *chassis_mainloop_thread_loop(chassis_event_thread_t *thread);
 #endif

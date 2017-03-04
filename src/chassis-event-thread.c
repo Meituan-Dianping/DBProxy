@@ -53,7 +53,7 @@
 #define closesocket(x) close(x)
 #endif
 
-__thread cur_thid;
+__thread gint cur_thid;
 
 
 /**
@@ -85,7 +85,6 @@ void chassis_event_add(network_mysqld_con* client_con) {        //���߳�
     if (write(thread->notify_send_fd, "", 1) != 1) g_log_dbproxy(g_error, "pipes - write error: %s", g_strerror(errno));
 }
 
-static GPrivate tls_index;
 
 void chassis_event_add_by_thread(chassis_event_thread_t* thread, struct event* ev, int timeout_s, int timeout_us)
 {
@@ -179,8 +178,8 @@ void chassis_event_thread_free(chassis_event_thread_t *thread) {
     /* we don't want to free the global event-base */
     if (thread->thr != NULL && thread->event_base) event_base_free(thread->event_base);
 
-    network_mysqld_con* con;
-    while (con = g_async_queue_try_pop(thread->event_queue)) {
+    network_mysqld_con* con = NULL;
+    while ((con = g_async_queue_try_pop(thread->event_queue))) {
         network_mysqld_con_free(con);
     }
     g_atomic_pointer_set(&(thread->thread_status_var.thread_stat[THREAD_STAT_EVENT_WAITING]), 0);
@@ -276,9 +275,7 @@ static void chassis_event_thread_update_conn_status(chassis_event_thread_t *thre
  */
 void *chassis_event_thread_loop(chassis_event_thread_t *thread) {
     cur_thid = thread->index;
-    network_mysqld_con *conn = NULL;
     gboolean has_no_active_con = FALSE;
-    gboolean has_set_exit_timeout = FALSE;
 
     /**
      * check once a second if we shall shutdown the proxy
@@ -427,8 +424,6 @@ void chassis_dec_connection(chassis *chas) {
 }
 
 void chassis_event_add_connection(chassis *chas, chassis_event_thread_t* thread, network_mysqld_con *client_con) {
-    gint current_connections = 0;
-
     if (NULL == thread){
         g_assert(chas != NULL);
         thread = g_ptr_array_index(chas->threads, cur_thid);
@@ -436,9 +431,9 @@ void chassis_event_add_connection(chassis *chas, chassis_event_thread_t* thread,
 
     g_assert(client_con != NULL && thread != NULL);
 
-    g_rw_lock_writer_lock(&thread->connection_lock);
+    g_rw_lock_writer_lock(&(thread->connection_lock));
 
-    if ((++thread->cur_max_con_idx) & CON_IDX_MASK == 0) {
+    if (((++thread->cur_max_con_idx) & CON_IDX_MASK) == 0) {
         thread->cur_max_con_idx = CON_PRE_FIRST_ID;
     }
     client_con->con_id = MAKE_CON_ID(thread->index, thread->cur_max_con_idx);

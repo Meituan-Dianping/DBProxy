@@ -18,14 +18,14 @@ int main(int argc, char** argv)
             return -1;
         }
 
-        unsigned char* in = argv[i];
+        char* in = argv[i];
         int inl = strlen(in);
 
         unsigned char inter[LEN];
         bzero(inter, LEN);
         int interl = 0;
 
-        if (EVP_EncryptUpdate(&ctx, inter, &interl, in, inl) != 1) {
+        if (EVP_EncryptUpdate(&ctx, inter, &interl, (unsigned char*)in, inl) != 1) {
             printf("¼ÓÃÜ¸üĞÂ´íÎó\n");
             return -2;
         }

@@ -288,7 +288,7 @@ int chassis_mainloop(void *_chas) {
 
         g_assert(p->apply_config);
         if (0 != p->apply_config(chas, p->config)) {
-            g_log_dbproxy(g_critical, "%s: applying config of plugin %s failed", p->name);
+            g_log_dbproxy(g_critical, "applying config of plugin %s failed", p->name);
             return -1;
         }
     }

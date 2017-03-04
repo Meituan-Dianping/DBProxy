@@ -26,6 +26,7 @@
 
 #include "network-mysqld-proto.h"
 #include "network-mysqld.h"
+#include "chassis-event-thread.h"
 
 /**
  * mid-level protocol 
@@ -76,7 +77,7 @@ typedef struct com_string {
 extern const COM_STRING com_command_name[];
 
 #define GET_COM_NAME(com_type) \
-     (((com_type) >= COM_SLEEP && (com_type) <= COM_DAEMON) ? com_command_name[(com_type)].com_str : "UNKNOWN TYPE")
+     ((((gushort)com_type) >= COM_SLEEP && ((gushort)com_type) <= COM_DAEMON) ? com_command_name[((gushort)com_type)].com_str : "UNKNOWN TYPE")
 
 #define GET_COM_STRING(query) GET_COM_NAME((query)->str[0]), ((query)->len > 1 ? ((query)->str + 1) : "")
 

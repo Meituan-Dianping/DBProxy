@@ -282,7 +282,7 @@ encrypt(const char *in) {
     }
 
     inl = strlen(in);
-    if (EVP_EncryptUpdate(&ctx, inter, &interl, in, inl) != 1) {
+    if (EVP_EncryptUpdate(&ctx, inter, &interl, (unsigned char*)in, inl) != 1) {
         EVP_CIPHER_CTX_cleanup(&ctx);
         return NULL;
     }
@@ -302,9 +302,9 @@ encrypt(const char *in) {
     char *out = g_malloc0(512);
     int outl = 0;
 
-    EVP_EncodeUpdate(&ectx, out, &outl, inter, len);
+    EVP_EncodeUpdate(&ectx, (unsigned char*)out, &outl, inter, len);
     len = outl;
-    EVP_EncodeFinal(&ectx, out+len, &outl);
+    EVP_EncodeFinal(&ectx, (unsigned char*)(out+len), &outl);
     len += outl;
 
     if (out[len-1] == 10) out[len-1] = '\0';
@@ -323,7 +323,7 @@ char *decrypt(const char *in) {    //1. Base64ﾽ￢ￂ￫
     unsigned char inter[512] = {};
     int interl = 0;
  
-    if (EVP_DecodeUpdate(&dctx, inter, &interl, in, inl) == -1) return NULL;
+    if (EVP_DecodeUpdate(&dctx, inter, &interl, (unsigned char*)in, inl) == -1) return NULL;
     int len = interl;
     if (EVP_DecodeFinal(&dctx, inter+len, &interl) != 1) return NULL;
         len += interl;
@@ -339,12 +339,12 @@ char *decrypt(const char *in) {    //1. Base64ﾽ￢ￂ￫
     char *out = g_malloc0(512);
     int outl = 0;
 
-    if (EVP_DecryptUpdate(&ctx, out, &outl, inter, len) != 1) {
+    if (EVP_DecryptUpdate(&ctx, (unsigned char*)out, &outl, inter, len) != 1) {
         g_free(out);
         return NULL;
     }
     len = outl;
-    if (EVP_DecryptFinal_ex(&ctx, out+len, &outl) != 1) {
+    if (EVP_DecryptFinal_ex(&ctx, (unsigned char*)(out+len), &outl) != 1) {
         g_free(out);
         return NULL;
     }
@@ -725,7 +725,6 @@ get_user_backends(network_backends_t *bs, GHashTable *pwd_table,
 {
     user_info_hval *hval = NULL;
     network_backends_tag    *res = NULL, *tag_backends = NULL;
-    guint max_cur_weight = 0;
     guint i;
 
     g_assert(username != NULL && pwd_table != NULL);

@@ -233,7 +233,6 @@ network_connection_pool_entry *network_connection_pool_add(network_connection_po
  */
 void network_connection_pool_remove(network_connection_pool *pool, network_connection_pool_entry *entry, gint remove_type) {
     network_socket *sock = entry->sock;
-    gchar *msg = NULL;
 
     if (sock->response == NULL) {
         g_log_dbproxy(g_warning, "remove backend from pool failed, "

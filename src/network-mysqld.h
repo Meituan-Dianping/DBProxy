@@ -538,6 +538,8 @@ NETWORK_API void set_var_queue_insert(GQueue *set_vars, gchar *set_var_name, gch
 
 NETWORK_API void reset_funcs_info(info_func *info_funcs);
 
+NETWORK_API gint kill_one_connection(chassis *chas, guint64 kill_con_id);
+
 #define SEND_INTERNAL_ERR(msg)                                          \
 do {                                                                    \
     gboolean valid = ISVALID(con->server_error_code);                                                           \

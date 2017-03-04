@@ -110,6 +110,8 @@
 #endif
 #endif
 
+extern int parse_resultset_fields(proxy_resultset_t *res);
+
 const char *network_mysqld_stat_desc[PROXY_STAT_END] =
 {
     "Com_query_read",
@@ -2634,8 +2636,6 @@ void
 network_mysqld_con_send_1_int_resultset(network_mysqld_con *con, gint info_type)
 {
     MYSQL_FIELD     *field;
-    gchar           *colname = NULL;
-    gint            colval = 0;
     GPtrArray       *rows = NULL, *row = NULL, *fields = NULL;
     gint i = 0;
 
@@ -2741,7 +2741,7 @@ network_mysqld_con_get_1_int_from_result_set(network_mysqld_con *con, void* inj_
        }
        res_row = res_row->next; /* only one row, next will exit loop */
     }
-exit:
+
     proxy_resultset_free(res);
 
     return v;
@@ -2766,7 +2766,6 @@ void network_mysqld_send_query_stat(network_mysqld_con *con, char com_type, gboo
 void network_mysqld_socket_stat(chassis *chas, network_socket_dir_t socket_dir, gboolean is_write, guint len)
 {
     thread_status_var_t *thread_status_var = chassis_event_thread_get_status(chas);
-    network_mysqld_stat_type_t stat_type = THREAD_STAT_END;
 
     if (socket_dir == SOCKET_SERVER) {
         if (is_write)
@@ -2969,10 +2968,10 @@ kill_one_connection(chassis *chas, guint64 kill_con_id)
         g_assert(conn != NULL);
 
         g_atomic_int_set(&conn->conn_status.exit_phase, CON_EXIT_KILL);
-        g_log_dbproxy(g_debug, "set connection %u kill status.", kill_con_id);
+        g_log_dbproxy(g_debug, "set connection %lu kill status.", kill_con_id);
         ret = 0;
     } else {
-        g_log_dbproxy(g_debug, "connect id %u in event thread %d no found.", kill_con_id, thread->index);
+        g_log_dbproxy(g_debug, "connect id %lu in event thread %d no found.", kill_con_id, thread->index);
     }
     g_rw_lock_reader_unlock(&thread->connection_lock);
 

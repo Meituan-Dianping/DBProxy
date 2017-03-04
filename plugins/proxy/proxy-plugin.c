@@ -486,7 +486,7 @@ GPtrArray* combine_sql(GPtrArray* tokens, gint table, GArray* columns, guint num
             if (token_id != TK_OBRACE) g_string_append_c(sql, ' '); 
 
             if (i == table) {
-                g_string_append_printf(sql, has_suffix ? "%s%u" : "%s_%u",
+                g_string_append_printf(sql, has_suffix ? "%s%lld" : "%s_%lld",
                                     ts[i]->text->str, strtoll(ts[g_array_index(columns, guint, 0)]->text->str, NULL, 10) % num);
             } else if (token_id == TK_STRING) {
                 g_string_append_printf(sql, "'%s'", ts[i]->text->str);
@@ -516,10 +516,10 @@ GPtrArray* combine_sql(GPtrArray* tokens, gint table, GArray* columns, guint num
         for (m = 0; m < num; ++m) {
             if (mt[m]->len > 0) {
                 GString* tmp = g_string_new(" IN(");
-                g_string_append_printf(tmp, "%llu", g_array_index(mt[m], guint64, 0));
+                g_string_append_printf(tmp, "%lu", g_array_index(mt[m], guint64, 0));
                 guint k;
                 for (k = 1; k < mt[m]->len; ++k) {
-                    g_string_append_printf(tmp, ",%llu", g_array_index(mt[m], guint64, k));
+                    g_string_append_printf(tmp, ",%lu", g_array_index(mt[m], guint64, k));
                 }
                 g_string_append_c(tmp, ')');
 
@@ -1057,8 +1057,6 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_auth) {
     network_socket *recv_sock, *send_sock;
     network_mysqld_auth_response *auth;
     int err = 0;
-    gboolean free_client_packet = TRUE;
-    network_mysqld_con_lua_t *st = con->plugin_con_state;
 
     recv_sock = con->client;
     send_sock = con->server;
@@ -1297,7 +1295,6 @@ static void modify_session_vars(network_mysqld_con* con) {
     network_mysqld_con_lua_t* st = con->plugin_con_state;
     GList *cur_set_vars_client = g_queue_peek_head_link(con->client->conn_attr.set_vars);
     GList *cur_set_vars_server = g_queue_peek_head_link(con->server->conn_attr.set_vars);
-    injection* inj = NULL;
     gint cmp_result = -1;
     GString* query = NULL;
     set_var_unit *set_var = NULL;
@@ -1626,7 +1623,6 @@ static gboolean check_flags(GPtrArray* tokens, network_mysqld_con* con) {
     }
 
     for (i = 1; i < len; ++i) {
-        sql_token* token = ts[i];
         if (ts[i]->token_id == TK_SQL_SQL_CALC_FOUND_ROWS) {
             con->conn_status.is_in_select_calc_found_rows = TRUE;
             break;
@@ -2558,7 +2554,7 @@ static void proxy_update_conn_attribute(network_mysqld_con *con, injection *inj)
 
             if (TRACE_SQL(con->srv->log->log_trace_modules)) {
                 GString *p = g_string_new(NULL);
-                g_string_append_printf(p, "[C:%s S:%s(%lu)] con_autocommit = [%s], con_in_trx = [%s], server_in_trx = [%s]",
+                g_string_append_printf(p, "[C:%s S:%s(%u)] con_autocommit = [%s], con_in_trx = [%s], server_in_trx = [%s]",
                                 con->client->src->name->str, con->server->dst->name->str, con->server->challenge->thread_id,
                                 (con->client->conn_attr.autocommit_status == AUTOCOMMIT_FALSE ? "FALSE":
                                         (con->client->conn_attr.autocommit_status == AUTOCOMMIT_TRUE ? "TRUE" : "UNKNOWN")),
@@ -2705,7 +2701,6 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query_result) {
         GString* p;
         if (0 != st->injected.queries->length) {
             inj = g_queue_pop_head(st->injected.queries);
-            char* str = inj->query->str + 1;
             if (IS_EXPLICIT_SINGLE_QUERY(inj)) {
                 log_sql_backend(config->sql_log_mgr, con, (void *)inj);
                 ret = PROXY_SEND_RESULT;
@@ -2842,7 +2837,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query_result) {
                             g_string_append_printf(msg, "warning_count = [%d], insert_id = [%d]",
                                             inj->qstat.warning_count, inj->qstat.insert_id);
 #else
-                            g_string_append_printf(msg, "[insert_id = %d, warning_count = %d, affected_rows = %d]",
+                            g_string_append_printf(msg, "[insert_id = %lu, warning_count = %d, affected_rows = %lu]",
                                             inj->qstat.insert_id, inj->qstat.warning_count, inj->qstat.affected_rows);
 #endif
                         }
@@ -3177,7 +3172,7 @@ int network_mysqld_proxy_connection_init(network_mysqld_con *con) {
 void network_mysqld_proxy_free(network_mysqld_con G_GNUC_UNUSED *con) {
 }
 
-void *string_free(GString *s) {
+void string_free(GString *s) {
     g_string_free(s, TRUE);
 }
 
@@ -3414,7 +3409,7 @@ static void check_backend_thread_running(network_backend_t* backend, MYSQL *mysq
             MYSQL_ROW row = mysql_fetch_row(result);
             backend->thread_running = atoi(row[1]);
         } else {
-            g_log_dbproxy(g_warning, "get backend (%s) threads_running failed, num_fields:%d, num_rows:%d", backend->addr->name->str, mysql_num_fields(result), mysql_num_rows(result));
+            g_log_dbproxy(g_warning, "get backend (%s) threads_running failed, num_fields:%d, num_rows:%llu", backend->addr->name->str, mysql_num_fields(result), mysql_num_rows(result));
         }
         mysql_free_result(result);
     } else {
@@ -3480,7 +3475,6 @@ check_state(void *user_data)
             gchar           *ip = bk_info->ip;
             guint           port = bk_info->port;
             backend_state_t bt = BACKEND_STATE_UNKNOWN;
-            MYSQL_RES       *result = NULL;
             guint           err_no = 0;
 
             if (bk_info->backend == NULL || IS_BACKEND_OFFLINE(bk_info))
@@ -3579,9 +3573,10 @@ sleep_phase:
         }
         g_mutex_unlock(g_mutex);
     }
-exit:
+
     g_log_dbproxy(g_message, "check_state thread will exit");
     g_thread_exit(0);
+    return NULL;
 }
 
 /* Comment out this function, because this function cause many bugs */
@@ -4510,6 +4505,7 @@ shard_tables_show_save(void *ex_param)
             g_string_free(shard_tables, TRUE);
         }
     }
+    return NULL;
 }
 
 static int

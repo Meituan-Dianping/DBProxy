@@ -97,7 +97,7 @@
  */
 gint chown_recursion(const gchar *path, uid_t owner, gid_t group) {
     GError *error = NULL;
-    GDir *dir;
+    GDir *dir = NULL;
     const gchar *filename;
     gchar *pathPlusFilename;
     gint ret = 0;

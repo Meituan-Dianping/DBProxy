@@ -43,7 +43,6 @@ static void pt_queue_push(pt_queue_t *pq, pt_histc_t base);
 static void pt_queue_pop(pt_queue_t q, pt_histc_t *base);
 static void pt_queue_push_ex(pt_queue_t *pq, gint no1, gint no2);
 static void pt_queue_pop_ex(pt_queue_t q, gint num, pt_histc_t *base);
-static void queue_pop_mb(pt_queue_t q, gint num, gint pos, gint *b);
 
 static gboolean
 try_get_int64_value(const gchar *option_value, gint64 *return_value)
@@ -65,8 +64,6 @@ try_get_int64_value(const gchar *option_value, gint64 *return_value)
 pt_percentile_t *
 pt_percentile_new(gdouble range_min, gdouble range_max, gint base)
 {
-
-    GError *gerr = NULL;
     pt_percentile_t *percentile_controller = NULL;
 
     percentile_controller = g_new0(pt_percentile_t, 1);
@@ -131,8 +128,8 @@ gdouble
 pt_percentile_calculate(guint latest_time, pt_time_type time_type,
                                         pt_percentile_t *percentile_controller)
 {
-    gint loop = 0, field = 0, nmax = 0, ncur = 0;
-     pt_histc_t data = {0};
+    gint loop = 0, nmax = 0, ncur = 0;
+     pt_histc_t data = {{0}, 0};
 
      memset((void*)&data, 0, sizeof(pt_histc_t));
 
@@ -147,6 +144,10 @@ pt_percentile_calculate(guint latest_time, pt_time_type time_type,
             pt_queue_pop_ex(percentile_controller->min_statis, percentile_controller->need_update_num, &data);
             pt_queue_pop_ex(percentile_controller->hor_statis, latest_time, &data);
             break ;
+         }
+         case PERCENTILE_TYPE_ERROR: {
+            g_log_dbproxy(g_critical, "unexpected branch encountered: PERCENTILE_TYPE_ERROR");
+            break;
          }
      }
 
@@ -182,10 +183,9 @@ pt_get_response_time(const gchar *value, pt_percentile_t *percentile_controller,
 {
     pt_time_type type = PERCENTILE_TYPE_ERROR;
     gint ret = 1;
-    gdouble respon_time = 0.0;
     gint64 arg = 0;
     gint   idx = 0;
-    gchar *ptr = NULL, *cur = NULL;
+    gchar *ptr = NULL;
 
     if (pt_off == percentile_controller->percentile_switch) {
         ret = 2;
@@ -307,8 +307,6 @@ void pt_queue_pop_ex(pt_queue_t q, gint num, pt_histc_t *base)
 void
 pt_queue_pop_mb(pt_queue_t q, gint num, gint pos, gint *b)
 {
-    gint i = 0;
-
     if (pt_is_queue_empty(q)) {
         return ;
     }
@@ -332,13 +330,13 @@ check_percentile(void *user_data)
     pt_percentile_t     *percentile_controller = (pt_percentile_t *)plugin_params->magic_value;
     GCond               *g_cond = plugin_params->plugin_thread_cond;
     GMutex              *g_mutex = plugin_params->plugin_thread_mutex;
-    pt_histc_t          data = {0};
+    pt_histc_t          data = {{0}, 0};
     gint64              end_time = 0;
 
     g_log_dbproxy(g_message, "%s thread start", PROXY_PERCENTILE_THREAD);
     if (NULL == percentile_controller) {
         g_log_dbproxy(g_critical, "check_percentile thread get argument failed");
-        return ;
+        return NULL;
     }
 
     while (!chassis_is_shutdown()) {
@@ -385,14 +383,13 @@ exit:
     g_log_dbproxy(g_message, "check_percentile thread will exit");
 
     g_thread_exit(0);
+    return NULL;
 }
 
 
 gchar *
 show_percentile_switch(void *ex_param)
 {
-    external_param *opt_param = (external_param *)ex_param;
-    chassis *srv = opt_param->chas;
     gchar *u = NULL;
 
     if (config->percentile_controller->percentile_switch == pt_off) {
@@ -469,8 +466,6 @@ show_percentile_value(void *ex_param)
 gint
 assign_percentile_value(const char *newval, void *ex_param)
 {
-    gint value = 0, ret = 1;
-
     return set_raw_int_value(newval, &config->percentile_controller->percentile_value, 1, 101);
 }
 
