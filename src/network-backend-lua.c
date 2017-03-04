@@ -563,10 +563,7 @@ again:
             SET_BACKEND_STATE(b, BACKEND_STATE_OFFLINE);
             g_rw_lock_writer_unlock(&bs->backends_lock);
         } else if (state_type == BACKEND_STATE_REMOVING) { 
-            g_rw_lock_writer_lock(&bs->backends_lock);
-            //Don't release memory, although causing memory leak.
-            g_ptr_array_remove_index(bs->backends, index);
-            g_rw_lock_writer_unlock(&bs->backends_lock);
+            network_backends_remove(bs, b);
         }
     } else {
         g_rw_lock_writer_lock(&bs->backends_lock);
