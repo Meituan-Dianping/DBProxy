@@ -92,7 +92,6 @@ int chassis_check_version(const char *lib_version, const char *hdr_version) {
  */
 chassis *chassis_new() {
     chassis *chas;
-    gint ret = 0;
 
     if (0 != chassis_check_version(event_get_version(), _EVENT_VERSION)) {
         g_log_dbproxy(g_critical, "chassis is build against libevent %s, but now runs against %s", _EVENT_VERSION, event_get_version());
@@ -123,10 +122,7 @@ chassis *chassis_new() {
 
     chas->opts = NULL;//need to free
 
-    if (0 != ret) {
-        g_log_dbproxy(g_critical, "create thread exit semphore failed");
-        return NULL;
-    }
+    chas->db_connect_timeout = 0.0;//default timeout 0.0s
 
     return chas;
 }

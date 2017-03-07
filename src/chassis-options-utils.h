@@ -64,6 +64,7 @@ CHASSIS_API gint assign_blacklist_file(const char *newval, void *ex_param);
 CHASSIS_API gint assign_remove_backend_timeout(const char *newval, void *ex_param);
 CHASSIS_API gint assign_log_trace_modules(const char *newval, void *ex_param);
 CHASSIS_API gint assign_backend_monitor_pwds(const char *newval, void *ex_param);
+CHASSIS_API gint assign_db_connect_timeout(const char *newval, void *ex_param);
 
 /* show utils */
 CHASSIS_API gchar* show_verbose_shutdown(void *external_param);
@@ -103,6 +104,7 @@ CHASSIS_API gchar* show_log_trace_modules(void *external_param);
 CHASSIS_API gchar* show_version(void *external_param);
 CHASSIS_API gchar* show_daemon(void *external_param);
 CHASSIS_API gchar* show_assign_backend_monitor_pwds(void *external_param);
+CHASSIS_API gchar* show_db_connect_timeout(void *external_param);
 CHASSIS_API int save_config(chassis *chas);
 CHASSIS_API gboolean opt_match(const char *str, const char *prefix);
 CHASSIS_API gint set_raw_int_value(const gchar *newval, gint *param, gint min, gint max);
