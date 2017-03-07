@@ -193,6 +193,8 @@ ret:
 }
 
 network_socket *self_connect(network_mysqld_con *con, network_backend_t *backend, GHashTable *pwd_table) {
+    struct timeval tv;
+
     //1. connect DB
     network_socket *sock = network_socket_new(SOCKET_SERVER);
     network_address_copy(sock->dst, backend->addr);
@@ -205,6 +207,16 @@ network_socket *self_connect(network_mysqld_con *con, network_backend_t *backend
         SELF_CONNECT_MSG_HANDLE(g_critical, sock, "socket failed", TRUE);
         network_socket_free(sock);
         return NULL;
+    }
+
+    //超时设置
+    if(con->srv->db_connect_timeout > 0.0) {
+        tv.tv_sec = (time_t)floor(con->srv->db_connect_timeout);
+        tv.tv_usec = (time_t)floor((con->srv->db_connect_timeout - tv.tv_sec) * 1000000);
+        if(tv.tv_sec > 0 || tv.tv_usec > 0) {
+            setsockopt(sock->fd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv));
+            setsockopt(sock->fd, SOL_SOCKET, SO_SNDTIMEO, (const char*)&tv, sizeof(tv));
+        }
     }
 
     if (-1 == (connect(sock->fd, &sock->dst->addr.common, sock->dst->len))) {

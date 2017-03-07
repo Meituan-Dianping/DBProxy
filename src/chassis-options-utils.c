@@ -886,6 +886,25 @@ assign_log_trace_modules(const char *newval, void *ex_param)
 
     return set_raw_int_value(newval, &srv->log->log_trace_modules, 0, G_MAXINT32);
 }
+
+gint
+assign_db_connect_timeout(const char *newval, void *ex_param)
+{
+    external_param *opt_param = (external_param *)ex_param;
+    chassis *srv = opt_param->chas;
+    gboolean ret = TRUE;
+    gdouble new_value = 0.0;
+
+    if(ret = try_get_double_value(newval, &new_value)) {
+        if(new_value >= 0.0) {
+            srv->db_connect_timeout = new_value;
+        } else {
+            ret = FALSE;
+        }
+    }
+    return (ret? 0: -1);
+}
+
 gchar *
 show_log_trace_modules(void *ex_param)
 {
@@ -917,6 +936,14 @@ show_daemon(void *ex_param)
     return g_strdup(res);
 }
 
+gchar* show_db_connect_timeout(void *ex_param)
+{
+    external_param *opt_param = (external_param *)ex_param;
+    chassis *srv = opt_param->chas;
+
+    return g_strdup_printf("%lf", srv->db_connect_timeout);
+}
+
 gint
 assign_backend_monitor_pwds(const char *newval, void *ex_param)
 {
@@ -939,6 +966,7 @@ assign_backend_monitor_pwds(const char *newval, void *ex_param)
 
     return ret;
 }
+
 gchar *
 show_assign_backend_monitor_pwds(void *ex_param)
 {

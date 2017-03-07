@@ -126,6 +126,8 @@ struct chassis {
     gint64 max_files_number;
     guint auto_restart;
     chassis_options_t *opts;
+
+    gdouble db_connect_timeout;
 };
 
 

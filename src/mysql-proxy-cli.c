@@ -215,6 +215,8 @@ typedef struct {
 
     gchar *percentile_switch;
     gint percentile_value;
+
+    gdouble db_connect_timeout;
 } chassis_frontend_t;
 
 /**
@@ -250,6 +252,8 @@ chassis_frontend_t *chassis_frontend_new(void) {
 
     frontend->percentile_switch = NULL;
     frontend->percentile_value = 95;
+
+    frontend->db_connect_timeout = 0.0;
     return frontend;
 }
 
@@ -352,6 +356,8 @@ int chassis_frontend_set_chassis_options(chassis_frontend_t *frontend, chassis_o
 
     chassis_options_add(opts, "backend-monitor-pwds", 0, 0, G_OPTION_ARG_STRING, &(frontend->backend_pwds), "the user and password to to check the backends health status", "user:pwd", assign_backend_monitor_pwds, show_assign_backend_monitor_pwds, ALL_OPTS_PROPERTY);
     chassis_options_add(opts, "version", 0, 0, G_OPTION_ARG_INT, &(frontend->print_version), "print dbproxy version", NULL, NULL, show_version, SHOW_OPTS_PROPERTY);
+
+    chassis_options_add(opts, "db-connect-timeout", 0, 0, G_OPTION_ARG_DOUBLE, &(frontend->db_connect_timeout), "connect mysql's timeout (default 0.0). value == 0, means don't set timeout.", NULL, assign_db_connect_timeout, show_db_connect_timeout, ALL_OPTS_PROPERTY);
 
     return 0;   
 }
@@ -780,6 +786,12 @@ int main_cmdline(int argc, char **argv) {
         GOTO_EXIT(EXIT_FAILURE);
     }
     srv->log->log_trace_modules = frontend->log_trace_modules;
+
+    if(frontend->db_connect_timeout < 0) {
+        g_log_dbproxy(g_critical, "db_connect_timeout has to be >= 0.0, is %lf", frontend->db_connect_timeout);
+        GOTO_EXIT(EXIT_FAILURE);
+    }
+    srv->db_connect_timeout = frontend->db_connect_timeout;
 
     /*
      * the MySQL Proxy should load 'admin' and 'proxy' plugins
