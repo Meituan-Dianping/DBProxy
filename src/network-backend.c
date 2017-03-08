@@ -725,7 +725,7 @@ get_user_backends(network_backends_t *bs, GHashTable *pwd_table,
                                 GRWLock *user_mgr_lock)
 {
     user_info_hval *hval = NULL;
-    network_backends_tag    *res = NULL, *tag_backends = NULL;
+    network_backends_tag *temp_res = NULL, *tag_backends = NULL;
     guint i;
 
     g_assert(username != NULL && pwd_table != NULL);
@@ -758,9 +758,10 @@ get_user_backends(network_backends_t *bs, GHashTable *pwd_table,
         hval->user_tag_max_weight = 0;
         for(i = 0; i < hval->backends_tag->len; ++i) {
             gchar* user_backends_tag = (gchar *)g_ptr_array_index(hval->backends_tag, i);
+            network_backends_tag *res = g_hash_table_lookup(bs->tag_backends, user_backends_tag);
 
-            res = g_hash_table_lookup(bs->tag_backends, user_backends_tag);
             if (res != NULL) {
+                temp_res = res;
                 if (hval->user_tag_max_weight == 0) {
                     hval->user_tag_max_weight = res->wrr_poll->cur_weight;
                     tag_backends = res;
@@ -770,6 +771,9 @@ get_user_backends(network_backends_t *bs, GHashTable *pwd_table,
                 }
             }
         }
+    }
+    if (tag_backends == NULL && temp_res != NULL) {
+        tag_backends = temp_res;
     }
     g_rw_lock_reader_unlock(user_mgr_lock);
 
