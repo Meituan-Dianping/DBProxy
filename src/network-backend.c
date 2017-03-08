@@ -483,9 +483,8 @@ int network_backends_remove(network_backends_t *bs, network_backend_t *backend) 
 
     g_assert(bs != NULL && backend != NULL);
 
-    if (FALSE == g_rw_lock_writer_trylock(&bs->backends_lock)) {
-        return 0;
-    }
+    g_rw_lock_writer_lock(&bs->backends_lock);
+
     if (g_atomic_int_get(&backend->connected_clients) != 0) {
         g_rw_lock_writer_unlock(&bs->backends_lock);
         return 0;
@@ -570,7 +569,12 @@ int network_backends_add(network_backends_t *bs, /* const */ gchar *address, bac
 
         if (first_slave == -1 && old_backend->type == BACKEND_TYPE_RO) first_slave = i;
 
-        if (old_backend->type == type && strleq(S(old_backend->addr->name), S(new_backend->addr->name))) {
+        if (BACKEND_TYPE_RW == type && old_backend->type == type && BACKEND_STATE_OFFLINE != old_backend->state) {
+            g_rw_lock_writer_unlock(&bs->backends_lock);
+            network_backend_free(new_backend);
+            g_log_dbproxy(g_warning, "add backend %s failed, there is already one RW backend", address);
+            return -1;
+        } else if (old_backend->type == type && strleq(S(old_backend->addr->name), S(new_backend->addr->name))) {
             network_backend_free(new_backend);
 
             g_rw_lock_writer_unlock(&bs->backends_lock);    /*remove lock*/
