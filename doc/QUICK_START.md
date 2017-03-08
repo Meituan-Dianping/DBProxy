@@ -27,6 +27,7 @@ make && make install
 
 1. 操作系统版本：CentOS6.5 CentOS7 Ubuntu14.04 Debian8.2；
 2. 目前确认有效的glib2版本是2.42.0-1.el6，CentOS、Ubuntu和Debian默认源中的版本都不是2.42.0-1.el6，会导致make报错，因此在上面增加对glib的下载编译安装；
+
 ## 1.2 安装DBProxy源码
 - 源码从代码仓库下载到本地  
  
