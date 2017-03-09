@@ -4330,7 +4330,7 @@ add_shard_tables(chassis_plugin_config *config, gchar **shard_tables)
         g_free(tmp_for_free);
 
         if (is_complete) {
-            gchar* key = g_strdup_printf("%s.%s", db, dt->table_name);
+            gchar* key = g_strdup_printf("%s.%s", dt->db_name, dt->table_name);
             g_rw_lock_writer_lock(&config->config_lock);
             g_hash_table_insert(config->dt_table, key, dt);
             g_rw_lock_writer_unlock(&config->config_lock);
