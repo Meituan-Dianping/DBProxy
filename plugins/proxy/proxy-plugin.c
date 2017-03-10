@@ -3175,7 +3175,7 @@ chassis_plugin_config * network_mysqld_proxy_plugin_new(void) {
 
     config->percentile_value = 64;
 
-    config->check_state_conn_timeout = 1;
+    config->check_state_conn_timeout = 3;
     config->check_state_interval = PROXY_CHECK_STATE_WAIT_TIMEOUT;
     config->check_state_retry_times = RETRY_TIMES;
     config->check_state_sleep_delay = SLEEP_DELAY;
@@ -3320,7 +3320,7 @@ static chassis_options_t * network_mysqld_proxy_plugin_get_options(chassis_plugi
                             NULL, NULL, 0);
         chassis_options_add(opts, "user-backends", 0, 0, G_OPTION_ARG_STRING_ARRAY, &(config->user_backends_str), "set user's backends(default: NULL)", NULL,
                             NULL, NULL, 0);
-        chassis_options_add(opts, "check-state-conn-timeout", 0, 0, G_OPTION_ARG_INT, &(config->check_state_conn_timeout), "set check_state connect time out(default: 1s)", NULL,
+        chassis_options_add(opts, "check-state-conn-timeout", 0, 0, G_OPTION_ARG_INT, &(config->check_state_conn_timeout), "set check_state connect time out(default: 3s)", NULL,
                             assign_check_state_conn_timeout, show_check_state_conn_timeout, ALL_OPTS_PROPERTY);
         chassis_options_add(opts, "check-state-interval", 0, 0, G_OPTION_ARG_INT, &(config->check_state_interval), "set check_state wakeup interval(default: 4s)", NULL,
                             assign_check_state_interval, show_check_state_interval, ALL_OPTS_PROPERTY);
