@@ -934,6 +934,8 @@ function read_query(packet)
         rows[#rows + 1] = { "SET backend-max-thread-running = $int", "online set backend's max thread running number" }
         rows[#rows + 1] = { "SET thread-running-sleep-delay = $int", "online set backend's max thread running sleep timeout" }
         rows[#rows + 1] = { "SET shutdown-timeout = $int", "online set the waiting seconds of idle connections during shutdown process" }
+        rows[#rows + 1] = { "SET check-state-conn-timeout = $int", "max waiting time when establish connection to MySQL for checking backend's state" }
+        rows[#rows + 1] = { "SET db-connect-timeout = $double", "max waiting time when establish new connection to MySQL" }
         rows[#rows + 1] = { "SHUTDOWN [NORMAL] | IMMEDIATE", "online shutdown the dbproxy Server, NORMAL: wait for the current transaction complete before shutdown-timeout expired, IMMEDIATE: shutdown immediately" }
         rows[#rows + 1] = { "KILL [CONNECTION] $id", "online kill the client connection, the $id can be found in command show processlist." }
         rows[#rows + 1] = { "SHOW percentile [$int m|h]", "display the response time, m:minute h:hour" }

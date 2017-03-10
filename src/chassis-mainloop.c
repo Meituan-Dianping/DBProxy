@@ -122,7 +122,7 @@ chassis *chassis_new() {
 
     chas->opts = NULL;//need to free
 
-    chas->db_connect_timeout = 0.0;//default timeout 0.0s
+    chas->db_connect_timeout = 3.0;//default timeout 3.0s
 
     return chas;
 }
