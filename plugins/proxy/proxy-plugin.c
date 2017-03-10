@@ -3953,10 +3953,10 @@ int network_mysqld_proxy_plugin_apply_config(chassis *chas, chassis_plugin_confi
         g_free(tmp_for_free);
     }
 
-    if (config->table_prefix) {
+    if (config->table_prefix && strlen(config->table_prefix) > 0) {
         config->tnw->prefix = g_strdup(config->table_prefix);
     }
-    if (config->table_suffix) {
+    if (config->table_suffix && strlen(config->table_suffix) > 0) {
         config->tnw->suffix = g_strdup(config->table_suffix);
     }
 
