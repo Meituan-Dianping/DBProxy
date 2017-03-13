@@ -265,15 +265,7 @@ static int proxy_backends_set(lua_State *L) {
     gsize keysize = 0;
     const char *key = luaL_checklstring(L, 2, &keysize);
 
-    if (strleq(key, keysize, C("addslave"))) {
-        gchar *address = g_strdup(lua_tostring(L, -1));
-        network_backends_add(bs, address, BACKEND_TYPE_RO);
-        g_free(address);
-    } else if (strleq(key, keysize, C("addmaster"))) {
-        gchar *address = g_strdup(lua_tostring(L, -1));
-        network_backends_add(bs, address, BACKEND_TYPE_RW);
-        g_free(address);
-    } else if (strleq(key, keysize, C("addclient"))) {
+    if (strleq(key, keysize, C("addclient"))) {
         gchar *address = g_strdup(lua_tostring(L, -1));
         network_backends_addclient(bs, address);
         g_free(address);
@@ -606,6 +598,14 @@ static int proxy_backends_call(lua_State *L)
         ret = proxy_backend_state(bs, lua_tointeger(L, -2)/*timeout*/,
                                             lua_tointeger(L, -3)/*bk_id*/,
                                             lua_tointeger(L, -4)/*state type */);
+    } else if (ADD_MASTER == type) {
+        gchar *address = g_strdup(lua_tostring(L, -2));
+        ret = network_backends_add(bs, address, BACKEND_TYPE_RW);
+        g_free(address);
+    } else if(ADD_SLAVE == type) {
+        gchar *address = g_strdup(lua_tostring(L, -2));
+        ret = network_backends_add(bs, address, BACKEND_TYPE_RO);
+        g_free(address);
     } else {
         ret = proxy_backends_users(bs, type, lua_tostring(L, -2)/*pwd*/, lua_tostring(L, -3)/*user*/);
     }

@@ -128,18 +128,42 @@ function read_query(packet)
               type = proxy.MYSQL_TYPE_STRING },
         }
     elseif string.find(query:lower(), "^add%s+master%s+%d%d?%d?%.%d%d?%d?%.%d%d?%d?%.%d%d?%d?:%d%d?%d?%d?%d?$") then
-            local newserver = string.match(query:lower(), "^add%s+master%s+(.+)$")
-            proxy.global.backends.addmaster = newserver
+        local newserver = string.match(query:lower(), "^add%s+master%s+(.+)$")
+        local ret = proxy.global.backends(newserver, proxy.ADD_MASTER)
         if proxy.global.config.rwsplit then proxy.global.config.rwsplit.max_weight = -1 end
+
+        if ret == -1 then
+            set_error("add backend failed")
+            return proxy.PROXY_SEND_RESULT
+        end
+        if ret == -2 then 
+            set_error("there is already one RW backend")
+            return proxy.PROXY_SEND_RESULT
+        end
+        if ret == -3 then
+            set_error("backend is already known")
+            return proxy.PROXY_SEND_RESULT
+        end
 
         fields = {
             { name = "status", 
               type = proxy.MYSQL_TYPE_STRING },
         }
+
     elseif string.find(query:lower(), "^add%s+slave%s+%d%d?%d?%.%d%d?%d?%.%d%d?%d?%.%d%d?%d?:%d%d?%d?%d?%d?.*$") then
-            local newserver = string.match(query:lower(), "^add%s+slave%s+(.+)$")
-            proxy.global.backends.addslave = newserver
+        local newserver = string.match(query:lower(), "^add%s+slave%s+(.+)$")
+        local ret = proxy.global.backends(newserver, proxy.ADD_SLAVE)
         if proxy.global.config.rwsplit then proxy.global.config.rwsplit.max_weight = -1 end
+
+        if ret == -1 then
+            set_error("add backend failed")
+            return proxy.PROXY_SEND_RESULT
+        end
+
+        if ret == -3 then
+            set_error("backend is already known")
+            return proxy.PROXY_SEND_RESULT
+        end
 
         fields = {
             { name = "status", 

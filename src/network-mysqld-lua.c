@@ -1018,6 +1018,8 @@ void network_mysqld_lua_init_global_fenv(lua_State *L) {
     DEF(ADD_ADMIN_HOSTS);
     DEF(REMOVE_ADMIN_HOSTS);
     DEF(ALTTER_ADMIN_PWDS);
+    DEF(ADD_MASTER);
+    DEF(ADD_SLAVE);
 
     DEF(BACKEND_TYPE_UNKNOWN);
     DEF(BACKEND_TYPE_RW);

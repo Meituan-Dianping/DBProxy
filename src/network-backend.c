@@ -577,13 +577,13 @@ int network_backends_add(network_backends_t *bs, /* const */ gchar *address, bac
             g_rw_lock_writer_unlock(&bs->backends_lock);
             network_backend_free(new_backend);
             g_log_dbproxy(g_warning, "add backend %s failed, there is already one RW backend", address);
-            return -1;
+            return -2;
         } else if (old_backend->type == type && strleq(S(old_backend->addr->name), S(new_backend->addr->name))) {
             network_backend_free(new_backend);
 
             g_rw_lock_writer_unlock(&bs->backends_lock);    /*remove lock*/
             g_log_dbproxy(g_warning, "backend %s is already known!", address);
-            return -1;
+            return -3;
         }
     }
 

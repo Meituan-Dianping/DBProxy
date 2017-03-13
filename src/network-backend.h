@@ -43,6 +43,8 @@
 #define ADD_ADMIN_HOSTS     9
 #define REMOVE_ADMIN_HOSTS  10
 #define ALTTER_ADMIN_PWDS   11
+#define ADD_MASTER          12
+#define ADD_SLAVE           13
 
 #define WHITELIST_USER  "%"
 #define USER_IDENT      "@"
