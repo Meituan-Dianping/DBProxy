@@ -337,8 +337,8 @@ int chassis_frontend_set_chassis_options(chassis_frontend_t *frontend, chassis_o
                                                     assign_freq_threshold, show_freq_threshold, ALL_OPTS_PROPERTY);
     chassis_options_add(opts, "access-num-per-time-window", 0, 0, G_OPTION_ARG_INT, &(frontend->access_num_per_time_window), "the threshold of query executing times when calculating frequency (default: 5)", NULL,
                                                     assign_access_ratio, show_access_ratio, ALL_OPTS_PROPERTY);
-    chassis_options_add(opts, "backend-max-thread-running", 0, 0, G_OPTION_ARG_INT, &(frontend->max_backend_tr), "the default value of blacklist's filter flag (default: 0, close)", NULL,
-                                                    assign_backend_max_thread_running, show_backend_max_thread_running, ALL_OPTS_PROPERTY);
+//    chassis_options_add(opts, "backend-max-thread-running", 0, 0, G_OPTION_ARG_INT, &(frontend->max_backend_tr), "the default value of blacklist's filter flag (default: 0, close)", NULL,
+//                                                    assign_backend_max_thread_running, show_backend_max_thread_running, ALL_OPTS_PROPERTY);
     chassis_options_add(opts, "thread-running-sleep-delay", 0, 0, G_OPTION_ARG_INT, &(frontend->thread_running_sleep_delay), "the thread running wait time_out(ms)", NULL,
                                                     assign_thread_running_sleep_delay, show_thread_running_sleep_delay, ALL_OPTS_PROPERTY);
     chassis_options_add(opts, "auto-filter-flag", 0, 0, G_OPTION_ARG_STRING, &(frontend->auto_filter_flag), "the default flag of auto added filter", NULL,

@@ -115,7 +115,7 @@ function read_query(packet)
         end
 
         if state == "offline" then
-            ret = proxy.global.backends(proxy.BACKEND_STATE_OFFLINING, id - 1, timeout, proxy.BACKEND_STATE);
+            ret = proxy.global.backends(proxy.BACKEND_STATE_OFFLINE, id - 1, timeout, proxy.BACKEND_STATE);
         elseif state == "online" then
             ret = proxy.global.backends(proxy.BACKEND_STATE_UNKNOWN, id - 1, timeout, proxy.BACKEND_STATE);
         else

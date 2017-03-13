@@ -186,6 +186,15 @@ static gboolean online = TRUE;
 static gchar op = COM_QUERY;
 
 
+typedef struct {
+    guint                     port;
+    volatile backend_state_t  state;
+    guint64                   bkid;
+    backend_type_t            type;
+    gchar                     *ip;
+    network_backend_t         *backend;
+    gchar                     *name; 
+} backend_info;
 
 typedef struct {
     gchar* db_name;
@@ -670,9 +679,10 @@ network_backend_t* idle_rw(network_mysqld_con* con, gint *backend_ndx) {
 
         if (chassis_event_thread_pool(backend) == NULL) continue;
 
-        if (backend->type == BACKEND_TYPE_RW &&
-                                (IS_BACKEND_UP(backend) ||      /* without pending backend */
-                                IS_BACKEND_WAITING_EXIT(backend))) {
+        if (backend->type == BACKEND_TYPE_RW && IS_BACKEND_UP(backend)) {
+                                /*(IS_BACKEND_UP(backend) ||      // without pending backend
+                                 *IS_BACKEND_WAITING_EXIT(backend))) {
+                                 */
             ret = backend;
             *backend_ndx = i;
             break;
@@ -888,9 +898,19 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_handshake) {
         network_mysqld_queue_append_raw(send_sock, send_sock->send_queue, g_queue_pop_tail(recv_sock->recv_queue->chunks));
 
         network_mysqld_con_lua_t *st = con->plugin_con_state;
-        if (!IS_BACKEND_OFFLINE(st->backend) && !IS_BACKEND_WAITING_EXIT(st->backend)) {
-            SET_BACKEND_STATE(st->backend, BACKEND_STATE_DOWN);
-            g_log_dbproxy(g_warning, "set backend (%s) state to DOWN", recv_sock->dst->name->str);
+        /** Currently setting backend to DOWN&UP is only allowed by check_state due to lock issue.
+         *  Seems this function is useless and reconsider following code when reuse this function.
+         *if (!IS_BACKEND_OFFLINE(st->backend) && !IS_BACKEND_WAITING_EXIT(st->backend)) {
+         *   SET_BACKEND_STATE(st->backend, BACKEND_STATE_DOWN);
+         *   g_log_dbproxy(g_warning, "set backend (%s) state to DOWN", recv_sock->dst->name->str);
+         *}
+         */
+        if (st != NULL && st->backend != NULL) {
+            // Currently don't know the case in which this code would be executed, print log.
+            g_log_dbproxy(g_critical, "unexpected code was executed: %d", g_atomic_int_get(&st->backend->connected_clients));
+            //g_atomic_int_dec_and_test(&st->backend->connected_clients);
+            st->backend = NULL;
+            st->backend_ndx = -1;
         }
     //  chassis_gtime_testset_now(&st->backend->state_since, NULL);
         network_socket_free(con->server);
@@ -3397,7 +3417,6 @@ check_state(void *user_data)
     GCond               *g_cond = plugin_params->plugin_thread_cond;
     GMutex              *g_mutex = plugin_params->plugin_thread_mutex;
     network_backends_t  *bs = chas->backends;
-    MYSQL mysql;
     gchar               *monitor_user = NULL, *monitor_pwd = NULL;
     gint                i = 0, j = 0, k = 0, m = 0, tm = 1;
     gint64              end_time = 0;
@@ -3406,11 +3425,10 @@ check_state(void *user_data)
 
     g_log_dbproxy(g_message, "%s thread start", PROXY_CHECK_STATE_THREAD);
 
-    mysql_init(&mysql);
-
     while (!chassis_is_shutdown()) {
-        GPtrArray* backends = bs->backends;
-        guint len = backends->len;
+        backend_info *bkinfo = NULL;
+        GPtrArray* backends = NULL;
+        guint len = 0;
 
         g_rw_lock_reader_lock(&bs->user_mgr_lock);
         if (bs->monitor_user != NULL) {
@@ -3419,135 +3437,121 @@ check_state(void *user_data)
         }
         g_rw_lock_reader_unlock(&bs->user_mgr_lock);
 
-        g_rw_lock_writer_lock(&bs->backends_lock);
-        for (i = 0; i < len; ++i) {
+        g_rw_lock_reader_lock(&bs->backends_lock);
+        backends = bs->backends;
+        len = backends->len;
+        bkinfo = g_malloc0(sizeof(backend_info) * len);
+        if (bkinfo == NULL) {
+            g_rw_lock_reader_unlock(&bs->backends_lock);
+            goto sleep_phase;
+        }
+        for (i = 0; i < len; i++) {
             network_backend_t* backend = g_ptr_array_index(backends, i);
-
+            bkinfo[i].backend = backend;
             if (backend == NULL) continue;
+            bkinfo[i].port = ntohs(backend->addr->addr.ipv4.sin_port);
+            bkinfo[i].ip = inet_ntoa(backend->addr->addr.ipv4.sin_addr);
+            bkinfo[i].ip = g_strdup(bkinfo[i].ip);
+            bkinfo[i].state = g_atomic_int_get(&backend->state);
+            bkinfo[i].bkid = backend->backend_id; 
+            bkinfo[i].name = g_strdup(backend->addr->name->str);
+            bkinfo[i].type = backend->type; 
+        }
+        g_rw_lock_reader_unlock(&bs->backends_lock);
 
-            if (IS_BACKEND_OFFLINE(backend) || IS_BACKEND_WAITING_EXIT(backend))
-                continue;
-
-            /* connect and get thread_running */
-            gchar* ip = inet_ntoa(backend->addr->addr.ipv4.sin_addr);
-            guint port = ntohs(backend->addr->addr.ipv4.sin_port);
+        for (i = 0; i < len; ++i) {
+            backend_info    *bk_info = bkinfo + i;
+            gchar           *ip = bk_info->ip;
+            guint           port = bk_info->port;
             backend_state_t bt = BACKEND_STATE_UNKNOWN;
             MYSQL_RES       *result = NULL;
+            guint           err_no = 0;
 
-            tm = config->check_state_conn_timeout;
-            /* connect_timeout read_timeout write_timeout */
-            mysql_options(&mysql, MYSQL_OPT_CONNECT_TIMEOUT, &tm);
-            mysql_options(&mysql, MYSQL_OPT_READ_TIMEOUT, &tm);     //to consider and test
-            mysql_options(&mysql, MYSQL_OPT_WRITE_TIMEOUT, &tm);    //to consider and test
+            if (bk_info->backend == NULL || IS_BACKEND_OFFLINE(bk_info))
+                continue;
 
             /* what about mointor_user/pwd is NULL ? */
             m = j = k = 0;
             while (m < config->check_state_retry_times) {
-            mysql_real_connect(&mysql, ip, monitor_user, monitor_pwd, NULL, port, NULL, 0);
-                if (mysql_errno(&mysql) == 0) {
+                MYSQL  mysql;
+                tm = config->check_state_conn_timeout;
+                mysql_init(&mysql);
+                /* connect_timeout read_timeout write_timeout */
+                mysql_options(&mysql, MYSQL_OPT_CONNECT_TIMEOUT, &tm);
+                mysql_options(&mysql, MYSQL_OPT_READ_TIMEOUT, &tm);
+                mysql_options(&mysql, MYSQL_OPT_WRITE_TIMEOUT, &tm);
+                mysql_real_connect(&mysql, ip, monitor_user, monitor_pwd, NULL, port, NULL, 0);
+                err_no = mysql_errno(&mysql);
+                if (err_no == 0) {
+                    mysql_close(&mysql);
                     break;
-                } else if (mysql_errno(&mysql) == CR_SERVER_LOST) {
-                    m++;
-                    g_log_dbproxy(g_warning, "due to %s, retry %dth times to connect backend %s",
-                                          mysql_error(&mysql),
-                                          m, backend->addr->name->str);
-                    sleep(config->check_state_sleep_delay);
+                } else if (err_no == ER_ACCESS_DENIED_ERROR) {
+                    if (monitor_user != NULL)
+                        g_log_dbproxy(g_warning, "accessing backend(%s) was denied: %s. user name: %s",
+                                                     bk_info->name, mysql_error(&mysql), monitor_user);
+                    mysql_close(&mysql);
+                    break;
+                } else if (err_no == ER_CON_COUNT_ERROR) {
+                    g_log_dbproxy(g_critical, "connecting backend(%s) failed: %s. user name: %s",
+                                                     bk_info->name, mysql_error(&mysql), (monitor_user ? monitor_user : "is null"));
+                    mysql_close(&mysql);
+                    break;
                 } else {
-                    break;
+                    m++;
+                    g_log_dbproxy(g_critical, "due to %s, retry %dth times to connect backend %s. user name: %s",
+                                          mysql_error(&mysql), m, bk_info->name, (monitor_user ? monitor_user : "is null"));
+                    mysql_close(&mysql);
+                    usleep(config->check_state_sleep_delay * 1000);
                 }
             }
 
-            if ((monitor_user == NULL && mysql_errno(&mysql) == ER_ACCESS_DENIED_ERROR) ||
-                                (chas->max_backend_tr == 0 && mysql_errno(&mysql) == 0)) {
+            if (err_no == ER_ACCESS_DENIED_ERROR || err_no == 0 || err_no == ER_CON_COUNT_ERROR) {
                 bt = BACKEND_STATE_UP;
-                goto set_state;
-            } else if (mysql_errno(&mysql) != 0) {
+            } else if (err_no != 0) {
                 bt = BACKEND_STATE_DOWN;
-                g_log_dbproxy(g_critical, "set backend(%s) state to DOWN for: %d(%s)",
-                              backend->addr->name->str,
-                              mysql_errno(&mysql), mysql_error(&mysql));
-                goto set_state;
-            }
-query :
-            m = 0;
-            while (m < config->check_state_retry_times) {
-                mysql_query(&mysql, "SHOW STATUS LIKE 'Threads_running';");
-
-                if ((mysql_errno(&mysql) == 0) ||
-                        (mysql_errno(&mysql) == CR_SERVER_GONE_ERROR)) {
-                   break;
-                } else {
-                    m++;
-                    g_log_dbproxy(g_warning, "due to %s, retry %dth times to get thread_running from %s",
-                                          mysql_error(&mysql),
-                                          m, backend->addr->name->str);
-                    sleep(config->check_state_sleep_delay);
-                }
             }
 
-            if (mysql_errno(&mysql) != 0) {
-                bt = BACKEND_STATE_DOWN;
-                g_log_dbproxy(g_critical, "set backend(%s) state to DOWN for: %d(%s)",
-                              backend->addr->name->str,
-                              mysql_errno(&mysql), mysql_error(&mysql));
-                goto set_state;
-            }
-
-            result = mysql_store_result(&mysql);
-            if (result == NULL) {
-                if (j++ < config->check_state_retry_times) {
-                    g_log_dbproxy(g_warning, "due to invalid result, retry %dth times to get thread_running from %s",
-                                    j,
-                                    backend->addr->name->str);
-                    sleep(config->check_state_sleep_delay);
-                    goto query;
-                } else {
-                    bt = BACKEND_STATE_DOWN;
-                    g_log_dbproxy(g_critical, "set backend(%s) state to DOWN for retry %d times to get thread_running",
-                                        backend->addr->name->str, config->check_state_retry_times);
-                    goto set_state;
-            }
-            } else {
-                MYSQL_ROW row;
-
-                g_assert(mysql_num_fields(result) > 1 && mysql_num_rows(result) > 0);
-
-                /* get result */
-                row = mysql_fetch_row(result);
-                set_raw_int_value(row[1], &(backend->thread_running), 1, 1024);
-                mysql_free_result(result);
-
-                if (backend->thread_running < chas->max_backend_tr) {
-                    bt = BACKEND_STATE_UP;
-                } else {
-                    if (k++ < config->check_state_retry_times) {
-                        g_log_dbproxy(g_warning, "due to %d over %d retry %d times to get thread_running from %s",
-                                        backend->thread_running,
-                                        chas->max_backend_tr, k,
-                                        backend->addr->name->str);
-                        sleep(config->check_state_sleep_delay);
-                        goto query;
-                    } else {
-                        bt = BACKEND_STATE_PENDING;
-                        g_log_dbproxy(g_critical, "set backend(%s) to PENDING due to thread running is %d",
-                                        backend->addr->name->str, backend->thread_running);
+            if (bk_info->state != bt && bk_info->type == BACKEND_TYPE_RO) {
+                int idx = 0;
+                gboolean change = FALSE;
+                network_backend_t* tmpbk = NULL;
+                g_rw_lock_writer_lock(&bs->backends_lock);
+                while (idx < bs->backends->len) {
+                    tmpbk = g_ptr_array_index(bs->backends, idx);
+                    if (tmpbk == bk_info->backend && bk_info->bkid == tmpbk->backend_id && bk_info->state == tmpbk->state) {
+                        SET_BACKEND_STATE(tmpbk, bt);
+                        change = TRUE;
+                        break;
                     }
+                    idx++;
                 }
-            }
-set_state:
-            mysql_close(&mysql);
-
-            if (backend->state != bt) {
-                SET_BACKEND_STATE(backend, bt);
-                g_log_dbproxy(g_warning, "set backend (%s) state to %s",//重复
-                        backend->addr->name->str,
+                g_rw_lock_writer_unlock(&bs->backends_lock);
+                if (change)
+                    g_log_dbproxy(g_warning, "set backend (%s) state to %s", bk_info->name,
                         bt == BACKEND_STATE_UP ? "UP" : (bt == BACKEND_STATE_DOWN ? "DOWN" : "PENDING"));
             }
         }
-        g_rw_lock_writer_unlock(&bs->backends_lock);
 
-        if (monitor_user != NULL) { g_free(monitor_user); }
-        if (monitor_pwd != NULL) { g_free(monitor_pwd); }
+        for (i = 0; i < len; i++) {
+            backend_info* bk_info = bkinfo + i;
+            if (bk_info->ip)
+                g_free(bk_info->ip);
+            if (bk_info->name)
+                g_free(bk_info->name);
+            bk_info->name = NULL;
+            bk_info->ip = NULL;
+        }
+        g_free(bkinfo);
+
+sleep_phase:
+        if (monitor_user != NULL) {
+            g_free(monitor_user);
+            monitor_user = NULL;
+        }
+        if (monitor_pwd != NULL) {
+            g_free(monitor_pwd);
+            monitor_pwd = NULL;
+        }
 
         g_mutex_lock(g_mutex);
         end_time = g_get_monotonic_time() + config->check_state_interval * G_TIME_SPAN_SECOND;

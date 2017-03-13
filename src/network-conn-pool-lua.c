@@ -222,12 +222,14 @@ network_socket *self_connect(network_mysqld_con *con, network_backend_t *backend
     if (-1 == (connect(sock->fd, &sock->dst->addr.common, sock->dst->len))) {
         SELF_CONNECT_MSG_HANDLE(g_critical, sock, "connecting to backend failed", TRUE);
         network_socket_free(sock);
-        if (!IS_BACKEND_OFFLINE(backend) && !IS_BACKEND_WAITING_EXIT(backend)) {
-            SET_BACKEND_STATE(backend, BACKEND_STATE_DOWN);
-            g_log_dbproxy(g_warning, "event_thread(%d) set backend (%s) state to DOWN",
-                                chassis_event_get_threadid(),
-                                backend->addr->name->str);
-        }
+        /** Currently setting backend to DOWN&UP is only allowed by check_sate due to the lock issue.  
+         *if (!IS_BACKEND_OFFLINE(backend) && !IS_BACKEND_WAITING_EXIT(backend)) {
+         *    SET_BACKEND_STATE(backend, BACKEND_STATE_DOWN);
+         *    g_log_dbproxy(g_warning, "event_thread(%d) set backend (%s) state to DOWN",
+         *                        chassis_event_get_threadid(),
+         *                        backend->addr->name->str);
+         *}
+         */
         return NULL;
     }
 

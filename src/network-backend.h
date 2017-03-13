@@ -82,6 +82,7 @@ typedef struct {
     guint    offline_timeout;    /* offline timeout */
     volatile guint connected_clients; /**< number of open connections to this backend for SQF */
 
+    guint64   backend_id;
 //  network_connection_pool *pool; /**< the pool of open connections */
     GPtrArray *pools;
 

@@ -1153,9 +1153,9 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
     if (g_atomic_int_get(&con->conn_status.exit_phase) != CON_ALIVE_NORMAL) {
             will_exit = TRUE;
     }
-    if (NULL != st && NULL != st->backend && IS_BACKEND_WAITING_EXIT(st->backend)) {
+    /*if (NULL != st && NULL != st->backend && IS_BACKEND_WAITING_EXIT(st->backend)) {
         will_exit = TRUE;
-    }
+    }*/
 
     if (TRACE_WAIT_EVENT(con->srv->log->log_trace_modules))
     {
@@ -1332,7 +1332,8 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
             } else if (g_atomic_int_get(&con->conn_status.exit_phase) == CON_EXIT_KILL) {
                     is_con_exit = TRUE;
                     err_msg = "closing connection immediatly during shutdown immediate process or kill session";
-            } else if (st != NULL && st->backend != NULL && IS_BACKEND_WAITING_EXIT(st->backend)) {
+            } 
+            /*else if (st != NULL && st->backend != NULL && IS_BACKEND_WAITING_EXIT(st->backend)) {
                     gint64 time_diff = 0;
 
                     g_rw_lock_reader_lock(&st->backend->backend_lock);
@@ -1347,7 +1348,8 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                         is_con_exit = TRUE;
                         err_msg = "closing connection immediately if no active transactions when offlining/removing";
                     }
-            }
+             }
+             */
 
             if (is_con_exit) {
                 CON_MSG_HANDLE(g_warning, con, err_msg);
@@ -1408,10 +1410,20 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
         case CON_STATE_CONNECT_SERVER:
             if (events == EV_TIMEOUT) {
                 network_mysqld_con_lua_t *st = con->plugin_con_state;
-                if (!IS_BACKEND_OFFLINE(st->backend) &&
-                        !IS_BACKEND_WAITING_EXIT(st->backend)) {
-                    SET_BACKEND_STATE(st->backend, BACKEND_STATE_DOWN);
-                    g_log_dbproxy(g_warning, "set backend (%s) state to DOWN", st->backend->addr->name->str);
+                /** Currently Setting backend to DOWN&UP is only allowed by check_sate due to lock issue.
+                 *if (!IS_BACKEND_OFFLINE(st->backend) &&
+                 *       !IS_BACKEND_WAITING_EXIT(st->backend)) {
+                 *   SET_BACKEND_STATE(st->backend, BACKEND_STATE_DOWN);
+                 *   g_log_dbproxy(g_warning, "set backend (%s) state to DOWN", st->backend->addr->name->str);
+                 *}
+                 */
+                if (st != NULL && st->backend != NULL) {
+                    // Currently don't know the case in which this code would be executed, print log.
+                    g_log_dbproxy(g_critical, "don't know the case in which this code would be executed: %d",
+                                                             g_atomic_int_get(&st->backend->connected_clients));
+                    //g_atomic_int_dec_and_test(&st->backend->connected_clients);
+                    st->backend = NULL;
+                    st->backend_ndx = -1;
                 }
                 network_socket_free(con->server);
                 con->server = NULL;
