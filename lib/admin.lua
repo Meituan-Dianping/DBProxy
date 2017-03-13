@@ -118,6 +118,10 @@ function read_query(packet)
             ret = proxy.global.backends(proxy.BACKEND_STATE_OFFLINE, id - 1, timeout, proxy.BACKEND_STATE);
         elseif state == "online" then
             ret = proxy.global.backends(proxy.BACKEND_STATE_UNKNOWN, id - 1, timeout, proxy.BACKEND_STATE);
+            if ret == -1 then
+                set_error("there is already one RW backend with status no-offline")
+                return proxy.PROXY_SEND_RESULT
+            end
         else
             set_error("invalid operation")
             return proxy.PROXY_SEND_RESULT

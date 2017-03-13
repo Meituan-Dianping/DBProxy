@@ -527,7 +527,7 @@ again:
                      g_rw_lock_reader_unlock(&bs->backends_lock);
                      g_log_dbproxy(g_warning,"online backend %d failed,"
                                        "there is already one RW backend with status no-offline", index);
-                     return 1;
+                     return -1;
                  }
              }
          }
