@@ -362,8 +362,33 @@ int chassis_frontend_set_chassis_options(chassis_frontend_t *frontend, chassis_o
     return 0;   
 }
 
-static void sigsegv_handler(int G_GNUC_UNUSED signum) {
-    g_on_error_stack_trace(g_get_prgname());
+static inline void print_stacktrace(int signum) {
+    int j, nptrs;
+    void *buffer[MAX_FRAMES+1];
+    gchar *signal_str = g_strdup(strsignal(signum));
+    if (signal_str){
+        g_log_dbproxy(g_warning, "[backtrace] signal:%s(%d) stack trace:", signal_str, signum);
+        g_free(signal_str);
+    }
+    else{
+        g_log_dbproxy(g_warning, "[backtrace] signal: (%d) stack trace:", signum);
+    }
+
+    nptrs = backtrace(buffer, MAX_FRAMES);
+    char **strings = backtrace_symbols(buffer, nptrs);
+    if (strings == NULL) {
+        g_log_dbproxy(g_warning, "[backtrace] no backtrace symbols");
+        return;
+    }
+    for (j= 0; j < nptrs; j++){
+        g_log_dbproxy(g_warning, "[backtrace] %-3d: %s", j, strings[j]);
+    }
+    free(strings);
+}
+
+static void sigsegv_handler(int signum) {
+    print_stacktrace(signum);
+    //g_on_error_stack_trace(g_get_prgname());
     abort(); /* trigger a SIGABRT instead of just exiting */
 }
 
@@ -643,9 +668,16 @@ int main_cmdline(int argc, char **argv) {
     sigsegv_sa.sa_handler = sigsegv_handler;
     sigemptyset(&sigsegv_sa.sa_mask);
 
-    if (frontend->invoke_dbg_on_crash && !(RUNNING_ON_VALGRIND)) {
-        sigaction(SIGSEGV, &sigsegv_sa, NULL);
-    }
+    sigaction(SIGSEGV, &sigsegv_sa, NULL);
+#ifdef SIGBUS
+    sigaction(SIGBUS, &sigsegv_sa, NULL);
+#endif
+    sigaction(SIGILL, &sigsegv_sa, NULL);
+    sigaction(SIGFPE, &sigsegv_sa, NULL);
+
+    /*if (frontend->invoke_dbg_on_crash && !(RUNNING_ON_VALGRIND)) {
+             sigaction(SIGSEGV, &sigsegv_sa, NULL);
+    }*/
 #endif
 
     /*
@@ -1014,9 +1046,15 @@ exit_nicely:
 #ifdef HAVE_SIGACTION
     /* reset the handler */
     sigsegv_sa.sa_handler = SIG_DFL;
-    if (frontend->invoke_dbg_on_crash && !(RUNNING_ON_VALGRIND)) {
+    /*if (frontend->invoke_dbg_on_crash && !(RUNNING_ON_VALGRIND)) {
         sigaction(SIGSEGV, &sigsegv_sa, NULL);
-    }
+    }*/
+    sigaction(SIGSEGV, &sigsegv_sa, NULL);
+#ifdef SIGBUS
+    sigaction(SIGBUS, &sigsegv_sa, NULL);
+#endif
+    sigaction(SIGILL, &sigsegv_sa, NULL);
+    sigaction(SIGFPE, &sigsegv_sa, NULL);
 #endif
     chassis_frontend_free(frontend);    
 

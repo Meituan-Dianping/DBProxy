@@ -46,6 +46,8 @@
 
 #include <glib.h>
 
+#include <execinfo.h>
+
 #include "network-exports.h"
 
 #include "network-socket.h"
@@ -59,6 +61,8 @@
 #include "lua-registry-keys.h"
 #include "network-mysqld-stats.h"
 #include "network-conn-errcode.h"
+
+#define MAX_FRAMES 128
 
 #define SEND_ERR_MSG_HANDLE(log_func, errmsg, con)                              \
 do {                                                                            \
