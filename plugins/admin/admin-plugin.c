@@ -470,6 +470,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(server_read_query) {
 
     chunk = recv_sock->recv_queue->chunks->head;
 
+    g_log_dbproxy(g_message, "admin-plugin read query"); //for debug program
     if (recv_sock->recv_queue->chunks->length != 1) {
         g_log_dbproxy(g_message, "client-recv-queue-len = %d", recv_sock->recv_queue->chunks->length);
     }

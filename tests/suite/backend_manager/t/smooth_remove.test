@@ -27,7 +27,7 @@ select * from backends;
 remove backend 2;
 select * from backends;
 
-add slave 10.32.45.150:5002;
+add slave 10.32.45.149:5002;
 #case4: 存在进行中的事务时，设置backend状态为offline，会等待一段时间
 connection conn0;
 set remove-backend-timeout = 3600;

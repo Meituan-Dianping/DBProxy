@@ -13,9 +13,6 @@ admin-username	admin	dbproxy_test	Dynamic
 show variables like 'auto-filter-flag';
 Variable_name	Group	Value	Set mode
 auto-filter-flag	main	OFF	Dynamic
-show variables like 'backend-max-thread-running';
-Variable_name	Group	Value	Set mode
-backend-max-thread-running	main	0	Dynamic
 show variables like 'backend-monitor-pwds';
 Variable_name	Group	Value	Set mode
 backend-monitor-pwds	main		Dynamic
@@ -27,7 +24,7 @@ Variable_name	Group	Value	Set mode
 blacklist-file	main	/usr/local/mysql-proxy/conf/blacklist.dat	Dynamic
 show variables like 'check-state-conn-timeout';
 Variable_name	Group	Value	Set mode
-check-state-conn-timeout	proxy	1	Dynamic
+check-state-conn-timeout	proxy	3	Dynamic
 show variables like 'check-state-interval';
 Variable_name	Group	Value	Set mode
 check-state-interval	proxy	4	Dynamic
@@ -142,30 +139,31 @@ wait-timeout	main	0(s)	Dynamic
 show proxy status;
 Variable_name	Value
 DB_connections_cached	0
-Net_client_read_packets	50
+Net_client_read_packets	49
 Net_server_write_packets	0
 DB_connections	0
 Percentile	2
-Com_query_write	0
 Aborted_clients	0
 Closed_clients	0
+Event_waiting	0
+Aborted_connects	0
 Com_query_read	0
 Com_query_read_sent	0
 Net_server_write	0
 Max_connections	0
 Connections	2
-Net_client_read	2200
+Net_client_read	2147
 Max_used_connections	2
-Aborted_connects	0
+Attempted_connects	1
 Slow_query_total_time	0
 Net_server_read_packets	0
-Attempted_connects	1
+Com_query_write	0
 Net_server_read	0
 Threads_running	0
 Slow_query	0
 Com_query_write_sent	0
-Net_client_write_packets	51
-Net_client_write	9529
+Net_client_write_packets	50
+Net_client_write	9325
 Com_other	0
 Com_other_sent	0
 show events waits status;

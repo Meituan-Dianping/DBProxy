@@ -78,6 +78,8 @@ SET blacklist-file = $file_path	online set blacklist file
 SET backend-max-thread-running = $int	online set backend's max thread running number
 SET thread-running-sleep-delay = $int	online set backend's max thread running sleep timeout
 SET shutdown-timeout = $int	online set the waiting seconds of idle connections during shutdown process
+SET check-state-conn-timeout = $int	max waiting time when establish connection to MySQL for checking backend's state
+SET db-connect-timeout = $double	max waiting time when establish new connection to MySQL
 SHUTDOWN [NORMAL] | IMMEDIATE	online shutdown the dbproxy Server, NORMAL: wait for the current transaction complete before shutdown-timeout expired, IMMEDIATE: shutdown immediately
 KILL [CONNECTION] $id	online kill the client connection, the $id can be found in command show processlist.
 SHOW percentile [$int m|h]	display the response time, m:minute h:hour

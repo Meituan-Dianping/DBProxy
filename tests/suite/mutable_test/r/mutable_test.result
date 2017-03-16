@@ -1,0 +1,61 @@
+show variables like 'version';
+Variable_name	Group	Value	Set mode
+version	main	dbproxy 0.2.0 Build Mar 16 2017	Static
+show variables like 'mysql-version';
+Variable_name	Group	Value	Set mode
+mysql-version	main	5.5	Dynamic
+show variables;
+Variable_name	Group	Value	Set mode
+access-num-per-time-window	main	5	Dynamic
+admin-address	admin	0.0.0.0:6018	Static
+admin-password	admin	8XjhBQKd	Dynamic
+admin-username	admin	dbproxy_test	Dynamic
+auto-filter-flag	main	OFF	Dynamic
+backend-monitor-pwds	main		Dynamic
+basedir	main	/usr/local/mysql-proxy	Static
+blacklist-file	main	/usr/local/mysql-proxy/conf/blacklist.dat	Dynamic
+check-state-conn-timeout	proxy	3	Dynamic
+check-state-interval	proxy	4	Dynamic
+check-state-retry-times	proxy	3	Dynamic
+check-state-sleep-delay	proxy	1	Dynamic
+daemon	main	TRUE	Static
+db-connect-timeout	main	3.000000	Dynamic
+db-connection-idle-timeout	main	3600(s)	Dynamic
+db-connection-max-age	main	7200(s)	Dynamic
+event-threads	main	8	Static
+instance	main	default_test	Static
+keepalive	main	FALSE	Static
+lastest-query-num	main	0	Dynamic
+log-level	main	message	Dynamic
+log-path	main	/usr/local/mysql-proxy/log/	Static
+log-trace-modules	main	0	Dynamic
+long-query-time	main	0(ms)	Dynamic
+long-wait-time	main	0(ms)	Dynamic
+manual-filter-flag	main	OFF	Dynamic
+max-connections	main	0	Dynamic
+max-open-files	main	1000000	Static
+mysql-version	main	5.5	Dynamic
+percentile	proxy	2	Static
+percentile-switch	proxy	OFF	Dynamic
+percentile-value	proxy	64	Dynamic
+plugins	main	proxy, admin	Static
+proxy-address	proxy	0.0.0.0:6003	Static
+query-filter-frequent-threshold	main	0.000000	Dynamic
+query-filter-time-threshold	main	-1	Dynamic
+query-response-time-range-base	main	2	Dynamic
+query-response-time-stats	main	1	Dynamic
+remove-backend-timeout	main	3600(s)	Dynamic
+select-where-limit	proxy	OFF	Dynamic
+shutdown-timeout	main	1(s)	Dynamic
+sql-log	proxy	REALTIME	Dynamic
+sql-log-buffer-size	proxy	10000	Dynamic
+sql-log-file-num	proxy	0	Dynamic
+sql-log-file-size	proxy	0	Dynamic
+sql-log-mode	proxy	BACKEND	Dynamic
+sql-log-slow-ms	proxy	0(ms)	Dynamic
+table-prefix	proxy		Dynamic
+table-suffix	proxy		Dynamic
+thread-running-sleep-delay	main	1(ms)	Dynamic
+user	main		Static
+version	main	dbproxy 0.2.0 Build Mar 16 2017	Static
+wait-timeout	main	0(s)	Dynamic

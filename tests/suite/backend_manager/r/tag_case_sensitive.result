@@ -3,43 +3,43 @@ status
 select * from backends;
 backend_ndx	address	hostname	state	type	weight	tag	threads_running
 1	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	up	rw	0	NULL	0
-2	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	removing	ro	1	tag_MT	0
-3	10.32.45.149:5002	dbproxy-functest02.dx.meituandianping.com	up	ro	1	NULL	0
+2	10.32.45.149:5002	dbproxy-functest02.dx.meituandianping.com	unknown	ro	1	tag_MT	0
+3	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	unknown	ro	1	NULL	0
 remove slave tag tag_mt 2;
 status
 select * from backends;
 backend_ndx	address	hostname	state	type	weight	tag	threads_running
 1	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	up	rw	0	NULL	0
-2	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	removing	ro	1	tag_MT	0
-3	10.32.45.149:5002	dbproxy-functest02.dx.meituandianping.com	up	ro	1	NULL	0
+2	10.32.45.149:5002	dbproxy-functest02.dx.meituandianping.com	unknown	ro	1	tag_MT	0
+3	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	unknown	ro	1	NULL	0
 remove slave tag tag_MT 2;
 status
 select * from backends;
 backend_ndx	address	hostname	state	type	weight	tag	threads_running
 1	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	up	rw	0	NULL	0
-2	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	removing	ro	1	NULL	0
-3	10.32.45.149:5002	dbproxy-functest02.dx.meituandianping.com	up	ro	1	NULL	0
+2	10.32.45.149:5002	dbproxy-functest02.dx.meituandianping.com	unknown	ro	1	NULL	0
+3	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	unknown	ro	1	NULL	0
 add slave tag tag_DP 2;
 status
 select * from backends;
 backend_ndx	address	hostname	state	type	weight	tag	threads_running
 1	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	up	rw	0	NULL	0
-2	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	removing	ro	1	tag_DP	0
-3	10.32.45.149:5002	dbproxy-functest02.dx.meituandianping.com	up	ro	1	NULL	0
+2	10.32.45.149:5002	dbproxy-functest02.dx.meituandianping.com	unknown	ro	1	tag_DP	0
+3	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	unknown	ro	1	NULL	0
 remove slave tag tag_dp;
 status
 select * from backends;
 backend_ndx	address	hostname	state	type	weight	tag	threads_running
 1	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	up	rw	0	NULL	0
-2	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	removing	ro	1	tag_DP	0
-3	10.32.45.149:5002	dbproxy-functest02.dx.meituandianping.com	up	ro	1	NULL	0
+2	10.32.45.149:5002	dbproxy-functest02.dx.meituandianping.com	unknown	ro	1	tag_DP	0
+3	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	unknown	ro	1	NULL	0
 remove slave tag tag_DP;
 status
 select * from backends;
 backend_ndx	address	hostname	state	type	weight	tag	threads_running
 1	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	up	rw	0	NULL	0
-2	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	removing	ro	1	NULL	0
-3	10.32.45.149:5002	dbproxy-functest02.dx.meituandianping.com	up	ro	1	NULL	0
+2	10.32.45.149:5002	dbproxy-functest02.dx.meituandianping.com	unknown	ro	1	NULL	0
+3	10.32.45.150:5002	dbproxy-functest01.dx.meituandianping.com	unknown	ro	1	NULL	0
 add user backends dbproxy_test@tag_MT;
 status
 select * from pwds;

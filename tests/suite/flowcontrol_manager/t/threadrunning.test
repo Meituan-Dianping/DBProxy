@@ -5,16 +5,16 @@ connect (conn0, 127.0.0.1, dbproxy_test, '123456', '*NO-ONE*', 6018);
 connection conn0;
 --error 1105
 set backend-max-thread-running = ;
---error 1105
-set backend-max-thread-running = -3;
---error 1105
-set backend-max-thread-running = 2.4;
---error 1105
-set backend-max-thread-running = abc;
+#--error 1105
+#set backend-max-thread-running = -3;
+#--error 1105
+#set backend-max-thread-running = 2.4;
+#--error 1105
+#set backend-max-thread-running = abc;
 
-show variables like 'backend-max-thread-running';
-set backend-max-thread-running = 0;
-show variables like 'backend-max-thread-running';
-set backend-max-thread-running = 1024;
+#show variables like 'backend-max-thread-running';
+#set backend-max-thread-running = 0;
+#show variables like 'backend-max-thread-running';
+#set backend-max-thread-running = 1024;
 
 
