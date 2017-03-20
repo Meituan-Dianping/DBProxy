@@ -15,7 +15,7 @@ int crc32_string(lua_State *L) {
     g_log_dbproxy(g_debug, "string:%s, length:%d", str, str_len);
     // crc32 hash
     unsigned int key = crc32(str, str_len);
-    g_log_dbproxy(g_debug, "crc key:%ld", key);
+    g_log_dbproxy(g_debug, "crc key:%u", key);
 
     // push crc number
     lua_pushnumber(L, key);

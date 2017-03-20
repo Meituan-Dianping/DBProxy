@@ -87,7 +87,7 @@ static chassis_option_t *find_option_by_name(const gchar *opt_name, chassis_opti
 static chassis_option_t *find_option_from_chas(chassis *chas, const gchar *opt_name);
 
 static gint tables_opts_handle(chassis *chas, gint tables_opts_type, lua_State *L, const char *option_value);
-
+int network_sys_config_lua_getmetatable(lua_State *L);
 
 network_mysqld_con_lua_t *network_mysqld_con_lua_new() {
     network_mysqld_con_lua_t *st;
@@ -238,7 +238,6 @@ static int network_mysqld_status_get(lua_State *L) {
     gsize keysize = 0;
     const char *key = luaL_checklstring(L, 2, &keysize);
     gint event_index = 0, stat_index =0, backend_index = 0;
-    gdouble percentile = 0.0;
 
     if (strleq(key, keysize, C("proxy_status"))) {
         guint64 status_sum = 0;
@@ -414,7 +413,7 @@ static int network_mysqld_status_get(lua_State *L) {
                 {
                     gchar con_id_str[32] = "";
                     conn = gl_conn->data;
-                    sprintf(con_id_str, "%llu", conn->con_id);
+                    sprintf(con_id_str, "%lu", conn->con_id);
                     lua_pushlstring(L, C_S(con_id_str));
 
                     lua_newtable(L);
@@ -1638,7 +1637,6 @@ try_get_double_value(const gchar *option_value, gdouble *return_value)
 {
     gchar *endptr = NULL;
     gdouble value = 0.0;
-    gdouble adjust_value = 0.0;
 
     g_assert(option_value != NULL);
 

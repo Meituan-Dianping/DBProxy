@@ -5,6 +5,7 @@
 #include "chassis-options-utils.h"
 #include "network-injection.h"
 #include "network-mysqld-packet.h"
+#include "chassis-event-thread.h"
 
 #include "proxy-plugin.h"
 #include "proxy-sql-log.h"
@@ -94,6 +95,7 @@ exit:
     g_log_dbproxy(g_message, "log manager thread will exit");
 
     g_thread_exit(0);
+    return NULL;
 }
 
 gint
@@ -403,7 +405,7 @@ show_sql_log_slow_ms(void *ex_param)
     external_param *opt_param = (external_param *)ex_param;
     sql_log_t   *sql_log = config->sql_log_mgr;
 
-    return g_strdup_printf("%ld%s", sql_log->sql_log_slow_ms,
+    return g_strdup_printf("%d%s", sql_log->sql_log_slow_ms,
                             (opt_param->opt_type == SAVE_OPTS ? "" : "(ms)"));
 }
 
@@ -419,7 +421,7 @@ gchar *
 show_sql_log_file_size(void *ex_param)
 {
     sql_log_t   *sql_log = config->sql_log_mgr;
-    return g_strdup_printf("%ld", sql_log->sql_log_max_size);
+    return g_strdup_printf("%d", sql_log->sql_log_max_size);
 }
 
 gint
@@ -428,7 +430,6 @@ assign_sql_log_file_num(const char *newval, void *ex_param)
     external_param  *opt_param = (external_param *)ex_param;
     chassis         *srv = opt_param->chas;
     sql_log_t       *sql_log = config->sql_log_mgr;
-    gint ret = 1;
 
     g_assert(newval != NULL);
 
@@ -490,7 +491,7 @@ load_sql_filenames(sql_log_t *sql_log, chassis *chas) {
     if (sql_log->log_filenames_list == NULL) {
         sql_log->log_filenames_list = g_queue_new();
     }
-    while (rlde = g_dir_read_name(rldir)) {
+    while ((rlde = g_dir_read_name(rldir))) {
         /* exclude current write file */
         if (strncmp(rlde, filename_prefix, strlen(filename_prefix)) == 0) {
             gchar *abslogfilename = g_strdup_printf("%s/%s", dirname, rlde);

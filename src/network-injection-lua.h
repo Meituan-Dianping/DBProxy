@@ -36,6 +36,7 @@
 #include "network-exports.h"
 #include "network-injection.h"
 
+NETWORK_API int parse_resultset_fields(proxy_resultset_t *res);
 NETWORK_API void proxy_getqueuemetatable(lua_State *L);
 NETWORK_API void proxy_getinjectionmetatable(lua_State *L);
 

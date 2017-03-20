@@ -551,8 +551,6 @@ void network_mysqld_replicant_plugin_free(chassis_plugin_config *config) {
  * plugin options 
  */
 static chassis_options_t * network_mysqld_replicant_plugin_get_options(chassis_plugin_config *config) {
-    guint i;
-
     if (config->opts == NULL) {
         chassis_options_t *opts = chassis_options_new();
 

@@ -121,8 +121,6 @@ static gint assign_admin_username(const char *newval, void *ex_param);
 static gchar *show_admin_username(void *ex_param);
 static gint assign_admin_password(const char *newval, void *ex_param);
 static gchar *show_admin_password(void *ex_param);
-static gint assign_admin_hosts(const char *newval, void *ex_param);
-static gchar *show_admin_hosts(void *ex_param);
 
 int network_mysqld_con_handle_stmt(chassis G_GNUC_UNUSED *chas, network_mysqld_con *con, GString *s) {
     gsize i, j;
@@ -299,8 +297,8 @@ NETWORK_MYSQLD_PLUGIN_PROTO(server_read_auth) {
         con->state = CON_STATE_SEND_AUTH_RESULT;
     }
 
-        g_rw_lock_reader_unlock(&con->srv->backends->au->admin_user_lock);
-exit:
+    g_rw_lock_reader_unlock(&con->srv->backends->au->admin_user_lock);
+
     g_string_free(hashed_password, TRUE);   
     g_string_free(excepted_response, TRUE);
 

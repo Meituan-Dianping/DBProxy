@@ -33,6 +33,8 @@
 #include "chassis-log.h"
 #include "chassis-options.h"
 #include "chassis-plugin.h"
+#include "chassis-path.h"
+#include "glib-ext.h"
 
 #define C(x) x, sizeof(x)-1
 #define C_S(x) x, strlen(x)
@@ -80,7 +82,7 @@ try_get_double_value(const gchar *option_value, gdouble *return_value)
 {
     gchar *endptr = NULL;
     gdouble value = 0.0;
-    gdouble adjust_value = 0.0;
+    //gdouble adjust_value = 0.0;
 
     g_assert(option_value != NULL);
 
@@ -356,7 +358,7 @@ show_max_connections(void *ex_param)
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
 
-    return g_strdup_printf("%ld", srv->proxy_max_connections);
+    return g_strdup_printf("%d", srv->proxy_max_connections);
 }
 
 gint
@@ -371,7 +373,7 @@ show_long_wait_time(void *ex_param)
 {
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
-    return g_strdup_printf("%ld%s", srv->long_wait_time, (opt_param->opt_type == SAVE_OPTS ? "" : "(ms)"));
+    return g_strdup_printf("%d%s", srv->long_wait_time, (opt_param->opt_type == SAVE_OPTS ? "" : "(ms)"));
 }
 
 gint
@@ -387,7 +389,7 @@ show_long_query_time(void *ex_param)
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
 
-    return g_strdup_printf("%ld%s", srv->long_query_time, (opt_param->opt_type == SAVE_OPTS ? "" : "(ms)"));
+    return g_strdup_printf("%d%s", srv->long_query_time, (opt_param->opt_type == SAVE_OPTS ? "" : "(ms)"));
 }
 
 gint
@@ -403,7 +405,7 @@ show_time_range_base(void *ex_param)
 {
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
-    return g_strdup_printf("%ld", srv->query_response_time_range_base);
+    return g_strdup_printf("%d", srv->query_response_time_range_base);
 }
 
 gint
@@ -420,7 +422,7 @@ show_time_stats(void *ex_param)
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
 
-    return g_strdup_printf("%ld", srv->query_response_time_stats);
+    return g_strdup_printf("%d", srv->query_response_time_stats);
 }
 
 gchar *
@@ -473,7 +475,7 @@ show_wait_timeout(void *ex_param)
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
 
-    return g_strdup_printf("%ld%s", srv->wait_timeout, (opt_param->opt_type == SAVE_OPTS ? "" : "(s)"));
+    return g_strdup_printf("%d%s", srv->wait_timeout, (opt_param->opt_type == SAVE_OPTS ? "" : "(s)"));
 }
 
 gint
@@ -492,7 +494,7 @@ show_shutdown_timeout(void *ex_param)
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
 
-    return g_strdup_printf("%ld%s", srv->shutdown_timeout, (opt_param->opt_type == SAVE_OPTS ? "" : "(s)"));
+    return g_strdup_printf("%d%s", srv->shutdown_timeout, (opt_param->opt_type == SAVE_OPTS ? "" : "(s)"));
 }
 
 gint
@@ -510,7 +512,7 @@ show_db_connection_idle_timeout(void *ex_param)
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
 
-    return g_strdup_printf("%ld%s", srv->db_connection_idle_timeout, (opt_param->opt_type == SAVE_OPTS ? "" : "(s)"));
+    return g_strdup_printf("%d%s", srv->db_connection_idle_timeout, (opt_param->opt_type == SAVE_OPTS ? "" : "(s)"));
 }
 
 gint
@@ -527,7 +529,7 @@ show_db_connection_max_age(void *ex_param)
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
 
-    return g_strdup_printf("%ld%s", srv->db_connection_max_age, (opt_param->opt_type == SAVE_OPTS ? "" : "(s)"));
+    return g_strdup_printf("%d%s", srv->db_connection_max_age, (opt_param->opt_type == SAVE_OPTS ? "" : "(s)"));
 }
 
 gint
@@ -590,7 +592,7 @@ show_lastest_query_num(void *ex_param)
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
 
-    return g_strdup_printf("%ld", srv->proxy_reserved->lastest_query_num);
+    return g_strdup_printf("%d", srv->proxy_reserved->lastest_query_num);
 }
 
 /*
@@ -697,7 +699,7 @@ show_access_ratio(void *ex_param)
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
 
-    return g_strdup_printf("%ld", srv->proxy_reserved->access_num_per_time_window);
+    return g_strdup_printf("%d", srv->proxy_reserved->access_num_per_time_window);
 }
 
 gint
@@ -734,7 +736,7 @@ show_thread_running_sleep_delay(void *ex_param)
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
 
-    return g_strdup_printf("%ld%s", srv->thread_running_sleep_delay, (opt_param->opt_type == SAVE_OPTS ? "" : "(ms)"));
+    return g_strdup_printf("%d%s", srv->thread_running_sleep_delay, (opt_param->opt_type == SAVE_OPTS ? "" : "(ms)"));
 }
 
 static gint
@@ -821,7 +823,7 @@ show_remove_backend_timeout(void *ex_param)
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
 
-    return g_strdup_printf("%lu%s", srv->backends->remove_backend_timeout, (opt_param->opt_type == SAVE_OPTS ? "" : "(s)"));
+    return g_strdup_printf("%u%s", srv->backends->remove_backend_timeout, (opt_param->opt_type == SAVE_OPTS ? "" : "(s)"));
 }
 
 gint
@@ -895,7 +897,7 @@ assign_db_connect_timeout(const char *newval, void *ex_param)
     gboolean ret = TRUE;
     gdouble new_value = 0.0;
 
-    if(ret = try_get_double_value(newval, &new_value)) {
+    if((ret = try_get_double_value(newval, &new_value))) {
         if(new_value >= 0.0) {
             srv->db_connect_timeout = new_value;
         } else {
@@ -911,7 +913,7 @@ show_log_trace_modules(void *ex_param)
     external_param *opt_param = (external_param *)ex_param;
     chassis *srv = opt_param->chas;
 
-    return g_strdup_printf("%ld", srv->log->log_trace_modules);
+    return g_strdup_printf("%d", srv->log->log_trace_modules);
 }
 
 gchar *
@@ -1176,10 +1178,8 @@ gboolean
 opt_match(const char *str, const char *prefix)
 {
     gchar   *percent_pos = NULL;
-    gchar   *table_end_pos = NULL;
     gsize   cmp_size = 0;
     gboolean match = FALSE;
-    gboolean has_percent = FALSE;
 
     g_assert(str != NULL && prefix != NULL);
 

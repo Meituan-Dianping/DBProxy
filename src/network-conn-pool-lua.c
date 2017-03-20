@@ -406,7 +406,7 @@ network_socket *self_connect(network_mysqld_con *con, network_backend_t *backend
 
     guint64 long_wait_time = chassis_event_thread_wait_end(con->srv, WAIT_EVENT_SERVER_CONNECT);
     if (long_wait_time > 0) {
-        gchar *msg = g_strdup_printf("long conn wait event: wait time(%d us)", long_wait_time);
+        gchar *msg = g_strdup_printf("long conn wait event: wait time(%lu us)", long_wait_time);
         SELF_CONNECT_MSG_HANDLE(g_warning, sock, msg, FALSE);
         g_free(msg);
     }

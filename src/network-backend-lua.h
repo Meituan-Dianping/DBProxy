@@ -23,7 +23,8 @@
 #include <lua.h>
 
 #include "network-exports.h"
-
+NETWORK_API int network_pwds_lua_getmetatable(lua_State *L);
+NETWORK_API int network_clients_lua_getmetatable(lua_State *L);
 NETWORK_API int network_backend_lua_getmetatable(lua_State *L);
 NETWORK_API int network_backends_lua_getmetatable(lua_State *L);
 

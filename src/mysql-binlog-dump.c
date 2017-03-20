@@ -134,7 +134,9 @@ int network_mysqld_proto_field_get(network_packet *packet,
                 guchar s[4];
             } shadow;
 
+#if 0
             guint i;
+#endif
 
             memcpy(shadow.s, s, 4);
 
@@ -161,7 +163,9 @@ int network_mysqld_proto_field_get(network_packet *packet,
                 guchar s[8];
             } shadow;
 
+#if 0
             guint i;
+#endif
 
             memcpy(shadow.s, s, 8);
 

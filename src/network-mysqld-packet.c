@@ -1175,7 +1175,6 @@ int network_mysqld_proto_get_ok_packet(network_packet *packet, network_mysqld_ok
     guint8 field_count;
     guint64 affected, insert_id;
     guint16 server_status, warning_count = 0;
-    guint32 capabilities = CLIENT_PROTOCOL_41;
 
     int err = 0;
     gchar *msg = NULL;
@@ -2333,7 +2332,7 @@ int network_mysqld_proto_get_binary_row(network_packet *packet, network_mysqld_p
         } else {
             err = network_mysqld_proto_binary_get_type(packet, param);
             if (err != 0) {
-                gchar *err_msg = g_strdup_printf("get %dth param type failed");
+                gchar *err_msg = g_strdup_printf("get param type failed");
                 EMIT_SIMPLE_CRITICAL(err_msg);
                 g_free(err_msg);
             }
@@ -2443,7 +2442,7 @@ GString* network_mysqld_auth_challenge_dump(network_mysqld_auth_challenge *shake
     g_string_append_printf(challenge_dump,
                             "protocol_version:%d server_version_str:%s server_version:%d "
                             "thread_id:%d capabilities:%d "
-                            "charset:%d server_status:%d challenge:%x",
+                            "charset:%d server_status:%d challenge:%s",
                              shake->protocol_version, shake->server_version_str, shake->server_version,
                              shake->thread_id, shake->capabilities,
                              shake->charset, shake->server_status, shake->challenge->str);
