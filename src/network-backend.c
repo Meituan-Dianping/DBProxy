@@ -487,10 +487,10 @@ int network_backends_remove(network_backends_t *bs, network_backend_t *backend) 
 
     g_rw_lock_writer_lock(&bs->backends_lock);
 
-    if (g_atomic_int_get(&backend->connected_clients) != 0) {
-        g_rw_lock_writer_unlock(&bs->backends_lock);
-        return 0;
-    }
+    //if (g_atomic_int_get(&backend->connected_clients) != 0) {
+    //    g_rw_lock_writer_unlock(&bs->backends_lock);
+    //    return 0;
+    //}
 
     if (backend->slave_tag != NULL) {
         tag_backends = g_hash_table_lookup(bs->tag_backends, backend->slave_tag->str);
@@ -512,7 +512,8 @@ int network_backends_remove(network_backends_t *bs, network_backend_t *backend) 
     }
 
     g_ptr_array_remove(bs->backends, backend);
-    network_backend_free(backend);
+    //Don't release memory, although causing memory leak. Fix it later
+    //network_backend_free(backend);
 
     g_rw_lock_writer_unlock(&bs->backends_lock);
 
