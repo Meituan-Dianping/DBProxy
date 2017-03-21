@@ -28,7 +28,7 @@ failover; query analysis; query filtering and modification; and many more.
 %setup
 
 %build
-%configure CFLAGS="-O0 -g" LDFLAGS="-Wl,--rpath=/usr/lib64/" 
+%configure CFLAGS="-O0 -s" LDFLAGS="-Wl,--rpath=/usr/lib64/" 
 %{__make} %{?_smp_mflags}
 
 %install
