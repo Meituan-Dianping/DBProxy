@@ -37,7 +37,8 @@ rm -rf ~/rpmbuild/SRPMS/dbproxy-${version_no}-${release_no}.el6.src.rpm
 
 rm -rf ~/rpmbuild/SOURCES/dbproxy-${version_no}
 rm -rf ~/rpmbuild/SPECS/dbproxy-${version_no}.spec
-cp -rf ../../dbproxy ~/rpmbuild/SOURCES/dbproxy-${version_no}
+mkdir ~/rpmbuild/SOURCES/dbproxy-${version_no}
+cp -rf ../* ~/rpmbuild/SOURCES/dbproxy-${version_no}
 cp -rf ./dbproxy.spec ~/rpmbuild/SPECS/dbproxy-${version_no}.spec
 
 sed -i "s/Version:.*/Version: ${version_no}/"  ~/rpmbuild/SPECS/dbproxy-${version_no}.spec
