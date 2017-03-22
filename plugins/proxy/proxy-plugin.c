@@ -3574,6 +3574,7 @@ sleep_phase:
         g_mutex_unlock(g_mutex);
     }
 
+    mysql_library_end();
     g_log_dbproxy(g_message, "check_state thread will exit");
     g_thread_exit(0);
     return NULL;
