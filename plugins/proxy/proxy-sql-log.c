@@ -339,12 +339,12 @@ gint
 assign_sql_log_mode(const char *newval, void *ex_param)
 {
     gint        ret = 0, sql_log_mode = 0;
-    gchar       *token = NULL, *sql_log_opt = NULL;
+    gchar       *token = NULL, *sql_log_opt = NULL, *log_opt = NULL;
     sql_log_t   *sql_log = config->sql_log_mgr;
 
     g_assert(newval != NULL);
 
-    sql_log_opt = g_strdup(newval);
+    log_opt = sql_log_opt = g_strdup(newval);
 
     while ((token = strsep(&sql_log_opt, ",")) != NULL) {
         if (strcasecmp(token, "ALL") == 0) {
@@ -358,7 +358,7 @@ assign_sql_log_mode(const char *newval, void *ex_param)
             ret = 1;
         }
      }
-     g_free(sql_log_opt);
+     g_free(log_opt);
 
     if (ret != 1) {
         sql_log->sql_log_mode = sql_log_mode;
