@@ -720,7 +720,7 @@ network_backend_t* wrr_ro(network_mysqld_con *con, gint *backend_ndx, gchar *bac
     guint next_ndx   = rwsplit->next_ndx;
 
     // get backend index by slave wrr
-    network_backend_t *res = NULL;
+    network_backend_t *res = NULL, *temp_res = NULL;
     for(i = 0; i < ndx_num; ++i) {
         network_backend_t *backend = (network_backend_t *)g_ptr_array_index(backends, next_ndx);
         if (backend == NULL || (con->srv->max_backend_tr > 0 &&
@@ -731,10 +731,13 @@ network_backend_t* wrr_ro(network_mysqld_con *con, gint *backend_ndx, gchar *bac
         if (chassis_event_thread_pool(backend) == NULL) goto next;
 
         if (backend->type == BACKEND_TYPE_RO &&
-                        backend->weight >= cur_weight &&
+                        /* backend->weight >= cur_weight && */
                         IS_BACKEND_UP(backend)) {   /* without pending backend */
-            res = backend;
-            *backend_ndx = i;
+            temp_res = backend;
+            if (backend->weight >= cur_weight) {
+                res = backend;
+                *backend_ndx = i;
+            }
         }
 
     next:
@@ -750,6 +753,9 @@ network_backend_t* wrr_ro(network_mysqld_con *con, gint *backend_ndx, gchar *bac
         if (res != NULL) break;
     }
 
+    if (res == NULL && temp_res != NULL) {
+        res = temp_res;
+    }
     rwsplit->cur_weight = cur_weight;
     rwsplit->next_ndx = next_ndx;
     return res;
