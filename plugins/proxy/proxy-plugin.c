@@ -1959,7 +1959,7 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
             network_backend_t *old_backend = st->backend;
             if (TRACE_SQL(con->srv->log->log_trace_modules)) {
                 gchar *msg = g_strdup_printf("current backend(%d) isn't the master node(%d), "
-                                            "altas will push it back to connnection pool, then get a new master backend.",
+                                            "DBProxy will close the connnection to this backend, then try to get a new master backend.",
                                              st->backend_ndx, backend_ndx);
                 CON_MSG_HANDLE(g_message, con, msg);
                 g_free(msg);
@@ -1974,7 +1974,9 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
             } else {
                 g_log_dbproxy(g_critical, "unexpected case encountered");
             }
-            if (old_backend != NULL && old_backend->type == BACKEND_TYPE_RW) {
+            if (old_backend != NULL && old_backend->type == BACKEND_TYPE_RW
+                 && (con->conn_status.is_in_transaction || con->locks && g_hash_table_size(con->locks) > 0
+                     || con->client && con->client->conn_attr.savepoint_flag)) {
                 //if old backend is RW, the err-message is still 'I have no server backend', fix it later.
                 if (backend_tag != NULL) { g_free(backend_tag); }
                 g_log_dbproxy(g_warning, "candidate master-backend is not the original, close both connections");

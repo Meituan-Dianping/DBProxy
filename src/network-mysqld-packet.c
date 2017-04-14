@@ -1194,7 +1194,7 @@ int network_mysqld_proto_get_ok_packet(network_packet *packet, network_mysqld_ok
 
     err = network_mysqld_proto_get_lenenc_int(packet, &affected);
     if (err != 0) {
-        msg = "get ok packet's insert_id failed";
+        msg = "get ok packet's affected_rows failed";
         goto funcexit;
     }
     err = network_mysqld_proto_get_lenenc_int(packet, &insert_id);
