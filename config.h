@@ -248,13 +248,13 @@
 #define PACKAGE_NAME "dbproxy"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "dbproxy 0.2.0"
+#define PACKAGE_STRING "dbproxy 0.2.2"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "dbproxy"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.2.0"
+#define PACKAGE_VERSION "0.2.2"
 
 /* lpackage-version-id */
 #define PACKAGE_VERSION_ID (0 << 16 | 2 << 8 | 0)
@@ -294,7 +294,7 @@
 
 
 /* Version number of package */
-#define VERSION "0.2.0"
+#define VERSION "0.2.2"
 
 /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
    significant byte first (like Motorola and SPARC, unlike Intel). */
