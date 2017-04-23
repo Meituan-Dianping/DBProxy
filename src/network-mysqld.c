@@ -1575,7 +1575,8 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                 if (TRACE_CON_STATUS(con->srv->log->log_trace_modules)) {
                     CON_MSG_HANDLE(g_warning, con, "send handshake to client failed");
                 } else {
-                    CON_MSG_HANDLE(g_warning, con, "send handshake to client failed");
+                    //change log level from g_warning to g_debug due to checking proxy status by MGW periodically.
+                    CON_MSG_HANDLE(g_debug, con, "send handshake to client failed");
                 }
                 g_atomic_int_add(&srv->proxy_aborted_connects, 1);
                 con->state = CON_STATE_ERROR;
