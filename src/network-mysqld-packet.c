@@ -2322,7 +2322,7 @@ int network_mysqld_proto_get_binary_row(network_packet *packet, network_mysqld_p
 
         param = network_mysqld_type_new(coldef->type);
         if (NULL == param) {
-            g_log_dbproxy(g_warning, "coulnd't create type = %d", coldef->type);
+            g_log_dbproxy(g_warning, "couldn't create type = %d", coldef->type);
             err = -1;
             break;
         }

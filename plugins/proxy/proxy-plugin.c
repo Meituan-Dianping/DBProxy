@@ -3575,7 +3575,7 @@ sleep_phase:
         g_mutex_lock(g_mutex);
         end_time = g_get_monotonic_time() + config->check_state_interval * G_TIME_SPAN_SECOND;
         if (!g_cond_wait_until(g_cond, g_mutex, end_time)) {
-            g_log_dbproxy(g_message, "check state waiting meet timeout");
+            g_log_dbproxy(g_debug, "check state waiting meet timeout");
         } else {
             g_log_dbproxy(g_message, "check_state thread get exit signal");
         }
@@ -3773,7 +3773,7 @@ set_state:
         g_mutex_lock(g_mutex);
         end_time = g_get_monotonic_time() + config->check_state_interval * G_TIME_SPAN_SECOND;
         if (!g_cond_wait_until(g_cond, g_mutex, end_time)) {
-            g_log_dbproxy(g_message, "check state waiting meet timeout");
+            g_log_dbproxy(g_debug, "check state waiting meet timeout");
         } else {
             g_log_dbproxy(g_message, "check_state thread get exit signal");
         }

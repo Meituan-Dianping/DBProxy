@@ -344,7 +344,7 @@ check_percentile(void *user_data)
         while (percentile_controller->percentile_switch == pt_off) {
             end_time = g_get_monotonic_time () + SECONDS_PER_MIN * G_TIME_SPAN_SECOND;
             if (!g_cond_wait_until(g_cond, g_mutex, end_time)) {
-                g_log_dbproxy(g_message, "percentile waiting meet timeout");
+                g_log_dbproxy(g_debug, "percentile waiting meet timeout");
             } else {
                 if (chassis_is_shutdown()) {
                     g_log_dbproxy(g_message, "check_percentile thread get exit signal");
