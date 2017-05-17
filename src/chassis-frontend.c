@@ -553,7 +553,7 @@ int chassis_frontend_write_pidfile(const char *pid_file, GError **gerr) {
     int ret = 0;
     int my_pid = 0, other_pid = 0;
     int len = 0;
-    gchar buffer[128];
+    gchar buffer[128] = {0};
     gchar *pid_str = NULL;
 
     my_pid = getpid();

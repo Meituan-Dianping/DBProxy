@@ -1243,7 +1243,8 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                     /* the client closed the connection, let's keep the server side open */
                     gchar *msg = "close both sides because of client was closed unexpectedly.";
                     if (con->state <= CON_STATE_READ_AUTH) {
-                        CON_MSG_HANDLE(g_message, con, msg);
+                        //change log level from g_message to g_debug due to checking proxy status by MGW periodically.
+                        CON_MSG_HANDLE(g_debug, con, msg);
                     } else {
                         CON_MSG_HANDLE(g_critical, con, msg);
                     }
