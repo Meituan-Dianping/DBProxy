@@ -45,3 +45,7 @@ If You have new functional requirements about DBProxy in the production environm
 ###7.Communication group(QQ)
 
 ![QQ](./doc/img/DBProxy用户交流群群二维码.png)
+
+![QQ](./doc/img/DBProxy用户交流群2群二维码.png)
+
+note:QQ chat group 1 is full of people and not available, please join QQ chat group 2(550320610).
