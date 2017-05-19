@@ -38,3 +38,7 @@ DBProxy是由美团点评公司技术工程部DBA团队（北京）开发维护�
 如果用户在实际的应用场景中对DBProxy有新的功能需求，或者在使用DBProxy的过程中发现了bug，在github上进行交流或是PullRequest，后续将会建立DBProxy的公众号以及讨论组/群方便大家的使用和版本的维护。
 
 ![QQ](./doc/img/DBProxy用户交流群群二维码.png)
+
+![QQ](./doc/img/DBProxy用户交流群2群二维码.png)
+
+注意：QQ群1已经满员，请加入QQ群2(550320610)。
