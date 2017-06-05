@@ -2090,7 +2090,6 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query) {
 
         if (type == COM_QUERY && tokens->len <= 1) {
             gchar *errmsg = g_strdup_printf("%s was empty", GET_COM_NAME(type));
-            g_string_free(packets, TRUE);
             network_mysqld_con_send_error_full_nolog(con->client, C_S(errmsg),
                                                ER_EMPTY_QUERY, "42000");
             SEND_ERR_MSG_HANDLE(g_critical, errmsg, con->client);
