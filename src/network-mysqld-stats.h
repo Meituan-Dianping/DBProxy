@@ -129,6 +129,19 @@ typedef struct connection_status_var_t
 {
     guint64 cur_query_type;
     guint64 cur_query_start_time;
+
+    guint64 cur_query_read_client_begin;
+    guint64 cur_query_read_client_end;
+    guint64 cur_query_send_server_begin;
+    guint64 cur_query_send_server_end;
+    guint64 cur_query_read_server_begin;
+    guint64 cur_query_read_server_end;
+    guint64 cur_query_send_client_begin;
+    guint64 cur_query_send_client_end;
+
+    guint8       query_status;
+    GString     *query;
+
     gboolean query_running;
     gchar cur_query[STMT_LENTH];
     guint64 cur_query_com_type;

@@ -491,6 +491,8 @@ void network_mysqld_con_free(network_mysqld_con *con) {
         g_atomic_pointer_add(&(thread_status_var->thread_stat[THREAD_STAT_THREADS_RUNNING]), -1);
     }
 
+    g_string_free(con->conn_status_var.query, TRUE);
+
     g_string_free(con->conn_status.set_charset_client, TRUE);
     g_string_free(con->conn_status.set_charset_results, TRUE);
     g_string_free(con->conn_status.set_charset_connection, TRUE);
@@ -1858,7 +1860,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
 
         case CON_STATE_READ_QUERY: {
             network_socket *recv_sock = con->client;
-
+            con->conn_status_var.cur_query_read_client_begin = chassis_get_rel_microseconds();
             if (events == EV_TIMEOUT) {
                 gchar *log_str = g_strdup_printf("close the noninteractive connection(%s) now because of timeout.",
                                                 NETWORK_SOCKET_SRC_NAME(recv_sock));
@@ -1926,7 +1928,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                     g_string_free(packets, TRUE);
                 }
             }
-
+            con->conn_status_var.cur_query_read_client_end = chassis_get_rel_microseconds();
             switch (plugin_call(srv, con, con->state)) {
                 case NETWORK_SOCKET_SUCCESS:
                     break;
@@ -2027,7 +2029,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
 
             con->is_in_wait = FALSE;
             con->try_send_query_times = 0;
-
+            con->conn_status_var.cur_query_send_server_begin = chassis_get_rel_microseconds();
             switch (network_mysqld_write(srv, con->server)) {
             case NETWORK_SOCKET_SUCCESS:
                 break;
@@ -2065,7 +2067,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                 con->state = CON_STATE_READ_QUERY_RESULT;
                 break;
             }
-
+            con->conn_status_var.cur_query_send_server_end = chassis_get_rel_microseconds();
             if (TRACE_SQL(con->srv->log->log_trace_modules)) {
                 if (con->state == CON_STATE_READ_QUERY_RESULT) {
                     CON_MSG_HANDLE(g_message, con, "send query to read query result");
@@ -2078,6 +2080,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
              *
              * depending on the backend we may forward the data to the client right away
              */
+            con->conn_status_var.cur_query_read_server_begin = chassis_get_rel_microseconds();
             do {
                 network_socket *recv_sock;
 
@@ -2158,7 +2161,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                     }
                 }
             } while (con->state == CON_STATE_READ_QUERY_RESULT);
-
+            con->conn_status_var.cur_query_read_server_end = chassis_get_rel_microseconds();
             if (g_atomic_int_get(&con->conn_status.exit_phase) == CON_EXIT_KILL) {
                 con->state = CON_STATE_ERROR;
                 g_log_dbproxy(g_warning, "connection close immediatly during shutdown immediate or kill session.");
@@ -2174,6 +2177,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
         case CON_STATE_SEND_QUERY_RESULT:
             /**
              * send the query result-set to the client */
+            con->conn_status_var.cur_query_send_client_begin = chassis_get_rel_microseconds();
             switch (network_mysqld_write(srv, con->client)) {
             case NETWORK_SOCKET_SUCCESS:
                 break;
@@ -2213,7 +2217,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
 
                 break;
             }
-
+            con->conn_status_var.cur_query_send_client_end = chassis_get_rel_microseconds();
             switch (plugin_call(srv, con, con->state)) {
             case NETWORK_SOCKET_SUCCESS:
                 break;

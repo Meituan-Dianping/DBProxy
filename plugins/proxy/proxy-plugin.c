@@ -2331,6 +2331,8 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_send_query_result) {
     send_sock = con->server;
     recv_sock = con->client;
 
+    log_sql_backend_ex(config->sql_log_mgr, con);
+
     if (st->connection_close) {
         con->state = CON_STATE_ERROR;
 
@@ -2642,6 +2644,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query_result) {
         inj = g_queue_peek_head(st->injected.queries);
     }
 
+
     if (inj && inj->ts_read_query_result_first == 0) {
         /**
          * log the time of the first received packet
@@ -2701,6 +2704,9 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query_result) {
             inj->ts_read_query_result_last = chassis_get_rel_microseconds();
             /* g_get_current_time(&(inj->ts_read_query_result_last)); */
         }
+
+        con->conn_status_var.query_status = inj->qstat.query_status;
+        con->conn_status_var.query = g_string_new(inj->query->str);
 
         network_mysqld_queue_reset(recv_sock); /* reset the packet-id checks as the server-side is finished */
 
@@ -2910,6 +2916,11 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query_result) {
             }
             network_mysqld_stat_stmt_end(con, cur_time);
             con->state = CON_STATE_READ_QUERY;
+
+            con->conn_status_var.cur_query_send_client_begin = 0.0;
+            con->conn_status_var.cur_query_send_client_end = 0.0;
+            log_sql_backend_ex(config->sql_log_mgr, con);
+
         }
     }
     NETWORK_MYSQLD_CON_TRACK_TIME(con, "proxy::ready_query_result::leave");
@@ -3370,7 +3381,7 @@ static chassis_options_t * network_mysqld_proxy_plugin_get_options(chassis_plugi
         chassis_options_add(opts, "percentile-value", 0, 0, G_OPTION_ARG_INT, &(config->percentile_value), "this parameter determines the percentile th", NULL, assign_percentile_value, show_percentile_value, ALL_OPTS_PROPERTY);
         chassis_options_add(opts, "percentile", 0, 0, G_OPTION_ARG_DOUBLE, &(config->percentile), "this parameter determines the percentile", NULL, NULL, show_percentile, SHOW_OPTS_PROPERTY);
         chassis_options_add(opts, "sql-log", 0, 0, G_OPTION_ARG_STRING, &(config->sql_log_type), "sql log type(ON: open, REALTIME: open_sync, OFF: close default: OFF)", NULL, assign_sql_log, show_sql_log, ALL_OPTS_PROPERTY);
-        chassis_options_add(opts, "sql-log-mode", 0, 0, G_OPTION_ARG_STRING, &(config->sql_log_mode), "sql log mode(CLIENT: client sql, BACKEND: backend sql, ALL: client + backend, default: ALL)", NULL,
+        chassis_options_add(opts, "sql-log-mode", 0, 0, G_OPTION_ARG_STRING, &(config->sql_log_mode), "sql log mode(CLIENT: client sql, BACKEND: backend sql, ALL: client + backend, TIME: record time in detail, default: ALL)", NULL,
                                                         assign_sql_log_mode, show_sql_log_mode, ALL_OPTS_PROPERTY);
         chassis_options_add(opts, "sql-log-slow-ms", 0, 0, G_OPTION_ARG_INT, &(config->sql_log_mgr->sql_log_slow_ms), "only log sql which takes longer than this milliseconds (default: 0)", NULL,
                                                         assign_sql_log_slow_ms, show_sql_log_slow_ms, ALL_OPTS_PROPERTY);
