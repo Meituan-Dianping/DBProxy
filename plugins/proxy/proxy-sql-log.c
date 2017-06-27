@@ -602,7 +602,8 @@ log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con)
     GString *message = NULL;
     GString *begin_time = NULL;
     gfloat read_client_latency = 0.0, handle1_latency = 0.0, send_server_latency = 0.0, server_latency = 0.0,
-            read_server_latency = 0.0, handle2_latency = 0.0, send_client_latency = 0.0, total_latency = 0.0;
+            read_server_latency = 0.0, handle2_latency = 0.0, send_client_latency = 0.0, total_latency = 0.0,
+            tokenize_latency = 0.0, split_latency = 0.0;
 
     if (sql_log->sql_log_type == OFF ||
         !(sql_log->sql_log_mode & SQL_LOG_TIME)) {
@@ -617,6 +618,8 @@ log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con)
     handle2_latency = (con->conn_status_var.cur_query_send_client_begin - con->conn_status_var.cur_query_read_server_end)/1000.0;
     send_client_latency = (con->conn_status_var.cur_query_send_client_end - con->conn_status_var.cur_query_send_client_begin)/1000.0;
     total_latency = (con->conn_status_var.cur_query_send_client_end - con->conn_status_var.cur_query_read_client_begin)/1000.0;
+    tokenize_latency = (con->conn_status_var.cur_query_tokenizer_end - con->conn_status_var.cur_query_tokenizer_begin)/1000.0;
+    split_latency = (con->conn_status_var.cur_query_split_end - con->conn_status_var.cur_query_split_begin)/1000.0;
 
     message = g_string_sized_new(sizeof("2004-01-01T00:00:00.000Z"));
 
@@ -625,7 +628,7 @@ log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con)
     /* get current time */
     chassis_log_update_timestamp(message, CHASSIS_RESOLUTION_US);
     g_string_append_printf(message, "# C_begin:%s recv_client_latency:%.3f(ms) proxy_pre_expend:%.3f(ms) send_server_latency:%.3f(ms) "
-            "DB_expend:%.3f(ms) recv_server_latency:%.3f(ms) proxy_pos_expend:%.3f(ms) send_client_latency:%.3f(ms) total_latency:%.3f(ms) %s %s:%s\n",
+            "DB_expend:%.3f(ms) recv_server_latency:%.3f(ms) proxy_pos_expend:%.3f(ms) tokenize_latency:%0.3f(ms) split_latency:%0.3f(ms) send_client_latency:%.3f(ms) total_latency:%.3f(ms) %s %s:%s\n",
                                 begin_time->str,
                                 read_client_latency,
                                 handle1_latency,
@@ -635,6 +638,8 @@ log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con)
                                 handle2_latency,
                                 send_client_latency,
                                 total_latency,
+                                tokenize_latency,
+                                split_latency,
                                 con->conn_status_var.query_status == MYSQLD_PACKET_OK ? "OK" : "ERR",
                                 GET_COM_STRING(con->conn_status_var.query));
     g_string_free(begin_time, TRUE);

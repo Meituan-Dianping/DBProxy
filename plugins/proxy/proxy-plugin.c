@@ -2082,12 +2082,16 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query) {
         log_sql_client(config->sql_log_mgr, con);
 
         GPtrArray *tokens = sql_tokens_new();
+
+        con->conn_status_var.cur_query_tokenizer_begin = chassis_get_rel_microseconds();
         sql_tokenizer(tokens, packets->str, packets->len);
+        con->conn_status_var.cur_query_tokenizer_end = chassis_get_rel_microseconds();
 
         if (TRACE_SQL(con->srv->log->log_trace_modules)) {
             CON_MSG_HANDLE(g_message, con, "sql parse success");
         }
 
+        con->conn_status_var.cur_query_split_begin = chassis_get_rel_microseconds();
         if (type == COM_QUERY && tokens->len <= 1) {
             gchar *errmsg = g_strdup_printf("%s was empty", GET_COM_NAME(type));
             network_mysqld_con_send_error_full_nolog(con->client, C_S(errmsg),
@@ -2230,6 +2234,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query) {
         sql_tokens_free(tokens);
     }
     NETWORK_MYSQLD_CON_TRACK_TIME(con, "proxy::ready_query::leave_lua");
+    con->conn_status_var.cur_query_split_end = chassis_get_rel_microseconds();
 
     switch (ret) {
     case PROXY_NO_DECISION:
