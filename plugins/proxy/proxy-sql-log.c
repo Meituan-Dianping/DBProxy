@@ -680,6 +680,7 @@ log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con)
                                 split_append_latency,
                                 con->conn_status_var.query_status == MYSQLD_PACKET_OK ? "OK" : "ERR",
                                 GET_COM_STRING(con->conn_status_var.query));
+
     g_string_free(begin_time, TRUE);
 
 
