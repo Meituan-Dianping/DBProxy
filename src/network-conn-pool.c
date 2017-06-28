@@ -133,6 +133,8 @@ void network_connection_pool_free(network_connection_pool *pool) {
  * @param username (optional) name of the auth connection
  * @param default_db (unused) unused name of the default-db
  */
+
+#define PAGE_ALIGN(addr, align_size) ((addr+align_size-1) & ~(align_size-1))
 network_socket *network_connection_pool_get(network_connection_pool *pool,
                     GString *user_name, guint32 capabilities, void *userdata) {
     network_connection_pool_entry *entry = NULL;
@@ -141,7 +143,7 @@ network_socket *network_connection_pool_get(network_connection_pool *pool,
 
     con->conn_status_var.cur_query_split_swap_cur1 = chassis_get_rel_microseconds();
     //GString *hash_key = g_string_sized_new(user_name->len + 4);
-    GString *hash_key = g_string_new(NULL);
+    GString *hash_key = g_string_sized_new(PAGE_ALIGN((user_name->len + 4), 4));
     con->conn_status_var.cur_query_split_proto_begin = chassis_get_rel_microseconds();
     network_mysqld_proto_append_int32(hash_key, capabilities);
     con->conn_status_var.cur_query_split_proto_end = chassis_get_rel_microseconds();
