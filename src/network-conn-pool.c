@@ -160,6 +160,7 @@ network_socket *network_connection_pool_get(network_connection_pool *pool,
 
         }
         g_string_free(hash_key, TRUE);
+        con->conn_status_var.cur_query_split_pool_end = chassis_get_rel_microseconds();
         return NULL;
     }
 
