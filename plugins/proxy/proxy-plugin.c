@@ -2094,7 +2094,6 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query) {
         con->conn_status_var.cur_query_split_begin = 0.0;
         con->conn_status_var.cur_query_split_end = 0.0;
 
-        con->conn_status_var.cur_query_analyze_begin = chassis_get_rel_microseconds();
         if (type == COM_QUERY && tokens->len <= 1) {
             gchar *errmsg = g_strdup_printf("%s was empty", GET_COM_NAME(type));
             network_mysqld_con_send_error_full_nolog(con->client, C_S(errmsg),
@@ -2238,7 +2237,6 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query) {
         sql_tokens_free(tokens);
     }
     NETWORK_MYSQLD_CON_TRACK_TIME(con, "proxy::ready_query::leave_lua");
-    con->conn_status_var.cur_query_analyze_end = chassis_get_rel_microseconds();
 
     switch (ret) {
     case PROXY_NO_DECISION:

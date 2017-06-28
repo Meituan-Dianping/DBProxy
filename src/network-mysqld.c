@@ -1859,7 +1859,6 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
             break;
 
         case CON_STATE_READ_QUERY: {
-            con->conn_status_var.cur_read_query_begin = chassis_get_rel_microseconds();
             network_socket *recv_sock = con->client;
             con->conn_status_var.cur_query_read_client_begin = chassis_get_rel_microseconds();
             if (events == EV_TIMEOUT) {
@@ -1981,8 +1980,6 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                     g_free(msg);
                 }
             }
-            con->conn_status_var.cur_read_query_end = chassis_get_rel_microseconds();
-
 
             break; }
         case CON_STATE_SEND_QUERY:
