@@ -140,7 +140,8 @@ network_socket *network_connection_pool_get(network_connection_pool *pool,
     GQueue *entry_list = NULL;
 
     con->conn_status_var.cur_query_split_swap_cur1 = chassis_get_rel_microseconds();
-    GString *hash_key = g_string_sized_new(user_name->len + 4);
+    //GString *hash_key = g_string_sized_new(user_name->len + 4);
+    GString *hash_key = g_string_new(NULL);
     con->conn_status_var.cur_query_split_proto_begin = chassis_get_rel_microseconds();
     network_mysqld_proto_append_int32(hash_key, capabilities);
     con->conn_status_var.cur_query_split_proto_end = chassis_get_rel_microseconds();
