@@ -2007,10 +2007,10 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
             CON_MSG_HANDLE(g_message, con, msg);
             g_free(msg);
         }
-        con->conn_status_var.cur_query_split_swap_begin = chassis_get_rel_microseconds();
+
         con->server = network_connection_pool_lua_swap(con, backend, backend_ndx,
                                                         con->srv->backends->pwd_table);
-        con->conn_status_var.cur_query_split_swap_end = chassis_get_rel_microseconds();
+
         if (backend != NULL && con->server == NULL) {
             g_atomic_int_dec_and_test(&backend->connected_clients);
         }
