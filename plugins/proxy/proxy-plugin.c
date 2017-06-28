@@ -2048,7 +2048,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query) {
     network_mysqld_con_lua_t *st = con->plugin_con_state;
     int proxy_query = 1;
     network_mysqld_lua_stmt_ret ret;
-    con->conn_status_var.cur_read_query_begin = chassis_get_rel_microseconds();
+
     NETWORK_MYSQLD_CON_TRACK_TIME(con, "proxy::ready_query::enter");
 
     send_sock = NULL;
@@ -2319,7 +2319,6 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query) {
         con->resultset_is_finished = TRUE; /* we don't have more too send */
     }
     NETWORK_MYSQLD_CON_TRACK_TIME(con, "proxy::ready_query::done");
-    con->conn_status_var.cur_read_query_end = chassis_get_rel_microseconds();
 
     return NETWORK_SOCKET_SUCCESS;
 }
