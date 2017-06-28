@@ -151,6 +151,12 @@ typedef struct connection_status_var_t
     guint64 cur_query_split_pos_begin;
     guint64 cur_query_split_pos_end;
 
+    guint64 cur_query_split_ro_begin;
+    guint64 cur_query_split_ro_end;
+
+    guint64 cur_query_split_rw_begin;
+    guint64 cur_query_split_rw_end;
+
     guint8       query_status;
     GString     *query;
 

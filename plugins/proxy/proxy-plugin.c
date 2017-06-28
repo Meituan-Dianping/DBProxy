@@ -668,6 +668,7 @@ network_backend_t* idle_rw(network_mysqld_con* con, gint *backend_ndx) {
 
     network_backends_t* backends = con->srv->backends;
 
+    con->conn_status_var.cur_query_split_rw_begin = chassis_get_rel_microseconds();
     guint count = network_backends_count(backends);
     for (i = 0; i < count; ++i) {
         network_backend_t* backend = network_backends_get(backends, i);
@@ -688,7 +689,7 @@ network_backend_t* idle_rw(network_mysqld_con* con, gint *backend_ndx) {
             break;
         }
     }
-
+    con->conn_status_var.cur_query_split_rw_end = chassis_get_rel_microseconds();
     return ret;
 }
 
@@ -700,7 +701,7 @@ network_backend_t* wrr_ro(network_mysqld_con *con, gint *backend_ndx, gchar *bac
     gchar                   *user = NETWORK_SOCKET_USR_NAME(con->client);
     guint ndx_num = 0;
     guint i;
-
+    con->conn_status_var.cur_query_split_ro_begin = chassis_get_rel_microseconds();
     tag_backends = get_user_backends(bs, bs->pwd_table, user, backend_tag, &bs->user_mgr_lock);
     if (tag_backends == NULL || tag_backends->backends->len == 0) return NULL;
 
@@ -758,6 +759,7 @@ network_backend_t* wrr_ro(network_mysqld_con *con, gint *backend_ndx, gchar *bac
     }
     rwsplit->cur_weight = cur_weight;
     rwsplit->next_ndx = next_ndx;
+    con->conn_status_var.cur_query_split_ro_end = chassis_get_rel_microseconds();
     return res;
 }
 
