@@ -1898,6 +1898,7 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
     gchar *backend_tag = NULL;
     gint backend_ndx = -1;
 
+    con->conn_status_var.cur_query_split_pre_begin = chassis_get_rel_microseconds();
     if (con->client->conn_attr.autocommit_status == AUTOCOMMIT_FALSE
         || con->conn_status.is_set_autocommit
         || con->conn_status.lock_stmt_type != LOCK_TYPE_NONE) {
@@ -1945,7 +1946,8 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
                 }
         b_master = TRUE;
     }
-
+    con->conn_status_var.cur_query_split_pre_end = chassis_get_rel_microseconds();
+    con->conn_status_var.cur_query_split_pos_begin = chassis_get_rel_microseconds();
     // 如果当前需要发往主库，则检查当前的db连接是否为主库连接，如果不是则不能使用当前db连接
     if (b_master && con->server != NULL)
     {
@@ -2031,7 +2033,7 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
     }
 
     if (backend_tag != NULL) { g_free(backend_tag); }
-
+    con->conn_status_var.cur_query_split_pos_end = chassis_get_rel_microseconds();
     return ;
 }
 
