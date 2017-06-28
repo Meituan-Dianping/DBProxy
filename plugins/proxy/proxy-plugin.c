@@ -1958,6 +1958,7 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
         backend = idle_rw(con, &backend_ndx);
         g_rw_lock_reader_unlock(&con->srv->backends->backends_lock);
 
+        con->conn_status_var.cur_query_split_1_begin = chassis_get_rel_microseconds();
         if (backend != st->backend)
         {
             network_backend_t *old_backend = st->backend;
@@ -1987,6 +1988,7 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
                 return;
             }
         }
+        con->conn_status_var.cur_query_split_1_end = chassis_get_rel_microseconds();
     }
 
     if (!b_master && con->server == NULL)
@@ -1994,6 +1996,7 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
         backend_ndx = -1;
         g_rw_lock_reader_lock(&con->srv->backends->backends_lock);
         backend = wrr_ro(con, &backend_ndx, backend_tag);
+        con->conn_status_var.cur_query_split_2_begin = chassis_get_rel_microseconds();
         if (backend != NULL) {
             g_atomic_int_inc(&backend->connected_clients);
         }
@@ -2010,12 +2013,14 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
         if (backend != NULL && con->server == NULL) {
             g_atomic_int_dec_and_test(&backend->connected_clients);
         }
+        con->conn_status_var.cur_query_split_2_end = chassis_get_rel_microseconds();
     }
 
     if (con->server == NULL) {
         backend_ndx = -1;
         g_rw_lock_reader_lock(&con->srv->backends->backends_lock);
         backend = idle_rw(con, &backend_ndx);
+        con->conn_status_var.cur_query_split_3_begin = chassis_get_rel_microseconds();
         if (backend != NULL) {
             g_atomic_int_inc(&backend->connected_clients);
         }
@@ -2032,6 +2037,7 @@ static void sql_rw_split(GPtrArray* tokens, network_mysqld_con* con, char type, 
         if (backend != NULL && con->server == NULL) {
             g_atomic_int_dec_and_test(&backend->connected_clients);
         }
+        con->conn_status_var.cur_query_split_3_end = chassis_get_rel_microseconds();
     }
 
     if (backend_tag != NULL) { g_free(backend_tag); }
