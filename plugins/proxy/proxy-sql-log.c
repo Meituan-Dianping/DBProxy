@@ -606,7 +606,7 @@ log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con)
             tokenize_latency = 0.0, split_latency = 0.0, split_pre_latency = 0.0, split_pos_latency = 0.0,
             split_pos_ro_latency = 0.0, split_pos_rw_latency = 0.0,
             split_pos_1_latency = 0.0, split_pos_2_latency = 0.0, split_pos_3_latency = 0.0, split_pos_swap_latency = 0.0,
-            split_selfconnect_latency = 0.0, split_pool_latency = 0.0, split_pos_swap_cur = 0.0;
+            split_selfconnect_latency = 0.0, split_pool_latency = 0.0, split_pos_swap_cur = 0.0, split_pos_swap_head = 0.0;
 
     if (sql_log->sql_log_type == OFF ||
         !(sql_log->sql_log_mode & SQL_LOG_TIME)) {
@@ -634,6 +634,7 @@ log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con)
     split_selfconnect_latency = (con->conn_status_var.cur_query_split_selfconnect_end - con->conn_status_var.cur_query_split_selfconnect_begin)/1000.0;
     split_pool_latency = (con->conn_status_var.cur_query_split_pool_end - con->conn_status_var.cur_query_split_pool_begin)/1000.0;
     split_pos_swap_cur = (con->conn_status_var.cur_query_split_pool_begin - con->conn_status_var.cur_query_split_swap_cur)/1000.0;
+    split_pos_swap_head = (con->conn_status_var.cur_query_split_pool_begin - con->conn_status_var.cur_query_split_swap_cur1)/1000.0;
 
     message = g_string_sized_new(sizeof("2004-01-01T00:00:00.000Z"));
 
@@ -645,7 +646,8 @@ log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con)
             "DB_expend:%.3f(ms) recv_server_latency:%.3f(ms) proxy_pos_expend:%.3f(ms) send_client_latency:%.3f(ms) total_latency:%.3f(ms) "
             "tokenize_latency:%0.3f(ms) split_latency:%0.3f(ms) split_pre_latency:%0.3f(ms) split_pos_latency:%0.3f(ms) "
             "split_pos_ro_latency:%0.3f(ms) split_pos_rw_latency:%0.3f(ms) split_pos_1_latency:%0.3f(ms) split_pos_2_latency:%0.3f(ms) split_pos_3_latency:%0.3f(ms) "
-            "split_pos_swap_latency:%0.3f(ms) split_selfconnect_latency:%0.3f(ms) split_pool_latency:%0.3f(ms) split_pos_swap_cur:%0.3f(ms) %s %s:%s\n",
+            "split_pos_swap_latency:%0.3f(ms) split_selfconnect_latency:%0.3f(ms) split_pool_latency:%0.3f(ms) split_pos_swap_cur:%0.3f(ms) "
+            "split_pos_swap_head:%0.3f(ms) %s %s:%s\n",
                                 begin_time->str,
                                 read_client_latency,
                                 handle1_latency,
@@ -668,6 +670,7 @@ log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con)
                                 split_selfconnect_latency,
                                 split_pool_latency,
                                 split_pos_swap_cur,
+                                split_pos_swap_head,
                                 con->conn_status_var.query_status == MYSQLD_PACKET_OK ? "OK" : "ERR",
                                 GET_COM_STRING(con->conn_status_var.query));
     g_string_free(begin_time, TRUE);
