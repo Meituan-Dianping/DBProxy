@@ -454,7 +454,7 @@ network_socket *network_connection_pool_lua_swap(network_mysqld_con *con, networ
 #endif
     network_connection_pool* pool = chassis_event_thread_pool(backend);
 
-
+    con->conn_status_var.cur_query_split_swap_cur = chassis_get_rel_microseconds();
     if (NULL == (send_sock = network_connection_pool_get(pool, con->client->response->username, con->client->response->capabilities, (void *)con))) {
         /**
          * no connections in the pool
@@ -466,7 +466,7 @@ network_socket *network_connection_pool_lua_swap(network_mysqld_con *con, networ
             CON_MSG_HANDLE(g_message, con, msg);
             g_free(msg);
         }
-        con->conn_status_var.cur_query_split_swap_cur = chassis_get_rel_microseconds();
+
         con->conn_status_var.cur_query_split_selfconnect_begin = chassis_get_rel_microseconds();
         if (NULL == (send_sock = self_connect(con, backend, pwd_table))) {
             st->backend_ndx = -1;
@@ -480,8 +480,6 @@ network_socket *network_connection_pool_lua_swap(network_mysqld_con *con, networ
             return NULL;
         }
         con->conn_status_var.cur_query_split_selfconnect_end = chassis_get_rel_microseconds();
-    } else {
-        con->conn_status_var.cur_query_split_swap_cur = chassis_get_rel_microseconds();
     }
 
     if (TRACE_SQL(con->srv->log->log_trace_modules)) {
