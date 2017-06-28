@@ -143,6 +143,7 @@ network_socket *network_connection_pool_get(network_connection_pool *pool,
     network_mysqld_proto_append_int32(hash_key, capabilities);
     g_string_append_len(hash_key, user_name->str, user_name->len);
 
+    con->conn_status_var.cur_query_split_pool_begin = chassis_get_rel_microseconds();
     entry_list = g_hash_table_lookup(pool, hash_key);
 
     /**
@@ -183,6 +184,7 @@ network_socket *network_connection_pool_get(network_connection_pool *pool,
     event_del(&(sock->event));
         
     g_string_free(hash_key, TRUE);
+    con->conn_status_var.cur_query_split_pool_end = chassis_get_rel_microseconds();
     return sock;
 }
 
