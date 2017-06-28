@@ -480,6 +480,8 @@ network_socket *network_connection_pool_lua_swap(network_mysqld_con *con, networ
             return NULL;
         }
         con->conn_status_var.cur_query_split_selfconnect_end = chassis_get_rel_microseconds();
+    } else {
+        con->conn_status_var.cur_query_split_swap_cur = chassis_get_rel_microseconds();
     }
 
     if (TRACE_SQL(con->srv->log->log_trace_modules)) {
