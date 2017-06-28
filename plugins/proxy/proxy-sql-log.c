@@ -633,7 +633,7 @@ log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con)
     split_pos_swap_latency = (con->conn_status_var.cur_query_split_swap_end - con->conn_status_var.cur_query_split_swap_begin)/1000.0;
     split_selfconnect_latency = (con->conn_status_var.cur_query_split_selfconnect_end - con->conn_status_var.cur_query_split_selfconnect_begin)/1000.0;
     split_pool_latency = (con->conn_status_var.cur_query_split_pool_end - con->conn_status_var.cur_query_split_pool_begin)/1000.0;
-    split_pos_swap_cur = (con->conn_status_var.cur_query_split_swap_cur - con->conn_status_var.cur_query_split_swap_begin)/1000.0;
+    split_pos_swap_cur = (con->conn_status_var.cur_query_split_pool_begin - con->conn_status_var.cur_query_split_swap_cur)/1000.0;
 
     message = g_string_sized_new(sizeof("2004-01-01T00:00:00.000Z"));
 
