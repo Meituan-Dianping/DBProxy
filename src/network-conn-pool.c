@@ -138,6 +138,8 @@ network_socket *network_connection_pool_get(network_connection_pool *pool,
     network_connection_pool_entry *entry = NULL;
     network_mysqld_con *con = (network_mysqld_con *)userdata;
     GQueue *entry_list = NULL;
+
+    con->conn_status_var.cur_query_split_swap_cur1 = chassis_get_rel_microseconds();
     GString *hash_key = g_string_sized_new(user_name->len + 4);
 
     network_mysqld_proto_append_int32(hash_key, capabilities);
