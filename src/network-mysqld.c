@@ -1316,7 +1316,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                 getpid(),
                 network_mysqld_con_state_get_name(con->state));
 #endif
-
+/*
         if (cur_threadid != 0) {
             gboolean is_con_exit = FALSE;
             gchar *err_msg = NULL;
@@ -1339,6 +1339,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                     is_con_exit = TRUE;
                     err_msg = "closing connection immediatly during shutdown immediate process or kill session";
             } 
+            */
             /*else if (st != NULL && st->backend != NULL && IS_BACKEND_WAITING_EXIT(st->backend)) {
                     gint64 time_diff = 0;
 
@@ -1356,13 +1357,13 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                     }
              }
              */
-
+/*
             if (is_con_exit) {
                 CON_MSG_HANDLE(g_warning, con, err_msg);
                 con->state = CON_STATE_ERROR;
             }
         }
-
+*/
         MYSQLPROXY_STATE_CHANGE(event_fd, events, con->state);
         switch (con->state) {
         case CON_STATE_ERROR:
