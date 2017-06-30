@@ -1982,8 +1982,8 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                     g_free(msg);
 
                 }
-                con->conn_status_var.cur_read_query_begin = chassis_get_rel_microseconds();
-                goto door;
+                //con->conn_status_var.cur_read_query_begin = chassis_get_rel_microseconds();
+                //goto door;
             }
             con->conn_status_var.cur_read_query_begin = chassis_get_rel_microseconds();
             break; }
