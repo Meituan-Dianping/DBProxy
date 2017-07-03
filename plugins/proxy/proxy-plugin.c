@@ -2654,6 +2654,8 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query_result) {
     recv_sock = con->server;
     send_sock = con->client;
 
+    con->conn_status_var.thread_id = NETWORK_SOCKET_THREADID(con->server);
+
     /* check if the last packet is valid */
     packet.data = g_queue_peek_tail(recv_sock->recv_queue->chunks);
     packet.offset = 0;
