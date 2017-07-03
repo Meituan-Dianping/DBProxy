@@ -188,7 +188,7 @@ typedef struct connection_status_var_t
 
     guint   count;
 
-    guint   thread_id;
+    guint32   thread_id;
 
     gboolean query_running;
     gchar cur_query[STMT_LENTH];
