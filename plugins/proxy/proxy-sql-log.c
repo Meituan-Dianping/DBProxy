@@ -653,7 +653,7 @@ log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con)
             "split_pos_ro_latency:%0.3f(ms) split_pos_rw_latency:%0.3f(ms) split_pos_1_latency:%0.3f(ms) split_pos_2_latency:%0.3f(ms) split_pos_3_latency:%0.3f(ms) "
             "split_pos_swap_latency:%0.3f(ms) split_selfconnect_latency:%0.3f(ms) split_pool_latency:%0.3f(ms) split_pos_swap_cur:%0.3f(ms) "
             "split_pos_swap_head:%0.3f(ms) split_proto_latency:%0.3f(ms) split_new_latency:%0.3f(ms) split_append_latency:%0.3f(ms) "
-            "read_query_latency:%0.3f(ms)  9 %s %s:%s\n",
+            "read_query_latency:%0.3f(ms) count=%d %s %s:%s\n",
                                 begin_time->str,
                                 read_client_latency,
                                 handle1_latency,
@@ -681,6 +681,7 @@ log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con)
                                 split_new_latency,
                                 split_append_latency,
                                 read_query_latency,
+                                con->conn_status_var.count,
                                 con->conn_status_var.query_status == MYSQLD_PACKET_OK ? "OK" : "ERR",
                                 GET_COM_STRING(con->conn_status_var.query));
 

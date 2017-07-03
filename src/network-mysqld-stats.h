@@ -186,6 +186,8 @@ typedef struct connection_status_var_t
     guint8       query_status;
     GString     *query;
 
+    guint   count;
+
     gboolean query_running;
     gchar cur_query[STMT_LENTH];
     guint64 cur_query_com_type;
