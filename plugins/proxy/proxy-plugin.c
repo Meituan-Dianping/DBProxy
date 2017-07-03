@@ -2350,6 +2350,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_send_query_result) {
     recv_sock = con->client;
 
     log_sql_backend_ex(config->sql_log_mgr, con);
+    con->conn_status_var.thread_id = NETWORK_SOCKET_THREADID(con->server);
 
     if (st->connection_close) {
         con->state = CON_STATE_ERROR;
@@ -2654,7 +2655,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query_result) {
     recv_sock = con->server;
     send_sock = con->client;
 
-    con->conn_status_var.thread_id = NETWORK_SOCKET_THREADID(con->server);
+
 
     /* check if the last packet is valid */
     packet.data = g_queue_peek_tail(recv_sock->recv_queue->chunks);
@@ -2735,9 +2736,11 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query_result) {
         if (0 != st->injected.queries->length) {
             inj = g_queue_pop_head(st->injected.queries);
             if (IS_EXPLICIT_SINGLE_QUERY(inj)) {
+                con->conn_status_var.thread_id = NETWORK_SOCKET_THREADID(con->server);
                 log_sql_backend(config->sql_log_mgr, con, (void *)inj);
                 ret = PROXY_SEND_RESULT;
             } else if (inj->id == INJECTION_EXPLICIT_MULTI_READ_QUERY) {
+                con->conn_status_var.thread_id = NETWORK_SOCKET_THREADID(con->server);
                 log_sql_backend(config->sql_log_mgr, con, (void *)inj);
 
                 merge_res_t* merge_res = con->merge_res;
@@ -2788,6 +2791,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query_result) {
                     }
                 }
             } else if (inj->id == INJECTION_EXPLICIT_MULTI_WRITE_QUERY) {
+                con->conn_status_var.thread_id = NETWORK_SOCKET_THREADID(con->server);
                 log_sql_backend(config->sql_log_mgr, con, (void *)inj);
 
                 if (inj->qstat.query_status == MYSQLD_PACKET_OK) {
@@ -2830,6 +2834,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query_result) {
                     ret = PROXY_SEND_RESULT;
                 }
             } else {
+                con->conn_status_var.thread_id = NETWORK_SOCKET_THREADID(con->server);
                 log_sql_backend(config->sql_log_mgr, con, (void *)inj);
                 proxy_update_conn_attribute(con, inj);
                 ret = PROXY_IGNORE_RESULT;
@@ -2939,6 +2944,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query_result) {
 
             con->conn_status_var.cur_query_send_client_begin = 0.0;
             con->conn_status_var.cur_query_send_client_end = 0.0;
+            con->conn_status_var.thread_id = NETWORK_SOCKET_THREADID(con->server);
             log_sql_backend_ex(config->sql_log_mgr, con);
 
         }
