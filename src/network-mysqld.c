@@ -1986,6 +1986,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                 //goto door;
             }
             con->conn_status_var.cur_read_query_begin = chassis_get_rel_microseconds();
+            con->conn_status_var.thread_id = NETWORK_SOCKET_THREADID(con->server);
             con->conn_status_var.count = 1;
             break; }
         case CON_STATE_SEND_QUERY:
