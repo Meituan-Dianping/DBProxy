@@ -1996,7 +1996,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
             if(1 == con->conn_status_var.count) {
                 con->conn_status_var.cur_read_query_end = chassis_get_rel_microseconds();
             }
-            con->conn_status_var.count =2;
+            con->conn_status_var.count ++;
             if (events != EV_TIMEOUT && con->server->send_queue->offset == 0) {
                 /* only parse the packets once */
                 network_packet packet;
