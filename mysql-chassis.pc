@@ -4,7 +4,7 @@ libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
 Name: mysql-chassis
-Version: 0.2.0
+Version: 0.2.5
 Description: the Chassis of the MySQL Proxy
 URL: http://forge.mysql.com/wiki/MySQL_Proxy
 Requires: glib-2.0 >= 2.16, gthread-2.0 >= 2.16

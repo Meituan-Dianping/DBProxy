@@ -17,6 +17,7 @@ typedef enum {
 
 #define  SQL_LOG_CLIENT      0x01
 #define  SQL_LOG_BACKEND     0x02
+#define  SQL_LOG_TIME        0x10
 #define  SQL_LOG_ALL         (SQL_LOG_BACKEND | SQL_LOG_CLIENT)
 
 #define SQL_LOG_DEFAULT_SIZE 1073741824
@@ -50,6 +51,7 @@ void load_sql_filenames(sql_log_t *sql_log, chassis *chas);
 void log_sql_slow(sql_log_t *sql_log, network_mysqld_con *con, guint64 query_time);
 void log_sql_connect(sql_log_t *sql_log, network_mysqld_con *con);
 void log_sql_backend(sql_log_t *sql_log, network_mysqld_con *con, injection *inj);
+void log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con);
 void log_sql_client(sql_log_t *sql_log, network_mysqld_con *con);
 gint sql_log_t_load_options(chassis *srv);
 

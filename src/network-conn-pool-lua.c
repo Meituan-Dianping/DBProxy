@@ -442,7 +442,7 @@ network_socket *network_connection_pool_lua_swap(network_mysqld_con *con, networ
     network_mysqld_con_lua_t *st = con->plugin_con_state;
 
     if (backend == NULL) { return NULL; }
-
+    con->conn_status_var.cur_query_split_swap_begin = chassis_get_rel_microseconds();
     /**
      * get a connection from the pool which matches our basic requirements
      * - username has to match
@@ -453,6 +453,8 @@ network_socket *network_connection_pool_lua_swap(network_mysqld_con *con, networ
     g_log_dbproxy(g_debug, "(swap) check if we have a connection for this user in the pool '%s'", con->client->response ? con->client->response->username->str: "empty_user");
 #endif
     network_connection_pool* pool = chassis_event_thread_pool(backend);
+
+    con->conn_status_var.cur_query_split_swap_cur = chassis_get_rel_microseconds();
     if (NULL == (send_sock = network_connection_pool_get(pool, con->client->response->username, con->client->response->capabilities, (void *)con))) {
         /**
          * no connections in the pool
@@ -464,7 +466,8 @@ network_socket *network_connection_pool_lua_swap(network_mysqld_con *con, networ
             CON_MSG_HANDLE(g_message, con, msg);
             g_free(msg);
         }
-        
+
+        con->conn_status_var.cur_query_split_selfconnect_begin = chassis_get_rel_microseconds();
         if (NULL == (send_sock = self_connect(con, backend, pwd_table))) {
             st->backend_ndx = -1;
             if (TRACE_SQL(con->srv->log->log_trace_modules)) {
@@ -473,8 +476,10 @@ network_socket *network_connection_pool_lua_swap(network_mysqld_con *con, networ
                 CON_MSG_HANDLE(g_message, con, msg);
                 g_free(msg);
             }
+            con->conn_status_var.cur_query_split_swap_end = chassis_get_rel_microseconds();
             return NULL;
         }
+        con->conn_status_var.cur_query_split_selfconnect_end = chassis_get_rel_microseconds();
     }
 
     if (TRACE_SQL(con->srv->log->log_trace_modules)) {
@@ -489,7 +494,7 @@ network_socket *network_connection_pool_lua_swap(network_mysqld_con *con, networ
     /* connect to the new backend */
     st->backend = backend;
     st->backend_ndx = backend_ndx;
-
+    con->conn_status_var.cur_query_split_swap_end = chassis_get_rel_microseconds();
     return send_sock;
 }
 

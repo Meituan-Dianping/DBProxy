@@ -131,6 +131,9 @@ sql_log_t_load_options(chassis *srv)
                 sql_log->sql_log_mode |= SQL_LOG_CLIENT;
             } else if (strcasecmp(token, "BACKEND") == 0) {
                 sql_log->sql_log_mode |= SQL_LOG_BACKEND;
+            } else if (strcasecmp(token, "TIME") == 0) {
+                sql_log->sql_log_mode = 0;
+                sql_log->sql_log_mode |= SQL_LOG_TIME;
             }
         }
     }
@@ -354,6 +357,9 @@ assign_sql_log_mode(const char *newval, void *ex_param)
             sql_log_mode |= SQL_LOG_CLIENT;
         } else if (strcasecmp(token, "BACKEND") == 0) {
             sql_log_mode |= SQL_LOG_BACKEND;
+        } else if (strcasecmp(token, "TIME") == 0) {
+            sql_log->sql_log_mode = 0;
+            sql_log_mode |= SQL_LOG_TIME;
         } else {
             ret = 1;
         }
@@ -373,7 +379,6 @@ show_sql_log_mode(void *ex_param)
     sql_log_t   *sql_log = config->sql_log_mgr;
     gint        mode_type = sql_log->sql_log_mode;
     gchar       *res = NULL;
-
     switch (mode_type) {
         case SQL_LOG_ALL:
             res = "ALL";
@@ -383,6 +388,9 @@ show_sql_log_mode(void *ex_param)
             break;
         case SQL_LOG_BACKEND:
             res = "BACKEND";
+            break;
+        case SQL_LOG_TIME:
+            res = "TIME";
             break;
         default:
             res = "Invalid type";
@@ -578,6 +586,106 @@ log_sql_backend(sql_log_t *sql_log, network_mysqld_con *con, injection *inj)
                                 inj->id, inj->bytes, inj->rows,
                                 latency_ms, inj->qstat.query_status == MYSQLD_PACKET_OK ? "OK" : "ERR",
                                 GET_COM_STRING(inj->query));
+    g_string_free(begin_time, TRUE);
+
+
+    if (log_queue_push(sql_log->lq, message) < 0) {
+        g_string_free(message, TRUE);
+    }
+
+    return ;
+}
+
+void
+log_sql_backend_ex(sql_log_t *sql_log, network_mysqld_con *con)
+{
+    GString *message = NULL;
+    GString *begin_time = NULL;
+    gfloat read_client_latency = 0.0, handle1_latency = 0.0, send_server_latency = 0.0, server_latency = 0.0,
+            read_server_latency = 0.0, handle2_latency = 0.0, send_client_latency = 0.0, total_latency = 0.0,
+            tokenize_latency = 0.0, split_latency = 0.0, split_pre_latency = 0.0, split_pos_latency = 0.0,
+            split_pos_ro_latency = 0.0, split_pos_rw_latency = 0.0,
+            split_pos_1_latency = 0.0, split_pos_2_latency = 0.0, split_pos_3_latency = 0.0, split_pos_swap_latency = 0.0,
+            split_selfconnect_latency = 0.0, split_pool_latency = 0.0, split_pos_swap_cur = 0.0, split_pos_swap_head = 0.0,
+            split_proto_latency = 0.0, split_new_latency = 0.0, split_append_latency = 0.0, read_query_latency = 0.0;
+
+    if (sql_log->sql_log_type == OFF ||
+        !(sql_log->sql_log_mode & SQL_LOG_TIME)) {
+        return;
+    }
+
+    read_client_latency = (con->conn_status_var.cur_query_read_client_end - con->conn_status_var.cur_query_read_client_begin)/1000.0;
+    handle1_latency = (con->conn_status_var.cur_query_send_server_begin - con->conn_status_var.cur_query_read_client_end)/1000.0;
+    send_server_latency = (con->conn_status_var.cur_query_send_server_end - con->conn_status_var.cur_query_send_server_begin)/1000.0;
+    server_latency = (con->conn_status_var.cur_query_read_server_begin - con->conn_status_var.cur_query_send_server_end)/1000.0;
+    read_server_latency = (con->conn_status_var.cur_query_read_server_end - con->conn_status_var.cur_query_read_server_begin)/1000.0;
+    handle2_latency = (con->conn_status_var.cur_query_send_client_begin - con->conn_status_var.cur_query_read_server_end)/1000.0;
+    send_client_latency = (con->conn_status_var.cur_query_send_client_end - con->conn_status_var.cur_query_send_client_begin)/1000.0;
+    total_latency = (con->conn_status_var.cur_query_send_client_end - con->conn_status_var.cur_query_read_client_begin)/1000.0;
+    tokenize_latency = (con->conn_status_var.cur_query_tokenizer_end - con->conn_status_var.cur_query_tokenizer_begin)/1000.0;
+    split_latency = (con->conn_status_var.cur_query_split_end - con->conn_status_var.cur_query_split_begin)/1000.0;
+    split_pre_latency = (con->conn_status_var.cur_query_split_pre_end - con->conn_status_var.cur_query_split_pre_begin)/1000.0;
+    split_pos_latency = (con->conn_status_var.cur_query_split_pos_end - con->conn_status_var.cur_query_split_pos_begin)/1000.0;
+    split_pos_ro_latency = (con->conn_status_var.cur_query_split_ro_end - con->conn_status_var.cur_query_split_ro_begin)/1000.0;
+    split_pos_rw_latency = (con->conn_status_var.cur_query_split_rw_end - con->conn_status_var.cur_query_split_rw_begin)/1000.0;
+    split_pos_1_latency = (con->conn_status_var.cur_query_split_1_end - con->conn_status_var.cur_query_split_1_begin)/1000.0;
+    split_pos_2_latency = (con->conn_status_var.cur_query_split_2_end - con->conn_status_var.cur_query_split_2_begin)/1000.0;
+    split_pos_3_latency = (con->conn_status_var.cur_query_split_3_end - con->conn_status_var.cur_query_split_3_begin)/1000.0;
+    split_pos_swap_latency = (con->conn_status_var.cur_query_split_swap_end - con->conn_status_var.cur_query_split_swap_begin)/1000.0;
+    split_selfconnect_latency = (con->conn_status_var.cur_query_split_selfconnect_end - con->conn_status_var.cur_query_split_selfconnect_begin)/1000.0;
+    split_pool_latency = (con->conn_status_var.cur_query_split_pool_end - con->conn_status_var.cur_query_split_pool_begin)/1000.0;
+    split_pos_swap_cur = (con->conn_status_var.cur_query_split_pool_begin - con->conn_status_var.cur_query_split_swap_cur)/1000.0;
+    split_pos_swap_head = (con->conn_status_var.cur_query_split_pool_begin - con->conn_status_var.cur_query_split_swap_cur1)/1000.0;
+    split_proto_latency = (con->conn_status_var.cur_query_split_proto_end - con->conn_status_var.cur_query_split_proto_begin)/1000.0;
+    split_new_latency = (con->conn_status_var.cur_query_split_proto_begin - con->conn_status_var.cur_query_split_swap_cur1)/1000.0;
+    split_append_latency = (con->conn_status_var.cur_query_split_pool_end - con->conn_status_var.cur_query_split_proto_begin)/1000.0;
+    read_query_latency = (con->conn_status_var.cur_read_query_end - con->conn_status_var.cur_read_query_begin)/1000.0;
+
+    message = g_string_sized_new(sizeof("2004-01-01T00:00:00.000Z"));
+
+    begin_time = chassis_log_microsecond_tostring(con->conn_status_var.cur_query_start_time,
+                                            CHASSIS_RESOLUTION_US);
+    /* get current time */
+    chassis_log_update_timestamp(message, CHASSIS_RESOLUTION_US);
+    g_string_append_printf(message, "# C_begin:%s recv_client_latency:%.3f(ms) proxy_pre_expend:%.3f(ms) send_server_latency:%.3f(ms) "
+            "DB_expend:%.3f(ms) recv_server_latency:%.3f(ms) proxy_pos_expend:%.3f(ms) send_client_latency:%.3f(ms) total_latency:%.3f(ms) "
+            "tokenize_latency:%0.3f(ms) split_latency:%0.3f(ms) split_pre_latency:%0.3f(ms) split_pos_latency:%0.3f(ms) "
+            "split_pos_ro_latency:%0.3f(ms) split_pos_rw_latency:%0.3f(ms) split_pos_1_latency:%0.3f(ms) split_pos_2_latency:%0.3f(ms) split_pos_3_latency:%0.3f(ms) "
+            "split_pos_swap_latency:%0.3f(ms) split_selfconnect_latency:%0.3f(ms) split_pool_latency:%0.3f(ms) split_pos_swap_cur:%0.3f(ms) "
+            "split_pos_swap_head:%0.3f(ms) split_proto_latency:%0.3f(ms) split_new_latency:%0.3f(ms) split_append_latency:%0.3f(ms) "
+            "read_query_latency:%0.3f(ms) count=%d thread_id=%u %s %s:%s\n",
+                                begin_time->str,
+                                read_client_latency,
+                                handle1_latency,
+                                send_server_latency,
+                                server_latency,
+                                read_server_latency,
+                                handle2_latency,
+                                send_client_latency,
+                                total_latency,
+                                tokenize_latency,
+                                split_latency,
+                                split_pre_latency,
+                                split_pos_latency,
+                                split_pos_ro_latency,
+                                split_pos_rw_latency,
+                                split_pos_1_latency,
+                                split_pos_2_latency,
+                                split_pos_3_latency,
+                                split_pos_swap_latency,
+                                split_selfconnect_latency,
+                                split_pool_latency,
+                                split_pos_swap_cur,
+                                split_pos_swap_head,
+                                split_proto_latency,
+                                split_new_latency,
+                                split_append_latency,
+                                read_query_latency,
+                                con->conn_status_var.count,
+                                con->conn_status_var.thread_id,
+                                con->conn_status_var.query_status == MYSQLD_PACKET_OK ? "OK" : "ERR",
+                                GET_COM_STRING(con->conn_status_var.query));
+
     g_string_free(begin_time, TRUE);
 
 

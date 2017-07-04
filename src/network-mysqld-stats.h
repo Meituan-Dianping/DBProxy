@@ -129,6 +129,67 @@ typedef struct connection_status_var_t
 {
     guint64 cur_query_type;
     guint64 cur_query_start_time;
+
+    guint64 cur_query_read_client_begin;
+    guint64 cur_query_read_client_end;
+    guint64 cur_query_send_server_begin;
+    guint64 cur_query_send_server_end;
+    guint64 cur_query_read_server_begin;
+    guint64 cur_query_read_server_end;
+    guint64 cur_query_send_client_begin;
+    guint64 cur_query_send_client_end;
+
+    guint64 cur_query_tokenizer_begin;
+    guint64 cur_query_tokenizer_end;
+
+    guint64 cur_query_split_begin;
+    guint64 cur_query_split_end;
+
+    guint64 cur_query_split_pre_begin;
+    guint64 cur_query_split_pre_end;
+
+    guint64 cur_query_split_pos_begin;
+    guint64 cur_query_split_pos_end;
+
+    guint64 cur_query_split_ro_begin;
+    guint64 cur_query_split_ro_end;
+
+    guint64 cur_query_split_rw_begin;
+    guint64 cur_query_split_rw_end;
+
+    guint64 cur_query_split_1_begin;
+    guint64 cur_query_split_1_end;
+
+    guint64 cur_query_split_2_begin;
+    guint64 cur_query_split_2_end;
+
+    guint64 cur_query_split_3_begin;
+    guint64 cur_query_split_3_end;
+
+    guint64 cur_query_split_swap_begin;
+    guint64 cur_query_split_swap_end;
+    guint64 cur_query_split_swap_cur;
+    guint64 cur_query_split_swap_cur1;
+
+    guint64 cur_query_split_selfconnect_begin;
+    guint64 cur_query_split_selfconnect_end;
+
+    guint64 cur_query_split_pool_begin;
+    guint64 cur_query_split_pool_end;
+
+    guint64 cur_query_split_proto_begin;
+    guint64 cur_query_split_proto_end;
+
+    guint64 cur_read_query_begin;
+    guint64 cur_read_query_end;
+
+    guint8       query_status;
+    GString     *query;
+
+    guint   count;
+
+    guint32   thread_id;
+
     gboolean query_running;
     gchar cur_query[STMT_LENTH];
     guint64 cur_query_com_type;

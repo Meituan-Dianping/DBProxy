@@ -133,16 +133,22 @@ void network_connection_pool_free(network_connection_pool *pool) {
  * @param username (optional) name of the auth connection
  * @param default_db (unused) unused name of the default-db
  */
+
+#define PAGE_ALIGN(addr, align_size) ((addr+align_size-1) & ~(align_size-1))
 network_socket *network_connection_pool_get(network_connection_pool *pool,
                     GString *user_name, guint32 capabilities, void *userdata) {
     network_connection_pool_entry *entry = NULL;
     network_mysqld_con *con = (network_mysqld_con *)userdata;
     GQueue *entry_list = NULL;
-    GString *hash_key = g_string_sized_new(user_name->len + 4);
 
+    con->conn_status_var.cur_query_split_swap_cur1 = chassis_get_rel_microseconds();
+    GString *hash_key = g_string_sized_new(user_name->len + 4);
+    con->conn_status_var.cur_query_split_proto_begin = chassis_get_rel_microseconds();
     network_mysqld_proto_append_int32(hash_key, capabilities);
+    con->conn_status_var.cur_query_split_proto_end = chassis_get_rel_microseconds();
     g_string_append_len(hash_key, user_name->str, user_name->len);
 
+    con->conn_status_var.cur_query_split_pool_begin = chassis_get_rel_microseconds();
     entry_list = g_hash_table_lookup(pool, hash_key);
 
     /**
@@ -159,6 +165,7 @@ network_socket *network_connection_pool_get(network_connection_pool *pool,
 
         }
         g_string_free(hash_key, TRUE);
+        con->conn_status_var.cur_query_split_pool_end = chassis_get_rel_microseconds();
         return NULL;
     }
 
@@ -183,6 +190,7 @@ network_socket *network_connection_pool_get(network_connection_pool *pool,
     event_del(&(sock->event));
         
     g_string_free(hash_key, TRUE);
+    con->conn_status_var.cur_query_split_pool_end = chassis_get_rel_microseconds();
     return sock;
 }
 
