@@ -2242,7 +2242,7 @@ NETWORK_MYSQLD_PLUGIN_PROTO(proxy_read_query) {
             GList *tmp = g_queue_peek_nth_link(st->injected.queries, 0);
             con->con_filter_var.ts_read_query = ((injection *)tmp->data)->ts_read_query;
 
-            proxy_reinitialize_db_connection(con);
+            //proxy_reinitialize_db_connection(con);
         }
 
         sql_tokens_free(tokens);
