@@ -1956,7 +1956,9 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                         g_atomic_int_add(&srv->proxy_aborted_clients, 1);
                         break;
                     }
-                }
+            }
+
+            con->conn_status_var.query_count = 0;
 
             /**
              * there should be 3 possible next states from here:
@@ -1995,7 +1997,7 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
              *
              * this state will loop until all the packets from the send-queue are flushed 
              */
-
+            con->conn_status_var.query_count++;
             if (events != EV_TIMEOUT && con->server->send_queue->offset == 0) {
                 /* only parse the packets once */
                 network_packet packet;
@@ -2072,8 +2074,15 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
                 if (con->server) network_mysqld_queue_reset(con->server);
                 break;
             default:
-                con->state = CON_STATE_READ_QUERY_RESULT;
-                break;
+                {
+                    network_mysqld_con_lua_t *st = con->plugin_con_state;
+                    if (st && 0 < st->injected.queries->length) {
+                        injection *inj = g_queue_peek_head(st->injected.queries);
+                        if (inj) inj->ts_after_send_query = chassis_get_rel_microseconds();
+                    }
+                    con->state = CON_STATE_READ_QUERY_RESULT;
+                    break;
+                }
             }
 
             if (TRACE_SQL(con->srv->log->log_trace_modules)) {
