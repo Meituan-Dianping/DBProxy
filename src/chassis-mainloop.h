@@ -105,6 +105,8 @@ struct chassis {
 
     MYSQL_VERSION my_version;
 
+    network_socket_autocommit_t autocommit;
+
     GPtrArray *threads;
 
     chassis_shutdown_hooks_t *shutdown_hooks;

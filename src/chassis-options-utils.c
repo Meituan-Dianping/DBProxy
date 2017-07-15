@@ -458,6 +458,41 @@ show_instance(void *ex_param)
     return g_strdup(srv->instance_name);
 }
 
+gchar *
+show_autocommit(void *ex_param)
+{
+    gchar *commit = NULL;
+    external_param *opt_param = (external_param *)ex_param;
+    chassis *srv = opt_param->chas;
+
+    if (srv->autocommit == AUTOCOMMIT_UNKNOWN)
+        commit = "default";
+    else if (srv->autocommit == AUTOCOMMIT_FALSE)
+        commit = "false";
+    else if (srv->autocommit == AUTOCOMMIT_TRUE)
+        commit = "true";
+
+    return g_strdup(commit);
+}
+
+gint
+assign_autocommit(const char *newval, void *ex_param) {
+    gint ret = 0;
+    external_param *opt_param = (external_param *)ex_param;
+    chassis *srv = opt_param->chas;
+
+    if (strcasecmp(newval, "true") == 0) {
+        srv->autocommit = AUTOCOMMIT_TRUE;
+    } else if (strcasecmp(newval, "false") == 0) {
+        srv->autocommit = AUTOCOMMIT_FALSE;
+    } else if (strcasecmp(newval, "default") == 0) {
+        srv->autocommit = AUTOCOMMIT_UNKNOWN;
+    } else {
+        ret = 1;
+    }
+    return ret;
+}
+
 gint
 assign_wait_timeout(const char *newval, void *ex_param)
 {

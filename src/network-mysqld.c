@@ -1381,6 +1381,16 @@ void network_mysqld_con_handle(int event_fd, short events, void *user_data) {
              * the server connection is still fine, 
              * let's keep it open for reuse */
 
+           if (con->server && con->server->conn_attr.autocommit_status == AUTOCOMMIT_TRUE) {
+                gboolean release = ((con->state == CON_STATE_CLOSE_CLIENT) &&
+                          //!con->conn_status.is_in_select_calc_found_rows &&
+                          con->client->conn_attr.savepoint_flag == FALSE &&
+                          !con->conn_status.is_in_transaction &&
+                          (g_hash_table_size(con->locks) == 0));
+                if (release)
+                    network_connection_pool_lua_add_connection(con);
+            }
+
             plugin_call_cleanup(srv, con);
 
             chassis_event_remove_connection(srv, con);
@@ -2449,6 +2459,8 @@ void network_mysqld_con_accept(int G_GNUC_UNUSED event_fd, short events, void *u
 
     client = network_socket_accept(listen_con->server);
     if (!client) return;
+
+    client->conn_attr.autocommit_status = listen_con->srv->autocommit;
 
     /* looks like we open a client connection */
     client_con = network_mysqld_con_new();

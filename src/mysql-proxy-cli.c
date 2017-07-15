@@ -183,6 +183,8 @@ typedef struct {
 
     gchar *instance_name;
 
+    gchar *autocommit;
+
     gint wait_timeout;
 
     gint shutdown_timeout;
@@ -287,6 +289,7 @@ void chassis_frontend_free(chassis_frontend_t *frontend) {
     if (frontend->sql_log) g_free(frontend->sql_log);
     if (frontend->sql_log_mode_str) g_free(frontend->sql_log_mode_str);
 
+    if (frontend->autocommit) g_free(frontend->autocommit);
     if (frontend->percentile_switch) g_free(frontend->percentile_switch);
 
     g_slice_free(chassis_frontend_t, frontend);
@@ -320,6 +323,7 @@ int chassis_frontend_set_chassis_options(chassis_frontend_t *frontend, chassis_o
     chassis_options_add(opts, "event-threads", 0, 0, G_OPTION_ARG_INT, &(frontend->event_thread_count), "number of event-handling threads (default: 1)", NULL, NULL, show_event_threads, SHOW_OPTS_PROPERTY);
     chassis_options_add(opts, "lua-path", 0, 0, G_OPTION_ARG_STRING, &(frontend->lua_path), "set the LUA_PATH", "<...>", NULL, NULL, 0);
     chassis_options_add(opts, "lua-cpath", 0, 0, G_OPTION_ARG_STRING, &(frontend->lua_cpath), "set the LUA_CPATH", "<...>", NULL, NULL, 0);
+    chassis_options_add(opts, "autocommit", 0, 0, G_OPTION_ARG_STRING, &(frontend->autocommit), "autocommit", NULL, assign_autocommit, show_autocommit, ALL_OPTS_PROPERTY);
     chassis_options_add(opts, "instance", 0, 0, G_OPTION_ARG_STRING, &(frontend->instance_name), "instance name", "<name>", NULL, show_instance, SHOW_OPTS_PROPERTY);
     chassis_options_add(opts, "wait-timeout", 0, 0, G_OPTION_ARG_INT, &(frontend->wait_timeout), "the number of seconds which dbproxy waits for activity on a connection before closing it (default:0)", NULL,
                                                     assign_wait_timeout, show_wait_timeout, ALL_OPTS_PROPERTY);
@@ -561,6 +565,18 @@ int main_cmdline(int argc, char **argv) {
     } else {
         g_log_dbproxy(g_critical, "--mysql-version has to be 5.6 or 5.5, is %s", frontend->mysql_version);
         GOTO_EXIT(EXIT_FAILURE);
+    }
+
+    srv->autocommit = AUTOCOMMIT_TRUE;
+    if (frontend->autocommit) {
+        if (!strcasecmp(frontend->autocommit, "default"))
+            srv->autocommit = AUTOCOMMIT_UNKNOWN;
+        else if (!strcasecmp(frontend->autocommit, "false"))
+            srv->autocommit = AUTOCOMMIT_FALSE;
+        else if (0 < strlen(frontend->autocommit) && strcasecmp(frontend->autocommit, "true")) {
+            g_log_dbproxy(g_critical, "--autocommit is assigned an invalid value: %s", frontend->autocommit);
+            GOTO_EXIT(EXIT_FAILURE);
+        }
     }
 
     if (frontend->max_connections < 0) {
