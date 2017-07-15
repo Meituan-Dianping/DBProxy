@@ -88,6 +88,7 @@ typedef struct {
     query_status qstat;                     /**< summary information about the query status */
     
     guint64 ts_read_query;                  /**< microsec timestamp when we added this query to the queues */
+    guint64 ts_after_send_query;
     guint64 ts_read_query_result_first;     /**< microsec timestamp when we received the first packet */
     guint64 ts_read_query_result_last;      /**< microsec timestamp when we received the last packet */
 

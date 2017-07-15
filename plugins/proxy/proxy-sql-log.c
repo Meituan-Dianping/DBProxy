@@ -546,7 +546,8 @@ log_sql_client(sql_log_t *sql_log, network_mysqld_con *con)
 void
 log_sql_backend(sql_log_t *sql_log, network_mysqld_con *con, injection *inj)
 {
-    gfloat latency_ms = 0.0;
+    gfloat latency_ms = 0.0, proc_query_ms = 0.0;
+    gfloat db_process_ms = 0.0, proc_result_ms = 0.0;
     GString *message = NULL;
     GString *begin_time = NULL;
 
@@ -559,6 +560,10 @@ log_sql_backend(sql_log_t *sql_log, network_mysqld_con *con, injection *inj)
     latency_ms = (inj->ts_read_query_result_last - inj->ts_read_query)/1000.0;
     if ((gint)latency_ms < sql_log->sql_log_slow_ms) return;
 
+    proc_query_ms = (inj->ts_after_send_query - inj->ts_read_query)/1000.0;
+    db_process_ms = (inj->ts_read_query_result_first - inj->ts_after_send_query)/1000.0;
+    proc_result_ms = (inj->ts_read_query_result_last - inj->ts_read_query_result_first)/1000.0;
+
     message = g_string_sized_new(sizeof("2004-01-01T00:00:00.000Z"));
 
     begin_time = chassis_log_microsecond_tostring(con->conn_status_var.cur_query_start_time,
@@ -566,7 +571,7 @@ log_sql_backend(sql_log_t *sql_log, network_mysqld_con *con, injection *inj)
     /* get current time */
     chassis_log_update_timestamp(message, CHASSIS_RESOLUTION_US);
     g_string_append_printf(message, ": C_begin:%s C:%s C_db:%s C_usr:%s S:%s(thread_id:%u) S_db:%s "
-                                    "S_usr:%s inj(type:%d bytes:%lu rows:%lu) %.3f(ms) %s %s:%s\n",
+                                    "S_usr:%s inj(type:%d bytes:%lu rows:%lu) event_thd:%d query_count:%d %.3f(ms) %.3f(ms) %.3f(ms) %.3f(ms) %s %s:%s\n",
                                 begin_time->str,
                                 NETWORK_SOCKET_SRC_NAME(con->client),
                                 NETWORK_SOCKET_DB_NAME(con->client),
@@ -575,7 +580,8 @@ log_sql_backend(sql_log_t *sql_log, network_mysqld_con *con, injection *inj)
                                 NETWORK_SOCKET_THREADID(con->server),
                                 NETWORK_SOCKET_DB_NAME(con->server),
                                 NETWORK_SOCKET_USR_NAME(con->server),
-                                inj->id, inj->bytes, inj->rows,
+                                inj->id, inj->bytes, inj->rows, cur_thid,
+                                con->conn_status_var.query_count, proc_query_ms, db_process_ms, proc_result_ms,
                                 latency_ms, inj->qstat.query_status == MYSQLD_PACKET_OK ? "OK" : "ERR",
                                 GET_COM_STRING(inj->query));
     g_string_free(begin_time, TRUE);

@@ -65,6 +65,7 @@ CHASSIS_API gint assign_remove_backend_timeout(const char *newval, void *ex_para
 CHASSIS_API gint assign_log_trace_modules(const char *newval, void *ex_param);
 CHASSIS_API gint assign_backend_monitor_pwds(const char *newval, void *ex_param);
 CHASSIS_API gint assign_db_connect_timeout(const char *newval, void *ex_param);
+CHASSIS_API gint assign_autocommit(const char *newval, void *ex_param);
 
 /* show utils */
 CHASSIS_API gchar* show_verbose_shutdown(void *external_param);
@@ -85,6 +86,7 @@ CHASSIS_API gchar* show_event_threads(void *external_param);
 CHASSIS_API gchar* show_lua_path(void *external_param);
 CHASSIS_API gchar* show_user(void *external_param);
 CHASSIS_API gchar* show_instance(void *external_param);
+CHASSIS_API gchar* show_autocommit(void *external_param);
 CHASSIS_API gchar* show_wait_timeout(void *external_param);
 CHASSIS_API gchar* show_shutdown_timeout(void *external_param);
 CHASSIS_API gchar* show_db_connection_idle_timeout(void *external_param);
